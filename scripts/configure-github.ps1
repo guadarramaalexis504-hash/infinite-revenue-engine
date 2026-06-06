@@ -1,5 +1,6 @@
 param(
-    [switch]$RunWorkflow
+    [switch]$RunWorkflow,
+    [string]$Repo
 )
 
 $ErrorActionPreference = "Stop"
@@ -8,6 +9,18 @@ Set-Location $Root
 
 if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
     throw "GitHub CLI (gh) is required. Install it and run gh auth login first."
+}
+
+gh auth status | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    throw "GitHub CLI is not authenticated. Run gh auth login first."
+}
+
+if ([string]::IsNullOrWhiteSpace($Repo)) {
+    $remotes = git remote
+    if (-not $remotes) {
+        throw "No git remote found. Add git remote origin or pass -Repo owner/name."
+    }
 }
 
 if (-not (Test-Path ".env")) {
@@ -23,6 +36,10 @@ $secretNames = @(
     "TIP_URL"
 )
 
+$optionalSecretNames = @(
+    "CLICK_REDIRECT_URL"
+)
+
 $envMap = @{}
 Get-Content ".env" | ForEach-Object {
     $line = $_.Trim()
@@ -32,12 +49,25 @@ Get-Content ".env" | ForEach-Object {
     }
 }
 
+function Test-PlaceholderValue {
+    param([string]$Value)
+
+    $lower = $Value.ToLowerInvariant()
+    return (
+        $lower.Contains("your-") -or
+        $lower.Contains("your_") -or
+        $lower.Contains("example.com") -or
+        $lower.Contains("optional_for_") -or
+        $lower.StartsWith("sk-your-")
+    )
+}
+
 foreach ($name in $secretNames) {
     if (-not $envMap.ContainsKey($name) -or [string]::IsNullOrWhiteSpace($envMap[$name])) {
         throw "Missing $name in .env"
     }
     $value = $envMap[$name].ToLowerInvariant()
-    if ($value.Contains("your-") -or $value.StartsWith("sk-your-") -or $value.StartsWith("your_")) {
+    if (Test-PlaceholderValue $value) {
         throw "$name still looks like a placeholder. Fill .env with the real value before configuring GitHub."
     }
     if ($name -eq "SUPABASE_KEY" -and ($value.StartsWith("sb_publishable_") -or $value.StartsWith("eyj"))) {
@@ -45,13 +75,33 @@ foreach ($name in $secretNames) {
     }
 }
 
+$secretsToSet = @()
 foreach ($name in $secretNames) {
-    $envMap[$name] | gh secret set $name --app actions
+    $secretsToSet += $name
+}
+
+foreach ($name in $optionalSecretNames) {
+    if ($envMap.ContainsKey($name) -and -not [string]::IsNullOrWhiteSpace($envMap[$name])) {
+        if (Test-PlaceholderValue $envMap[$name]) {
+            Write-Host "Skipping optional placeholder secret: $name"
+        } else {
+            $secretsToSet += $name
+        }
+    }
+}
+
+$repoArgs = @()
+if (-not [string]::IsNullOrWhiteSpace($Repo)) {
+    $repoArgs = @("--repo", $Repo)
+}
+
+foreach ($name in $secretsToSet) {
+    $envMap[$name] | gh secret set $name --app actions @repoArgs
     Write-Host "Set GitHub secret: $name"
 }
 
 if ($RunWorkflow) {
-    gh workflow run farm-loop.yml
+    gh workflow run farm-loop.yml @repoArgs
     Write-Host "Triggered farm-loop.yml"
 }
 

@@ -11,6 +11,7 @@ Current operating target:
 - Local review queue: `ASSET_OUTPUT_DIR=out/revenue-assets`.
 - Owned static site: `SITE_OUTPUT_DIR=out/site`.
 - Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
+- Live-readiness check: `.\scripts\doctor.ps1`.
 - Milestones: `$15`, `$200`, `$1,000`, `$20,000`.
 - Default behavior: keep running after milestones because `STOP_AFTER_TARGET=false`.
 
@@ -243,6 +244,7 @@ Revenue should be counted only from confirmed `tip_events` and `conversion_event
 - OpenAI API key.
 - GitHub token or GitHub Actions secrets.
 - GitHub remote and authenticated `gh` or repository UI access so workflows can be dispatched.
+- If no remote exists locally, use `.\scripts\configure-github.ps1 -Repo owner/repo -RunWorkflow`.
 - Payment path: Buy Me a Coffee, Stripe, Gumroad, Lemon Squeezy, or GitHub Sponsors.
 - Owned publishing surface: repo, website, landing pages, newsletter, or store.
 - Manual review process for assets before public release.

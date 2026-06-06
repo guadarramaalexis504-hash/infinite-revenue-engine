@@ -63,10 +63,22 @@ From PowerShell:
 
 That creates `.env` from `.env.example` when needed, creates `.venv`, installs dependencies, runs tests, and runs one safe dry-run.
 
+Check exactly what is still blocking live automation:
+
+```powershell
+.\scripts\doctor.ps1
+```
+
 After filling `.env` with real credentials, configure GitHub repository secrets automatically:
 
 ```powershell
 .\scripts\configure-github.ps1 -RunWorkflow
+```
+
+If this local clone does not have a git remote yet, pass the repository explicitly:
+
+```powershell
+.\scripts\configure-github.ps1 -Repo owner/repo -RunWorkflow
 ```
 
 If `.env` also includes `DATABASE_URL` and `psql` is installed, apply the Supabase schema automatically:
@@ -112,6 +124,8 @@ Optional environment variables:
 - `ASSET_OUTPUT_DIR`, optional local manual-review export path such as `out/revenue-assets`
 - `SITE_OUTPUT_DIR`, optional owned static site export path such as `out/site`
 - `CLICK_REDIRECT_URL`, optional owned click redirect endpoint such as `https://your-domain.example/click`
+
+`scripts/configure-github.ps1` sets the required secrets and also sets `CLICK_REDIRECT_URL` when it is present and not a placeholder. The GitHub Actions workflow uses GitHub's built-in `github.token` for issue discovery rate limits.
 
 ## Click Redirect Handler
 

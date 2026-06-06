@@ -3,10 +3,12 @@ import unittest
 from pathlib import Path
 
 from farm_loop.automation import (
+    build_activation_report,
     github_secret_names,
     insecure_supabase_key_vars,
     load_env_file,
     missing_required_vars,
+    optional_github_secret_names,
     placeholder_vars,
 )
 
@@ -58,6 +60,9 @@ EMPTY=
             ],
         )
 
+    def test_optional_github_secret_names_include_click_redirect(self):
+        self.assertEqual(optional_github_secret_names(), ["CLICK_REDIRECT_URL"])
+
     def test_placeholder_vars_detects_example_values(self):
         env = {
             "SUPABASE_URL": "https://your-project-ref.supabase.co",
@@ -85,6 +90,78 @@ EMPTY=
         self.assertNotIn("--body-file", script)
         self.assertIn("gh secret set $name --app actions", script)
         self.assertLess(script.index("foreach ($name in $secretNames)"), script.index("gh secret set $name"))
+
+    def test_configure_github_script_supports_repo_override_and_optional_click_secret(self):
+        script = Path("scripts/configure-github.ps1").read_text(encoding="utf-8")
+
+        self.assertIn("[string]$Repo", script)
+        self.assertIn("$optionalSecretNames", script)
+        self.assertIn('"CLICK_REDIRECT_URL"', script)
+        self.assertIn("gh auth status", script)
+        self.assertIn("No git remote found", script)
+
+    def test_farm_loop_workflow_exposes_github_token_for_issue_discovery(self):
+        workflow = Path(".github/workflows/farm-loop.yml").read_text(encoding="utf-8")
+
+        self.assertIn("GITHUB_TOKEN: ${{ github.token }}", workflow)
+
+    def test_doctor_script_runs_automation_module(self):
+        script = Path("scripts/doctor.ps1").read_text(encoding="utf-8")
+
+        self.assertIn("-m", script)
+        self.assertIn("farm_loop.automation", script)
+
+    def test_activation_report_flags_external_blockers(self):
+        env = {
+            "SUPABASE_URL": "https://example.supabase.co",
+            "SUPABASE_KEY": "sb_secret_real",
+            "OPENAI_API_KEY": "sk-real",
+            "STACKEXCHANGE_KEY": "stack-key",
+            "BUYMEACOFFEE_WEBHOOK_TOKEN": "webhook-token",
+            "TIP_URL": "https://buymeacoffee.com/example",
+        }
+
+        report = build_activation_report(
+            env=env,
+            env_exists=True,
+            schema_exists=True,
+            farm_workflow_exists=True,
+            pages_workflow_exists=True,
+            git_remote_exists=False,
+            gh_installed=True,
+            gh_authenticated=False,
+        )
+
+        self.assertFalse(report["ready"])
+        failed = {check["name"] for check in report["checks"] if check["status"] == "fail"}
+        self.assertEqual(failed, {"git_remote", "gh_auth"})
+        self.assertIn("Add git remote origin", report["next_actions"])
+        self.assertIn("Run gh auth login", report["next_actions"])
+
+    def test_activation_report_accepts_ready_configuration(self):
+        env = {
+            "SUPABASE_URL": "https://abc123.supabase.co",
+            "SUPABASE_KEY": "sb_secret_real",
+            "OPENAI_API_KEY": "sk-real",
+            "STACKEXCHANGE_KEY": "stack-key",
+            "BUYMEACOFFEE_WEBHOOK_TOKEN": "webhook-token",
+            "TIP_URL": "https://buymeacoffee.com/example",
+            "CLICK_REDIRECT_URL": "https://revenue.example.net/click",
+        }
+
+        report = build_activation_report(
+            env=env,
+            env_exists=True,
+            schema_exists=True,
+            farm_workflow_exists=True,
+            pages_workflow_exists=True,
+            git_remote_exists=True,
+            gh_installed=True,
+            gh_authenticated=True,
+        )
+
+        self.assertTrue(report["ready"])
+        self.assertEqual(report["next_actions"], [])
 
     def test_workflow_sets_idea_catalog_path_for_portfolio_runs(self):
         workflow = Path(".github/workflows/farm-loop.yml").read_text(encoding="utf-8")
@@ -114,7 +191,7 @@ EMPTY=
 
         self.assertIn("ASSET_OUTPUT_DIR=out/revenue-assets", env_example)
         self.assertIn("SITE_OUTPUT_DIR=out/site", env_example)
-        self.assertIn("CLICK_REDIRECT_URL=https://your-domain.example/click", env_example)
+        self.assertIn("CLICK_REDIRECT_URL=", env_example)
         self.assertIn("out/", gitignore)
 
     def test_pages_workflow_passes_optional_click_redirect_url(self):
