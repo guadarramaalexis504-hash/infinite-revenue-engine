@@ -47,6 +47,8 @@ GitHub Actions runs portfolio phases through `.github/workflows/farm-loop.yml`:
 - daily: summarize portfolio progress
 - weekly: prune low-performing loops
 
+`.github/workflows/pages-site.yml` builds the owned static site and deploys it to GitHub Pages through GitHub's official Pages Actions. It runs manually and once per day after Pages is configured for GitHub Actions in the repository settings.
+
 ## One-Command Automation
 
 From PowerShell:
@@ -73,6 +75,12 @@ Start the local infinite loop:
 
 ```powershell
 .\scripts\run-local-loop.ps1 -IntervalSeconds 300
+```
+
+Generate the owned site locally before pushing:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 12 --site-output-dir out/site
 ```
 
 ## Required Secrets

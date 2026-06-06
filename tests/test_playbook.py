@@ -21,6 +21,8 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "--site-output-dir",
             "SITE_OUTPUT_DIR",
             "owned static site",
+            ".github/workflows/pages-site.yml",
+            "GitHub Pages",
         ]:
             self.assertIn(required, body)
 

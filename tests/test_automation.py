@@ -91,6 +91,23 @@ EMPTY=
 
         self.assertIn('IDEA_CATALOG_PATH: "data/revenue_ideas.json"', workflow)
 
+    def test_pages_workflow_deploys_owned_static_site_with_official_actions(self):
+        workflow = Path(".github/workflows/pages-site.yml").read_text(encoding="utf-8")
+
+        for required in [
+            "permissions:",
+            "pages: write",
+            "id-token: write",
+            "actions/configure-pages@v5",
+            "actions/upload-pages-artifact@v4",
+            "actions/deploy-pages@v4",
+            "--site-output-dir out/site",
+            "path: out/site",
+            "environment:",
+            "name: github-pages",
+        ]:
+            self.assertIn(required, workflow)
+
     def test_env_example_documents_local_asset_output_dir(self):
         env_example = Path(".env.example").read_text(encoding="utf-8")
         gitignore = Path(".gitignore").read_text(encoding="utf-8")
