@@ -69,6 +69,20 @@ class CLITests(unittest.TestCase):
 
         self.assertEqual(args.launch_queue_output_dir, "out/launch-queue")
 
+    def test_parse_args_supports_microtool_output_dir(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--portfolio-phase",
+                "generate",
+                "--dry-run",
+                "--microtool-output-dir",
+                "out/microtools",
+            ]
+        )
+
+        self.assertEqual(args.microtool_output_dir, "out/microtools")
+
 
 if __name__ == "__main__":
     unittest.main()

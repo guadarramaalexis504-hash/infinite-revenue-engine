@@ -30,6 +30,9 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "--launch-queue-output-dir",
             "LAUNCH_QUEUE_OUTPUT_DIR",
             "launch queue",
+            "--microtool-output-dir",
+            "MICROTOOL_OUTPUT_DIR",
+            "interactive microtools",
         ]:
             self.assertIn(required, body)
 

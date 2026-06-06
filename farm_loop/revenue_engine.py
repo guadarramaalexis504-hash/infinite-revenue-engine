@@ -21,6 +21,7 @@ class RevenuePortfolioSummary:
     site_pages_exported: int = 0
     launch_tasks_created: int = 0
     launch_tasks_exported: int = 0
+    microtools_exported: int = 0
 
 
 def run_revenue_portfolio_once(
@@ -34,6 +35,7 @@ def run_revenue_portfolio_once(
     asset_exporter: Any | None = None,
     site_exporter: Any | None = None,
     launch_queue_exporter: Any | None = None,
+    microtool_exporter: Any | None = None,
 ) -> RevenuePortfolioSummary:
     if phase in {"summarize", "prune"}:
         if supabase and not dry_run:
@@ -47,6 +49,7 @@ def run_revenue_portfolio_once(
             site_pages_exported=0,
             launch_tasks_created=0,
             launch_tasks_exported=0,
+            microtools_exported=0,
         )
 
     discovered: list[RevenueOpportunity] = []
@@ -102,6 +105,10 @@ def run_revenue_portfolio_once(
     if launch_queue_exporter:
         launch_tasks_exported = len(launch_queue_exporter.export(launch_tasks))
 
+    microtools_exported = 0
+    if microtool_exporter:
+        microtools_exported = len(microtool_exporter.export_portfolio(portfolio_assets))
+
     if supabase and not dry_run:
         supabase.insert_event(
             None,
@@ -114,6 +121,7 @@ def run_revenue_portfolio_once(
                 "site_pages_exported": site_pages_exported,
                 "launch_tasks_created": launch_tasks_created,
                 "launch_tasks_exported": launch_tasks_exported,
+                "microtools_exported": microtools_exported,
                 "milestones": milestones or DEFAULT_MILESTONES,
                 "phase": phase,
             },
@@ -128,6 +136,7 @@ def run_revenue_portfolio_once(
         site_pages_exported=site_pages_exported,
         launch_tasks_created=launch_tasks_created,
         launch_tasks_exported=launch_tasks_exported,
+        microtools_exported=microtools_exported,
     )
 
 

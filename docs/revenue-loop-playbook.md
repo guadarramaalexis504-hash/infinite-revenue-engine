@@ -11,6 +11,7 @@ Current operating target:
 - Local review queue: `ASSET_OUTPUT_DIR=out/revenue-assets`.
 - Owned static site: `SITE_OUTPUT_DIR=out/site`.
 - Launch queue: `LAUNCH_QUEUE_OUTPUT_DIR=out/launch-queue`.
+- Interactive microtools: `MICROTOOL_OUTPUT_DIR=out/microtools`.
 - Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
 - Live-readiness check: `.\scripts\doctor.ps1`.
 - Milestones: `$15`, `$200`, `$1,000`, `$20,000`.
@@ -64,6 +65,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 ```
 
 The launch queue writes `launch_queue.json` and `LAUNCH_QUEUE.md`. It converts each selected opportunity into activation, review, owned publishing, monetization, and measurement tasks. In live Supabase runs, these tasks are inserted into `launch_tasks`.
+
+Generate interactive microtools:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --microtool-output-dir out/microtools
+```
+
+Supported interactive microtools start with Supabase RLS policy checker and GitHub Actions YAML checker. These are static owned-channel tools, not third-party posts. Each tool still needs manual review, proof, and payment/tracking setup before public launch.
 
 Attribution:
 

@@ -48,6 +48,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The launch queue writes `launch_queue.json` and `LAUNCH_QUEUE.md` with activation blockers, manual review tasks, owned publishing tasks, payment/support CTA tasks, and measurement tasks.
 
+Generate interactive microtools for supported opportunities:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --microtool-output-dir out/microtools
+```
+
+The first supported interactive microtools are a Supabase RLS policy checker and a GitHub Actions YAML checker. They are static HTML files for owned channels and still require manual review before publishing.
+
 Support links on generated pages include attribution parameters such as `utm_campaign=<external_id>` plus `ire_source` and `ire_external_id`, so future analytics or webhook handlers can tie clicks/conversions back to a specific opportunity.
 
 If `CLICK_REDIRECT_URL` is set, support links point to your owned click redirect endpoint first, so clicks can be saved to Supabase `click_events` before sending the visitor to the final support/payment URL.
@@ -133,6 +141,7 @@ Optional environment variables:
 - `SITE_OUTPUT_DIR`, optional owned static site export path such as `out/site`
 - `CLICK_REDIRECT_URL`, optional owned click redirect endpoint such as `https://your-domain.example/click`
 - `LAUNCH_QUEUE_OUTPUT_DIR`, optional launch queue export path such as `out/launch-queue`
+- `MICROTOOL_OUTPUT_DIR`, optional interactive microtool export path such as `out/microtools`
 
 `scripts/configure-github.ps1` sets the required secrets and also sets `CLICK_REDIRECT_URL` when it is present and not a placeholder. The GitHub Actions workflow uses GitHub's built-in `github.token` for issue discovery rate limits.
 

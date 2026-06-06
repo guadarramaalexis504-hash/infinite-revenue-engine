@@ -12,6 +12,7 @@ from .asset_exporter import LocalAssetExporter
 from .config import Settings
 from .drafts import DraftGenerator
 from .launch_queue import LaunchQueueExporter
+from .microtool_exporter import MicrotoolExporter
 from .scoring import rank_questions, to_opportunity_payload
 from .sources_stackexchange import StackExchangeClient
 from .supabase_client import SupabaseClient
@@ -228,6 +229,8 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     )
     launch_queue_output_dir = args.launch_queue_output_dir or settings.launch_queue_output_dir
     launch_queue_exporter = LaunchQueueExporter(launch_queue_output_dir) if launch_queue_output_dir else None
+    microtool_output_dir = args.microtool_output_dir or settings.microtool_output_dir
+    microtool_exporter = MicrotoolExporter(microtool_output_dir, tip_url=settings.tip_url) if microtool_output_dir else None
     summary = run_revenue_portfolio_once(
         sources=sources,
         supabase=supabase,
@@ -238,6 +241,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         asset_exporter=asset_exporter,
         site_exporter=site_exporter,
         launch_queue_exporter=launch_queue_exporter,
+        microtool_exporter=microtool_exporter,
     )
     LOGGER.info("portfolio_summary %s", json.dumps(asdict(summary), sort_keys=True))
     return 0
@@ -279,6 +283,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--launch-queue-output-dir",
         default=None,
         help="Write a prioritized launch task queue to JSON and Markdown files.",
+    )
+    parser.add_argument(
+        "--microtool-output-dir",
+        default=None,
+        help="Write supported interactive microtools as static HTML pages.",
     )
     return parser.parse_args(argv)
 

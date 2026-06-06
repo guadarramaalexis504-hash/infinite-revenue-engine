@@ -79,6 +79,15 @@ class FakeLaunchQueueExporter:
         return ["launch_queue.json", "LAUNCH_QUEUE.md"]
 
 
+class FakeMicrotoolExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export_portfolio(self, opportunities_with_assets):
+        self.exports.append(opportunities_with_assets)
+        return ["index.html", "kw-portfolio/index.html"]
+
+
 class RevenuePortfolioTests(unittest.TestCase):
     def test_run_revenue_portfolio_once_scores_generates_assets_and_continues_past_milestones(self):
         supabase = FakeSupabase()
@@ -146,6 +155,21 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(summary.launch_tasks_exported, 2)
         self.assertEqual(len(queue_exporter.exports), 1)
         self.assertEqual(queue_exporter.exports[0][0].external_id, "kw-portfolio")
+
+    def test_run_revenue_portfolio_once_can_export_microtools(self):
+        microtool_exporter = FakeMicrotoolExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            microtool_exporter=microtool_exporter,
+        )
+
+        self.assertEqual(summary.microtools_exported, 2)
+        self.assertEqual(len(microtool_exporter.exports), 1)
+        self.assertEqual(microtool_exporter.exports[0][0][0].external_id, "kw-portfolio")
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ __all__ = [
     "drafts",
     "launch_queue",
     "main",
+    "microtool_exporter",
     "revenue_dashboard",
     "revenue_engine",
     "revenue_scoring",
