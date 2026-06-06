@@ -63,6 +63,19 @@ class StaticSiteExporterTests(unittest.TestCase):
         self.assertIn("target=https%3A%2F%2Fbuymeacoffee.com%2Fexample", page)
         self.assertIn("opportunity_external_id=offer-webhook-setup-service", page)
 
+    def test_links_to_interactive_tools_when_tools_path_is_configured(self):
+        assets = AssetGenerator().generate_all(self.opportunity)
+
+        with tempfile.TemporaryDirectory() as directory:
+            StaticSiteExporter(directory, tools_path="tools/").export_portfolio([(self.opportunity, assets)])
+            root = Path(directory)
+            index = (root / "index.html").read_text(encoding="utf-8")
+            page = (root / "offer-webhook-setup-service" / "index.html").read_text(encoding="utf-8")
+
+        self.assertIn('href="tools/"', index)
+        self.assertIn("Interactive tools", index)
+        self.assertIn('href="../tools/"', page)
+
 
 if __name__ == "__main__":
     unittest.main()

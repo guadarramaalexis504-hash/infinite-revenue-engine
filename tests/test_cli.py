@@ -1,6 +1,6 @@
 import unittest
 
-from farm_loop.main import parse_args
+from farm_loop.main import parse_args, tools_path_for_site
 
 
 class CLITests(unittest.TestCase):
@@ -82,6 +82,11 @@ class CLITests(unittest.TestCase):
         )
 
         self.assertEqual(args.microtool_output_dir, "out/microtools")
+
+    def test_tools_path_for_site_returns_relative_tools_url_inside_site_output(self):
+        self.assertEqual(tools_path_for_site("out/site", "out/site/tools"), "tools/")
+        self.assertEqual(tools_path_for_site("out/site", "out/site/tools/dev"), "tools/dev/")
+        self.assertEqual(tools_path_for_site("out/site", "out/microtools"), "")
 
 
 if __name__ == "__main__":

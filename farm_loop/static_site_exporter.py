@@ -10,10 +10,18 @@ from .tracking import build_click_redirect_url, build_tracking_url
 
 
 class StaticSiteExporter:
-    def __init__(self, output_dir: str | Path, *, tip_url: str = "", click_redirect_url: str = "") -> None:
+    def __init__(
+        self,
+        output_dir: str | Path,
+        *,
+        tip_url: str = "",
+        click_redirect_url: str = "",
+        tools_path: str = "",
+    ) -> None:
         self.output_dir = Path(output_dir)
         self.tip_url = tip_url
         self.click_redirect_url = click_redirect_url
+        self.tools_path = tools_path
 
     def export_portfolio(self, opportunities_with_assets: list[tuple[RevenueOpportunity, list[AssetDraft]]]) -> list[str]:
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -32,6 +40,7 @@ class StaticSiteExporter:
 
     def _index_page(self, opportunities: list[RevenueOpportunity]) -> str:
         cards = "\n".join(self._opportunity_card(opportunity) for opportunity in opportunities)
+        tools_link = self._tools_link(prefix="")
         return self._page(
             "Infinite Revenue Engine",
             f"""
@@ -39,6 +48,7 @@ class StaticSiteExporter:
               <header class="topbar">
                 <strong>Infinite Revenue Engine</strong>
                 <span>Owned static site</span>
+                {tools_link}
               </header>
               <section class="hero">
                 <div>
@@ -72,6 +82,7 @@ class StaticSiteExporter:
     def _opportunity_page(self, opportunity: RevenueOpportunity, assets: list[AssetDraft]) -> str:
         asset_sections = "\n".join(self._asset_section(asset) for asset in assets)
         cta = self._support_cta(opportunity)
+        tools_link = self._tools_link(prefix="../")
         return self._page(
             opportunity.title,
             f"""
@@ -79,6 +90,7 @@ class StaticSiteExporter:
               <header class="topbar">
                 <a href="../">Infinite Revenue Engine</a>
                 <span>manual review</span>
+                {tools_link}
               </header>
               <article class="detail">
                 <p class="channel">{escape(opportunity.channel.replace("_", " "))}</p>
@@ -120,6 +132,12 @@ class StaticSiteExporter:
         else:
             url = build_tracking_url(self.tip_url, opportunity, content="support_cta")
         return f'<p class="notice">Useful? <a href="{escape(url)}">Support this work</a>.</p>'
+
+    def _tools_link(self, *, prefix: str) -> str:
+        if not self.tools_path:
+            return ""
+        path = f"{prefix}{self.tools_path.lstrip('/')}"
+        return f'<a class="nav-link" href="{escape(path)}">Interactive tools</a>'
 
     def _page(self, title: str, body: str) -> str:
         return f"""<!doctype html>

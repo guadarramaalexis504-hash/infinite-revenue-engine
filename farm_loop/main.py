@@ -6,6 +6,7 @@ import logging
 import sys
 import time
 from dataclasses import asdict, dataclass
+from pathlib import Path
 from typing import Any
 
 from .asset_exporter import LocalAssetExporter
@@ -222,14 +223,20 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     asset_exporter = LocalAssetExporter(asset_output_dir) if asset_output_dir else None
     site_output_dir = args.site_output_dir or settings.site_output_dir
     click_redirect_url = args.click_redirect_url or settings.click_redirect_url or ""
+    microtool_output_dir = args.microtool_output_dir or settings.microtool_output_dir
+    tools_path = tools_path_for_site(site_output_dir, microtool_output_dir) if site_output_dir and microtool_output_dir else ""
     site_exporter = (
-        StaticSiteExporter(site_output_dir, tip_url=settings.tip_url, click_redirect_url=click_redirect_url)
+        StaticSiteExporter(
+            site_output_dir,
+            tip_url=settings.tip_url,
+            click_redirect_url=click_redirect_url,
+            tools_path=tools_path,
+        )
         if site_output_dir
         else None
     )
     launch_queue_output_dir = args.launch_queue_output_dir or settings.launch_queue_output_dir
     launch_queue_exporter = LaunchQueueExporter(launch_queue_output_dir) if launch_queue_output_dir else None
-    microtool_output_dir = args.microtool_output_dir or settings.microtool_output_dir
     microtool_exporter = MicrotoolExporter(microtool_output_dir, tip_url=settings.tip_url) if microtool_output_dir else None
     summary = run_revenue_portfolio_once(
         sources=sources,
@@ -245,6 +252,19 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     )
     LOGGER.info("portfolio_summary %s", json.dumps(asdict(summary), sort_keys=True))
     return 0
+
+
+def tools_path_for_site(site_output_dir: str | None, microtool_output_dir: str | None) -> str:
+    if not site_output_dir or not microtool_output_dir:
+        return ""
+    site_path = Path(site_output_dir)
+    tools_path = Path(microtool_output_dir)
+    try:
+        relative = tools_path.relative_to(site_path)
+    except ValueError:
+        return ""
+    relative_url = relative.as_posix().strip("/")
+    return f"{relative_url}/" if relative_url else ""
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
