@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from farm_loop.config import Settings
@@ -47,6 +48,60 @@ class PortfolioCLIActivationTests(unittest.TestCase):
         self.assertEqual(result, 0)
         collect_report.assert_called_once()
         self.assertEqual(run_once.call_args.kwargs["activation_report"], report)
+
+    def test_run_portfolio_single_expands_bundle_output_dir_to_all_exporters(self):
+        report = {
+            "ready": False,
+            "next_actions": ["Run gh auth login"],
+        }
+        settings = Settings(
+            supabase_url=None,
+            supabase_key=None,
+            openai_api_key=None,
+            stackexchange_key=None,
+            tip_url="",
+            asset_output_dir="env/assets",
+            site_output_dir="env/site",
+            launch_queue_output_dir="env/launch-queue",
+            microtool_output_dir="env/microtools",
+            offer_output_dir="env/offers",
+            roadmap_output_dir="env/roadmap",
+        )
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--portfolio-phase",
+                "generate",
+                "--dry-run",
+                "--bundle-output-dir",
+                "out/revenue-bundle",
+            ]
+        )
+
+        with (
+            patch("farm_loop.main.Settings.from_env", return_value=settings),
+            patch("farm_loop.main.collect_activation_report", return_value=report) as collect_report,
+            patch("farm_loop.main.run_revenue_portfolio_once") as run_once,
+        ):
+            run_once.return_value = RevenuePortfolioSummary(
+                status="success",
+                discovered=0,
+                selected=0,
+                assets_created=0,
+            )
+
+            result = run_portfolio_single(args)
+
+        kwargs = run_once.call_args.kwargs
+        self.assertEqual(result, 0)
+        collect_report.assert_called_once()
+        self.assertEqual(kwargs["asset_exporter"].output_dir, Path("out/revenue-bundle/assets"))
+        self.assertEqual(kwargs["site_exporter"].output_dir, Path("out/revenue-bundle/site"))
+        self.assertEqual(kwargs["microtool_exporter"].output_dir, Path("out/revenue-bundle/site/tools"))
+        self.assertEqual(kwargs["offer_exporter"].output_dir, Path("out/revenue-bundle/offers"))
+        self.assertEqual(kwargs["roadmap_exporter"].output_dir, Path("out/revenue-bundle/roadmap"))
+        self.assertEqual(kwargs["launch_queue_exporter"].output_dir, Path("out/revenue-bundle/launch-queue"))
+        self.assertEqual(kwargs["activation_report"], report)
 
 
 if __name__ == "__main__":

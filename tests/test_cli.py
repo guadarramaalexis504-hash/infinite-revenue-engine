@@ -1,6 +1,6 @@
 import unittest
 
-from farm_loop.main import parse_args, tools_path_for_site
+from farm_loop.main import bundle_output_paths, parse_args, tools_path_for_site
 
 
 class CLITests(unittest.TestCase):
@@ -142,6 +142,30 @@ class CLITests(unittest.TestCase):
         )
 
         self.assertEqual(args.roadmap_output_dir, "out/roadmap")
+
+    def test_parse_args_supports_bundle_output_dir(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--portfolio-phase",
+                "generate",
+                "--dry-run",
+                "--bundle-output-dir",
+                "out/revenue-bundle",
+            ]
+        )
+
+        self.assertEqual(args.bundle_output_dir, "out/revenue-bundle")
+
+    def test_bundle_output_paths_use_standard_revenue_bundle_dirs(self):
+        paths = bundle_output_paths("out/revenue-bundle")
+
+        self.assertEqual(paths["asset_output_dir"], "out/revenue-bundle/assets")
+        self.assertEqual(paths["site_output_dir"], "out/revenue-bundle/site")
+        self.assertEqual(paths["microtool_output_dir"], "out/revenue-bundle/site/tools")
+        self.assertEqual(paths["offer_output_dir"], "out/revenue-bundle/offers")
+        self.assertEqual(paths["roadmap_output_dir"], "out/revenue-bundle/roadmap")
+        self.assertEqual(paths["launch_queue_output_dir"], "out/revenue-bundle/launch-queue")
 
     def test_parse_args_supports_manual_conversion_recording(self):
         args = parse_args(

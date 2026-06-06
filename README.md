@@ -66,6 +66,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The opportunity roadmap writes `opportunity_roadmap.json` and `OPPORTUNITY_ROADMAP.md` with activation blockers, channel summary, milestone plan, and all ranked ideas so the engine keeps a long backlog toward 20000 USD.
 
+Generate the full local revenue bundle in one command:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
+```
+
+The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, the opportunity roadmap, and the launch queue using one standard folder tree.
+
 Record a confirmed sale from any payment path:
 
 ```powershell
@@ -175,6 +183,7 @@ Optional environment variables:
 - `MICROTOOL_OUTPUT_DIR`, optional interactive microtool export path such as `out/microtools`
 - `OFFER_OUTPUT_DIR`, optional offer catalog export path such as `out/offers`
 - `ROADMAP_OUTPUT_DIR`, optional ranked opportunity roadmap path such as `out/roadmap`
+- `BUNDLE_OUTPUT_DIR`, optional all-in-one local revenue bundle path such as `out/revenue-bundle`
 
 `scripts/configure-github.ps1` sets the required secrets and also sets optional secrets such as `CLICK_REDIRECT_URL`, `CONVERSION_WEBHOOK_TOKEN`, `SERVICE_INTAKE_URL`, and `SITE_BASE_URL` when present and not placeholders. The GitHub Actions workflow uses GitHub's built-in `github.token` for issue discovery rate limits.
 

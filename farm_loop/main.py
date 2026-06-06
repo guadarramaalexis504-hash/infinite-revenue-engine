@@ -223,13 +223,30 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         KeywordCSVSource(settings.keyword_csv_path),
         IdeaCatalogSource(settings.idea_catalog_path),
     ]
-    asset_output_dir = args.asset_output_dir or settings.asset_output_dir
+    cli_bundle_paths = bundle_output_paths(args.bundle_output_dir) if args.bundle_output_dir else {}
+    env_bundle_paths = bundle_output_paths(settings.bundle_output_dir) if settings.bundle_output_dir else {}
+    asset_output_dir = (
+        args.asset_output_dir
+        or cli_bundle_paths.get("asset_output_dir")
+        or settings.asset_output_dir
+        or env_bundle_paths.get("asset_output_dir")
+    )
     asset_exporter = LocalAssetExporter(asset_output_dir) if asset_output_dir else None
-    site_output_dir = args.site_output_dir or settings.site_output_dir
+    site_output_dir = (
+        args.site_output_dir
+        or cli_bundle_paths.get("site_output_dir")
+        or settings.site_output_dir
+        or env_bundle_paths.get("site_output_dir")
+    )
     site_base_url = args.site_base_url or settings.site_base_url or ""
     click_redirect_url = args.click_redirect_url or settings.click_redirect_url or ""
     intake_url = args.intake_url or settings.service_intake_url or ""
-    microtool_output_dir = args.microtool_output_dir or settings.microtool_output_dir
+    microtool_output_dir = (
+        args.microtool_output_dir
+        or cli_bundle_paths.get("microtool_output_dir")
+        or settings.microtool_output_dir
+        or env_bundle_paths.get("microtool_output_dir")
+    )
     tools_path = tools_path_for_site(site_output_dir, microtool_output_dir) if site_output_dir and microtool_output_dir else ""
     site_exporter = (
         StaticSiteExporter(
@@ -243,13 +260,28 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         if site_output_dir
         else None
     )
-    launch_queue_output_dir = args.launch_queue_output_dir or settings.launch_queue_output_dir
+    launch_queue_output_dir = (
+        args.launch_queue_output_dir
+        or cli_bundle_paths.get("launch_queue_output_dir")
+        or settings.launch_queue_output_dir
+        or env_bundle_paths.get("launch_queue_output_dir")
+    )
     launch_queue_exporter = LaunchQueueExporter(launch_queue_output_dir) if launch_queue_output_dir else None
     activation_report = collect_activation_report() if launch_queue_exporter else None
     microtool_exporter = MicrotoolExporter(microtool_output_dir, tip_url=settings.tip_url) if microtool_output_dir else None
-    offer_output_dir = args.offer_output_dir or settings.offer_output_dir
+    offer_output_dir = (
+        args.offer_output_dir
+        or cli_bundle_paths.get("offer_output_dir")
+        or settings.offer_output_dir
+        or env_bundle_paths.get("offer_output_dir")
+    )
     offer_exporter = OfferCatalogExporter(offer_output_dir) if offer_output_dir else None
-    roadmap_output_dir = args.roadmap_output_dir or settings.roadmap_output_dir
+    roadmap_output_dir = (
+        args.roadmap_output_dir
+        or cli_bundle_paths.get("roadmap_output_dir")
+        or settings.roadmap_output_dir
+        or env_bundle_paths.get("roadmap_output_dir")
+    )
     roadmap_exporter = OpportunityRoadmapExporter(roadmap_output_dir) if roadmap_output_dir else None
     if roadmap_exporter and not activation_report:
         activation_report = collect_activation_report()
@@ -326,6 +358,19 @@ def tools_path_for_site(site_output_dir: str | None, microtool_output_dir: str |
     return f"{relative_url}/" if relative_url else ""
 
 
+def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
+    base_path = Path(bundle_output_dir)
+    site_path = base_path / "site"
+    return {
+        "asset_output_dir": (base_path / "assets").as_posix(),
+        "site_output_dir": site_path.as_posix(),
+        "microtool_output_dir": (site_path / "tools").as_posix(),
+        "offer_output_dir": (base_path / "offers").as_posix(),
+        "roadmap_output_dir": (base_path / "roadmap").as_posix(),
+        "launch_queue_output_dir": (base_path / "launch-queue").as_posix(),
+    }
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Safe review-first technical answer opportunity loop.")
     mode = parser.add_mutually_exclusive_group()
@@ -388,6 +433,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--roadmap-output-dir",
         default=None,
         help="Write a ranked opportunity roadmap for all discovered ideas.",
+    )
+    parser.add_argument(
+        "--bundle-output-dir",
+        default=None,
+        help="Write all reviewable revenue outputs into one standard bundle directory.",
     )
     parser.add_argument("--conversion-provider", default="manual", help="Payment provider, e.g. manual, stripe, gumroad.")
     parser.add_argument("--conversion-external-id", default=None, help="Provider sale/event id used for dedupe.")
