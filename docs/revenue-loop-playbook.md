@@ -9,6 +9,7 @@ Current operating target:
 - Local idea catalog: `IDEA_CATALOG_PATH=data/revenue_ideas.json`.
 - Manual keyword list: `KEYWORD_CSV_PATH=data/revenue_keywords.csv`.
 - Local review queue: `ASSET_OUTPUT_DIR=out/revenue-assets`.
+- Owned static site: `SITE_OUTPUT_DIR=out/site`.
 - Milestones: `$15`, `$200`, `$1,000`, `$20,000`.
 - Default behavior: keep running after milestones because `STOP_AFTER_TARGET=false`.
 
@@ -44,6 +45,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 ```
 
 Each selected opportunity gets a folder with `manifest.json` and Markdown drafts. These files are still manual review only; they are not auto-published.
+
+Generate an owned static site:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --site-output-dir out/site
+```
+
+The site is a local owned channel draft with an index and one page per opportunity. It can carry a support CTA when `TIP_URL` is configured, but it still needs manual review before public deployment.
 
 Local continuous review loop:
 

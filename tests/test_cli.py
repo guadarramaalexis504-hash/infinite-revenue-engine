@@ -25,6 +25,20 @@ class CLITests(unittest.TestCase):
 
         self.assertEqual(args.asset_output_dir, "out/review-queue")
 
+    def test_parse_args_supports_static_site_output_dir(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--portfolio-phase",
+                "generate",
+                "--dry-run",
+                "--site-output-dir",
+                "out/site",
+            ]
+        )
+
+        self.assertEqual(args.site_output_dir, "out/site")
+
 
 if __name__ == "__main__":
     unittest.main()

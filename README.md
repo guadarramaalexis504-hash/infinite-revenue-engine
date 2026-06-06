@@ -34,6 +34,12 @@ Export reviewable local assets from the portfolio:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --asset-output-dir out/revenue-assets
 ```
 
+Generate an owned static site from the same selected opportunities:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --site-output-dir out/site
+```
+
 GitHub Actions runs portfolio phases through `.github/workflows/farm-loop.yml`:
 
 - every 5 minutes: discover and score opportunities
@@ -92,6 +98,7 @@ Optional environment variables:
 - `KEYWORD_CSV_PATH`, default `data/revenue_keywords.csv`
 - `IDEA_CATALOG_PATH`, default `data/revenue_ideas.json`
 - `ASSET_OUTPUT_DIR`, optional local manual-review export path such as `out/revenue-assets`
+- `SITE_OUTPUT_DIR`, optional owned static site export path such as `out/site`
 
 ## Supabase Setup
 

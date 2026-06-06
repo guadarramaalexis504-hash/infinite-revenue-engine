@@ -96,6 +96,7 @@ EMPTY=
         gitignore = Path(".gitignore").read_text(encoding="utf-8")
 
         self.assertIn("ASSET_OUTPUT_DIR=out/revenue-assets", env_example)
+        self.assertIn("SITE_OUTPUT_DIR=out/site", env_example)
         self.assertIn("out/", gitignore)
 
 

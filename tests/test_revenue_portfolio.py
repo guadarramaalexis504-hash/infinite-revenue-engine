@@ -56,6 +56,15 @@ class FakeAssetExporter:
         return [f"{opportunity.external_id}/{asset.asset_type}.md" for asset in assets]
 
 
+class FakeSiteExporter:
+    def __init__(self):
+        self.portfolios = []
+
+    def export_portfolio(self, opportunities_with_assets):
+        self.portfolios.append(opportunities_with_assets)
+        return ["index.html", "kw-portfolio/index.html"]
+
+
 class RevenuePortfolioTests(unittest.TestCase):
     def test_run_revenue_portfolio_once_scores_generates_assets_and_continues_past_milestones(self):
         supabase = FakeSupabase()
@@ -88,6 +97,22 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(summary.assets_exported, 6)
         self.assertEqual(len(exporter.exports), 1)
         self.assertEqual(exporter.exports[0][0].external_id, "kw-portfolio")
+
+    def test_run_revenue_portfolio_once_can_export_owned_static_site(self):
+        site_exporter = FakeSiteExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            site_exporter=site_exporter,
+        )
+
+        self.assertEqual(summary.site_pages_exported, 2)
+        self.assertEqual(len(site_exporter.portfolios), 1)
+        self.assertEqual(site_exporter.portfolios[0][0][0].external_id, "kw-portfolio")
+        self.assertEqual(len(site_exporter.portfolios[0][0][1]), 6)
 
 
 if __name__ == "__main__":

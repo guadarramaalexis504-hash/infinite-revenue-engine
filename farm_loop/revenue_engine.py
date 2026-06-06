@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Any
 
-from .assets import AssetGenerator
+from .assets import AssetDraft, AssetGenerator
 from .revenue_scoring import RevenueOpportunity, rank_revenue_opportunities
 
 
@@ -17,6 +17,7 @@ class RevenuePortfolioSummary:
     selected: int
     assets_created: int
     assets_exported: int = 0
+    site_pages_exported: int = 0
 
 
 def run_revenue_portfolio_once(
@@ -28,11 +29,19 @@ def run_revenue_portfolio_once(
     dry_run: bool = False,
     phase: str = "discover",
     asset_exporter: Any | None = None,
+    site_exporter: Any | None = None,
 ) -> RevenuePortfolioSummary:
     if phase in {"summarize", "prune"}:
         if supabase and not dry_run:
             supabase.insert_event(None, f"revenue_portfolio_{phase}", {"phase": phase})
-        return RevenuePortfolioSummary(status="success", discovered=0, selected=0, assets_created=0, assets_exported=0)
+        return RevenuePortfolioSummary(
+            status="success",
+            discovered=0,
+            selected=0,
+            assets_created=0,
+            assets_exported=0,
+            site_pages_exported=0,
+        )
 
     discovered: list[RevenueOpportunity] = []
     for source in sources:
@@ -42,6 +51,7 @@ def run_revenue_portfolio_once(
     generator = AssetGenerator()
     assets_created = 0
     assets_exported = 0
+    portfolio_assets: list[tuple[RevenueOpportunity, list[AssetDraft]]] = []
 
     for opportunity in selected:
         opportunity_id = None
@@ -58,6 +68,7 @@ def run_revenue_portfolio_once(
         if asset_exporter:
             asset_exporter.export_opportunity(opportunity, assets)
             assets_exported += len(assets)
+        portfolio_assets.append((opportunity, assets))
 
         if supabase and not dry_run:
             supabase.insert_experiment(
@@ -70,6 +81,10 @@ def run_revenue_portfolio_once(
                 }
             )
 
+    site_pages_exported = 0
+    if site_exporter:
+        site_pages_exported = len(site_exporter.export_portfolio(portfolio_assets))
+
     if supabase and not dry_run:
         supabase.insert_event(
             None,
@@ -79,6 +94,7 @@ def run_revenue_portfolio_once(
                 "selected": len(selected),
                 "assets_created": assets_created,
                 "assets_exported": assets_exported,
+                "site_pages_exported": site_pages_exported,
                 "milestones": milestones or DEFAULT_MILESTONES,
                 "phase": phase,
             },
@@ -90,4 +106,5 @@ def run_revenue_portfolio_once(
         selected=len(selected),
         assets_created=assets_created,
         assets_exported=assets_exported,
+        site_pages_exported=site_pages_exported,
     )

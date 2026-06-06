@@ -15,6 +15,7 @@ __all__ = [
     "sources_idea_catalog",
     "sources_keywords",
     "sources_stackexchange",
+    "static_site_exporter",
     "supabase_client",
     "webhook_handler",
     "webhooks",

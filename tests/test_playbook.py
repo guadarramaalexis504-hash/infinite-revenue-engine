@@ -18,6 +18,9 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "--asset-output-dir",
             "ASSET_OUTPUT_DIR",
             "local review queue",
+            "--site-output-dir",
+            "SITE_OUTPUT_DIR",
+            "owned static site",
         ]:
             self.assertIn(required, body)
 

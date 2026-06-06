@@ -18,6 +18,7 @@ from .revenue_engine import run_revenue_portfolio_once
 from .sources_github import GitHubIssuesClient
 from .sources_idea_catalog import IdeaCatalogSource
 from .sources_keywords import KeywordCSVSource
+from .static_site_exporter import StaticSiteExporter
 
 
 LOGGER = logging.getLogger("farm_loop")
@@ -217,6 +218,8 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     ]
     asset_output_dir = args.asset_output_dir or settings.asset_output_dir
     asset_exporter = LocalAssetExporter(asset_output_dir) if asset_output_dir else None
+    site_output_dir = args.site_output_dir or settings.site_output_dir
+    site_exporter = StaticSiteExporter(site_output_dir, tip_url=settings.tip_url) if site_output_dir else None
     summary = run_revenue_portfolio_once(
         sources=sources,
         supabase=supabase,
@@ -225,6 +228,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         dry_run=args.dry_run,
         phase=args.portfolio_phase,
         asset_exporter=asset_exporter,
+        site_exporter=site_exporter,
     )
     LOGGER.info("portfolio_summary %s", json.dumps(asdict(summary), sort_keys=True))
     return 0
@@ -251,6 +255,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--asset-output-dir",
         default=None,
         help="Write generated portfolio assets to a local manual-review directory.",
+    )
+    parser.add_argument(
+        "--site-output-dir",
+        default=None,
+        help="Write an owned static site for generated portfolio opportunities.",
     )
     return parser.parse_args(argv)
 
