@@ -62,7 +62,7 @@ def rank_revenue_opportunities(
     min_expected_value_usd: float = 0.0,
 ) -> list[RevenueOpportunity]:
     seen: set[tuple[str, str]] = set()
-    scored: list[RevenueOpportunity] = []
+    best_by_topic: dict[tuple[str, str], RevenueOpportunity] = {}
     for opportunity in opportunities:
         key = (opportunity.source, opportunity.external_id)
         if key in seen:
@@ -70,6 +70,18 @@ def rank_revenue_opportunities(
         seen.add(key)
         candidate = score_opportunity(opportunity)
         if candidate.expected_value_usd >= min_expected_value_usd:
-            scored.append(candidate)
+            topic_key = (candidate.channel, _normalize_title(candidate.title))
+            existing = best_by_topic.get(topic_key)
+            if existing is None or _ranking_key(candidate) > _ranking_key(existing):
+                best_by_topic[topic_key] = candidate
+    scored = list(best_by_topic.values())
     scored.sort(key=lambda item: (item.expected_value_usd, -item.build_minutes), reverse=True)
     return scored[:max_items]
+
+
+def _normalize_title(title: str) -> str:
+    return "".join(character.lower() for character in title if character.isalnum())
+
+
+def _ranking_key(opportunity: RevenueOpportunity) -> tuple[float, int]:
+    return (opportunity.expected_value_usd, -opportunity.build_minutes)

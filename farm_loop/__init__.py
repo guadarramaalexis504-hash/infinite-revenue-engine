@@ -7,6 +7,7 @@ __all__ = [
     "click_handler",
     "config",
     "drafts",
+    "launch_queue",
     "main",
     "revenue_dashboard",
     "revenue_engine",

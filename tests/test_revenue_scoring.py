@@ -61,6 +61,41 @@ class RevenueScoringTests(unittest.TestCase):
         self.assertEqual(ranked[0].external_id, "kw-1")
         self.assertGreater(ranked[0].expected_value_usd, 0)
 
+    def test_rank_revenue_opportunities_deduplicates_same_channel_title_across_sources(self):
+        lower_value = RevenueOpportunity(
+            source="manual_keywords",
+            external_id="kw-supabase-rls",
+            title="Supabase RLS policy checker",
+            url="file://keywords.csv#kw-supabase-rls",
+            problem="Developers need RLS feedback.",
+            tags=["supabase", "rls"],
+            channel="microtool_seo",
+            payout_estimate_usd=250,
+            conversion_probability=0.08,
+            estimated_cost_usd=5,
+            risk_penalty_usd=1,
+            build_minutes=45,
+        )
+        higher_value = RevenueOpportunity(
+            source="idea_catalog",
+            external_id="microtool-supabase-rls-policy-checker",
+            title="Supabase RLS Policy Checker",
+            url="file://ideas#microtool-supabase-rls-policy-checker",
+            problem="Solo builders need a quick way to catch missing or unsafe RLS policies.",
+            tags=["supabase", "rls", "postgres"],
+            channel="microtool_seo",
+            payout_estimate_usd=300,
+            conversion_probability=0.08,
+            estimated_cost_usd=5,
+            risk_penalty_usd=1,
+            build_minutes=45,
+        )
+
+        ranked = rank_revenue_opportunities([lower_value, higher_value], max_items=10)
+
+        self.assertEqual(len(ranked), 1)
+        self.assertEqual(ranked[0].external_id, "microtool-supabase-rls-policy-checker")
+
 
 if __name__ == "__main__":
     unittest.main()

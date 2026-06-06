@@ -4,6 +4,7 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 from .assets import AssetDraft, AssetGenerator
+from .launch_queue import LaunchTask, build_launch_queue
 from .revenue_scoring import RevenueOpportunity, rank_revenue_opportunities
 
 
@@ -18,6 +19,8 @@ class RevenuePortfolioSummary:
     assets_created: int
     assets_exported: int = 0
     site_pages_exported: int = 0
+    launch_tasks_created: int = 0
+    launch_tasks_exported: int = 0
 
 
 def run_revenue_portfolio_once(
@@ -30,6 +33,7 @@ def run_revenue_portfolio_once(
     phase: str = "discover",
     asset_exporter: Any | None = None,
     site_exporter: Any | None = None,
+    launch_queue_exporter: Any | None = None,
 ) -> RevenuePortfolioSummary:
     if phase in {"summarize", "prune"}:
         if supabase and not dry_run:
@@ -41,6 +45,8 @@ def run_revenue_portfolio_once(
             assets_created=0,
             assets_exported=0,
             site_pages_exported=0,
+            launch_tasks_created=0,
+            launch_tasks_exported=0,
         )
 
     discovered: list[RevenueOpportunity] = []
@@ -52,6 +58,7 @@ def run_revenue_portfolio_once(
     assets_created = 0
     assets_exported = 0
     portfolio_assets: list[tuple[RevenueOpportunity, list[AssetDraft]]] = []
+    opportunity_ids: dict[tuple[str, str], str | None] = {}
 
     for opportunity in selected:
         opportunity_id = None
@@ -59,6 +66,7 @@ def run_revenue_portfolio_once(
             rows = supabase.upsert_revenue_opportunity(opportunity.to_payload())
             if isinstance(rows, list) and rows:
                 opportunity_id = rows[0].get("id")
+        opportunity_ids[(opportunity.source, opportunity.external_id)] = opportunity_id
 
         assets = generator.generate_all(opportunity)
         for asset in assets:
@@ -85,6 +93,15 @@ def run_revenue_portfolio_once(
     if site_exporter:
         site_pages_exported = len(site_exporter.export_portfolio(portfolio_assets))
 
+    launch_tasks = build_launch_queue(portfolio_assets)
+    launch_tasks_created = len(launch_tasks)
+    launch_tasks_exported = 0
+    if supabase and not dry_run:
+        for task in launch_tasks:
+            supabase.insert_launch_task(task.to_payload(_task_opportunity_id(task, opportunity_ids)))
+    if launch_queue_exporter:
+        launch_tasks_exported = len(launch_queue_exporter.export(launch_tasks))
+
     if supabase and not dry_run:
         supabase.insert_event(
             None,
@@ -95,6 +112,8 @@ def run_revenue_portfolio_once(
                 "assets_created": assets_created,
                 "assets_exported": assets_exported,
                 "site_pages_exported": site_pages_exported,
+                "launch_tasks_created": launch_tasks_created,
+                "launch_tasks_exported": launch_tasks_exported,
                 "milestones": milestones or DEFAULT_MILESTONES,
                 "phase": phase,
             },
@@ -107,4 +126,12 @@ def run_revenue_portfolio_once(
         assets_created=assets_created,
         assets_exported=assets_exported,
         site_pages_exported=site_pages_exported,
+        launch_tasks_created=launch_tasks_created,
+        launch_tasks_exported=launch_tasks_exported,
     )
+
+
+def _task_opportunity_id(task: LaunchTask, opportunity_ids: dict[tuple[str, str], str | None]) -> str | None:
+    if not task.source or not task.external_id:
+        return None
+    return opportunity_ids.get((task.source, task.external_id))

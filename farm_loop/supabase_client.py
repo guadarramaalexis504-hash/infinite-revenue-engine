@@ -134,6 +134,9 @@ class SupabaseClient:
     def insert_click_event(self, payload: dict) -> Any:
         return self.request("POST", "click_events", json_body=payload)
 
+    def insert_launch_task(self, payload: dict) -> Any:
+        return self.request("POST", "launch_tasks", json_body=payload)
+
     def insert_tip_event(self, payload: dict) -> Any:
         return self.request("POST", "tip_events", json_body=payload)
 

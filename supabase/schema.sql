@@ -142,6 +142,24 @@ create table if not exists public.experiments (
     updated_at timestamptz not null default now()
 );
 
+create table if not exists public.launch_tasks (
+    id uuid primary key default gen_random_uuid(),
+    opportunity_id uuid references public.opportunities(id) on delete set null,
+    priority integer not null default 100,
+    category text not null,
+    title text not null,
+    detail text not null default '',
+    status text not null default 'pending' check (status in ('blocked', 'pending', 'running', 'done', 'skipped')),
+    blocking boolean not null default false,
+    source text,
+    external_id text,
+    channel text,
+    expected_value_usd numeric(10, 2) not null default 0,
+    payload jsonb not null default '{}'::jsonb,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now()
+);
+
 create index if not exists opportunities_expected_value_idx
     on public.opportunities(expected_value_usd desc);
 
@@ -150,6 +168,9 @@ create index if not exists assets_status_channel_idx
 
 create index if not exists conversion_events_source_created_at_idx
     on public.conversion_events(source, created_at desc);
+
+create index if not exists launch_tasks_status_priority_idx
+    on public.launch_tasks(status, priority, expected_value_usd desc);
 
 insert into public.revenue_milestones(amount_usd, label)
 values
@@ -184,3 +205,4 @@ alter table public.offers enable row level security;
 alter table public.click_events enable row level security;
 alter table public.conversion_events enable row level security;
 alter table public.experiments enable row level security;
+alter table public.launch_tasks enable row level security;

@@ -14,6 +14,7 @@ class SchemaTests(unittest.TestCase):
             "click_events",
             "conversion_events",
             "experiments",
+            "launch_tasks",
         ]:
             self.assertIn(f"create table if not exists public.{table}", schema)
             self.assertIn(f"alter table public.{table} enable row level security", schema)

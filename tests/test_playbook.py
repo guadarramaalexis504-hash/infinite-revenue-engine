@@ -27,6 +27,9 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "click_events",
             "CLICK_REDIRECT_URL",
             "click redirect",
+            "--launch-queue-output-dir",
+            "LAUNCH_QUEUE_OUTPUT_DIR",
+            "launch queue",
         ]:
             self.assertIn(required, body)
 

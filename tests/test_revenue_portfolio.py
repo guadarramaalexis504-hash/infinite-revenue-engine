@@ -30,6 +30,7 @@ class FakeSupabase:
         self.assets = []
         self.experiments = []
         self.events = []
+        self.launch_tasks = []
 
     def upsert_revenue_opportunity(self, payload):
         self.opportunities.append(payload)
@@ -42,6 +43,10 @@ class FakeSupabase:
     def insert_experiment(self, payload):
         self.experiments.append(payload)
         return [{"id": "experiment-1"}]
+
+    def insert_launch_task(self, payload):
+        self.launch_tasks.append(payload)
+        return [{"id": f"launch-task-{len(self.launch_tasks)}"}]
 
     def insert_event(self, run_id, event_type, payload):
         self.events.append((event_type, payload))
@@ -65,6 +70,15 @@ class FakeSiteExporter:
         return ["index.html", "kw-portfolio/index.html"]
 
 
+class FakeLaunchQueueExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, tasks):
+        self.exports.append(tasks)
+        return ["launch_queue.json", "LAUNCH_QUEUE.md"]
+
+
 class RevenuePortfolioTests(unittest.TestCase):
     def test_run_revenue_portfolio_once_scores_generates_assets_and_continues_past_milestones(self):
         supabase = FakeSupabase()
@@ -81,6 +95,9 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(summary.status, "success")
         self.assertEqual(supabase.opportunities[0]["external_id"], "kw-portfolio")
         self.assertEqual(supabase.experiments[0]["status"], "planned")
+        self.assertEqual(summary.launch_tasks_created, 4)
+        self.assertEqual(len(supabase.launch_tasks), 4)
+        self.assertEqual(supabase.launch_tasks[0]["external_id"], "kw-portfolio")
 
     def test_run_revenue_portfolio_once_can_export_local_review_assets(self):
         exporter = FakeAssetExporter()
@@ -113,6 +130,22 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(len(site_exporter.portfolios), 1)
         self.assertEqual(site_exporter.portfolios[0][0][0].external_id, "kw-portfolio")
         self.assertEqual(len(site_exporter.portfolios[0][0][1]), 6)
+
+    def test_run_revenue_portfolio_once_can_export_launch_queue(self):
+        queue_exporter = FakeLaunchQueueExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            launch_queue_exporter=queue_exporter,
+        )
+
+        self.assertEqual(summary.launch_tasks_created, 4)
+        self.assertEqual(summary.launch_tasks_exported, 2)
+        self.assertEqual(len(queue_exporter.exports), 1)
+        self.assertEqual(queue_exporter.exports[0][0].external_id, "kw-portfolio")
 
 
 if __name__ == "__main__":

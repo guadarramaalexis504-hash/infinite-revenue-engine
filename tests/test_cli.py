@@ -55,6 +55,20 @@ class CLITests(unittest.TestCase):
 
         self.assertEqual(args.click_redirect_url, "https://example.com/click")
 
+    def test_parse_args_supports_launch_queue_output_dir(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--portfolio-phase",
+                "generate",
+                "--dry-run",
+                "--launch-queue-output-dir",
+                "out/launch-queue",
+            ]
+        )
+
+        self.assertEqual(args.launch_queue_output_dir, "out/launch-queue")
+
 
 if __name__ == "__main__":
     unittest.main()

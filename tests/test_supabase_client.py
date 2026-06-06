@@ -118,6 +118,16 @@ class SupabaseClientTests(unittest.TestCase):
         self.assertEqual(session.calls[0]["url"], "https://project.supabase.co/rest/v1/click_events")
         self.assertEqual(session.calls[0]["json"]["source"], "revenue_site")
 
+    def test_insert_launch_task_uses_launch_tasks_table(self):
+        session = FakeSession()
+        client = SupabaseClient("https://project.supabase.co", "secret-key", session=session)
+
+        client.insert_launch_task({"title": "Publish owned page", "status": "pending"})
+
+        self.assertEqual(session.calls[0]["method"], "POST")
+        self.assertEqual(session.calls[0]["url"], "https://project.supabase.co/rest/v1/launch_tasks")
+        self.assertEqual(session.calls[0]["json"]["title"], "Publish owned page")
+
 
 if __name__ == "__main__":
     unittest.main()

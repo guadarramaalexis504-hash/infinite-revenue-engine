@@ -40,6 +40,14 @@ Generate an owned static site from the same selected opportunities:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --site-output-dir out/site
 ```
 
+Generate a prioritized launch queue from the selected opportunities:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --launch-queue-output-dir out/launch-queue
+```
+
+The launch queue writes `launch_queue.json` and `LAUNCH_QUEUE.md` with activation blockers, manual review tasks, owned publishing tasks, payment/support CTA tasks, and measurement tasks.
+
 Support links on generated pages include attribution parameters such as `utm_campaign=<external_id>` plus `ire_source` and `ire_external_id`, so future analytics or webhook handlers can tie clicks/conversions back to a specific opportunity.
 
 If `CLICK_REDIRECT_URL` is set, support links point to your owned click redirect endpoint first, so clicks can be saved to Supabase `click_events` before sending the visitor to the final support/payment URL.
@@ -124,6 +132,7 @@ Optional environment variables:
 - `ASSET_OUTPUT_DIR`, optional local manual-review export path such as `out/revenue-assets`
 - `SITE_OUTPUT_DIR`, optional owned static site export path such as `out/site`
 - `CLICK_REDIRECT_URL`, optional owned click redirect endpoint such as `https://your-domain.example/click`
+- `LAUNCH_QUEUE_OUTPUT_DIR`, optional launch queue export path such as `out/launch-queue`
 
 `scripts/configure-github.ps1` sets the required secrets and also sets `CLICK_REDIRECT_URL` when it is present and not a placeholder. The GitHub Actions workflow uses GitHub's built-in `github.token` for issue discovery rate limits.
 
@@ -158,6 +167,7 @@ Run `supabase/schema.sql` in the Supabase SQL editor. The schema defines:
 - `channels`: allowed revenue lanes such as microtools, GitHub issue helper, digital products, affiliates, and paid setup kits.
 - `assets`: reviewable generated assets: microtool specs, article outlines, patch plans, product listings, landing copy, support offers.
 - `offers`, `click_events`, `conversion_events`, `experiments`: monetization and learning loop tracking.
+- `launch_tasks`: prioritized manual launch tasks for review, publishing, monetization, and measurement.
 
 ## Safety Rules
 
