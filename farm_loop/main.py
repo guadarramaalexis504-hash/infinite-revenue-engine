@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from .asset_exporter import LocalAssetExporter
+from .automation import collect_activation_report
 from .config import Settings
 from .conversions import build_manual_conversion_payload
 from .drafts import DraftGenerator
@@ -243,6 +244,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     )
     launch_queue_output_dir = args.launch_queue_output_dir or settings.launch_queue_output_dir
     launch_queue_exporter = LaunchQueueExporter(launch_queue_output_dir) if launch_queue_output_dir else None
+    activation_report = collect_activation_report() if launch_queue_exporter else None
     microtool_exporter = MicrotoolExporter(microtool_output_dir, tip_url=settings.tip_url) if microtool_output_dir else None
     offer_output_dir = args.offer_output_dir or settings.offer_output_dir
     offer_exporter = OfferCatalogExporter(offer_output_dir) if offer_output_dir else None
@@ -258,6 +260,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         launch_queue_exporter=launch_queue_exporter,
         microtool_exporter=microtool_exporter,
         offer_exporter=offer_exporter,
+        activation_report=activation_report,
     )
     LOGGER.info("portfolio_summary %s", json.dumps(asdict(summary), sort_keys=True))
     return 0

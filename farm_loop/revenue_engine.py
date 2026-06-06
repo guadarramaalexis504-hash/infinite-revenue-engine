@@ -45,6 +45,7 @@ def run_revenue_portfolio_once(
     launch_queue_exporter: Any | None = None,
     microtool_exporter: Any | None = None,
     offer_exporter: Any | None = None,
+    activation_report: dict | None = None,
 ) -> RevenuePortfolioSummary:
     if phase == "summarize":
         dashboard_snapshots_created = 0
@@ -180,7 +181,7 @@ def run_revenue_portfolio_once(
     if site_exporter:
         site_pages_exported = len(site_exporter.export_portfolio(portfolio_assets))
 
-    launch_tasks = build_launch_queue(portfolio_assets)
+    launch_tasks = build_launch_queue(portfolio_assets, activation_report=activation_report)
     launch_tasks_created = len(launch_tasks)
     launch_tasks_exported = 0
     if supabase and not dry_run:

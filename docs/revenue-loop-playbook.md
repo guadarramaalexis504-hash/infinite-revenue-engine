@@ -69,7 +69,7 @@ Generate a prioritized launch queue:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --launch-queue-output-dir out/launch-queue
 ```
 
-The launch queue writes `launch_queue.json` and `LAUNCH_QUEUE.md`. It converts each selected opportunity into activation, review, owned publishing, monetization, and measurement tasks. In live Supabase runs, these tasks are inserted into `launch_tasks`.
+The launch queue writes `launch_queue.json` and `LAUNCH_QUEUE.md`. It converts each selected opportunity into activation, review, owned publishing, monetization, and measurement tasks. CLI exports also include the current activation preflight from the doctor check, so missing `.env` values, git remote setup, and `gh` authentication become blocking tasks at the top. In live Supabase runs, these tasks are inserted into `launch_tasks`.
 
 Generate an offer catalog:
 

@@ -48,7 +48,7 @@ Generate a prioritized launch queue from the selected opportunities:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --launch-queue-output-dir out/launch-queue
 ```
 
-The launch queue writes `launch_queue.json` and `LAUNCH_QUEUE.md` with activation blockers, manual review tasks, owned publishing tasks, payment/support CTA tasks, and measurement tasks.
+The launch queue writes `launch_queue.json` and `LAUNCH_QUEUE.md` with activation blockers, manual review tasks, owned publishing tasks, payment/support CTA tasks, and measurement tasks. When exported from the CLI, it runs the same activation preflight as `scripts/doctor.ps1`, so missing credentials, placeholder secrets, absent git remote, or missing `gh` auth become top-priority tasks.
 
 Generate monetizable offer drafts:
 

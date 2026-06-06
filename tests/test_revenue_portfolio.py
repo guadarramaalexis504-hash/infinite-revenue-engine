@@ -204,6 +204,29 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(len(queue_exporter.exports), 1)
         self.assertEqual(queue_exporter.exports[0][0].external_id, "kw-portfolio")
 
+    def test_run_revenue_portfolio_once_includes_activation_blockers_in_launch_queue(self):
+        queue_exporter = FakeLaunchQueueExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            launch_queue_exporter=queue_exporter,
+            activation_report={
+                "ready": False,
+                "next_actions": [
+                    "Replace placeholder .env values: SUPABASE_KEY",
+                    "Add git remote origin",
+                ],
+            },
+        )
+
+        self.assertEqual(summary.launch_tasks_created, 6)
+        self.assertTrue(queue_exporter.exports[0][0].blocking)
+        self.assertEqual(queue_exporter.exports[0][0].category, "activation")
+        self.assertIn("Replace placeholder", queue_exporter.exports[0][0].title)
+
     def test_run_revenue_portfolio_once_can_export_microtools(self):
         microtool_exporter = FakeMicrotoolExporter()
 

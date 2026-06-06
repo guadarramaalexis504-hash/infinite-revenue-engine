@@ -30,6 +30,7 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "--launch-queue-output-dir",
             "LAUNCH_QUEUE_OUTPUT_DIR",
             "launch queue",
+            "activation preflight",
             "--microtool-output-dir",
             "MICROTOOL_OUTPUT_DIR",
             "interactive microtools",
