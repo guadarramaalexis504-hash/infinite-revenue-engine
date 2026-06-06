@@ -1,0 +1,41 @@
+name: Farm Loop
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+
+concurrency:
+  group: farm-loop-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  farm-loop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      STACKEXCHANGE_KEY: ${{ secrets.STACKEXCHANGE_KEY }}
+      BUYMEACOFFEE_WEBHOOK_TOKEN: ${{ secrets.BUYMEACOFFEE_WEBHOOK_TOKEN }}
+      TIP_URL: ${{ secrets.TIP_URL }}
+      TARGET_USD: "15"
+      MAX_DRAFTS_PER_RUN: "3"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
+
+      - name: Run farm loop once
+        run: python -m farm_loop.main --once

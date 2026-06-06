@@ -1,0 +1,151 @@
+# Infinite Farm Loop Seguro
+
+Python loop for finding technical-answer opportunities, generating reviewable drafts, and tracking optional tips toward a 15 USD target. It does not scrape HTML, auto-post to forums, or execute payment-gated spam.
+
+## Runtime
+
+Install dependencies:
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+Run one safe dry run:
+
+```powershell
+python -m farm_loop.main --once --dry-run
+```
+
+Run continuously locally:
+
+```powershell
+python -m farm_loop.main --loop --interval-seconds 300
+```
+
+GitHub Actions runs `python -m farm_loop.main --once` every 5 minutes through `.github/workflows/farm-loop.yml`.
+
+## One-Command Automation
+
+From PowerShell:
+
+```powershell
+.\scripts\bootstrap.ps1
+```
+
+That creates `.env` from `.env.example` when needed, creates `.venv`, installs dependencies, runs tests, and runs one safe dry-run.
+
+After filling `.env` with real credentials, configure GitHub repository secrets automatically:
+
+```powershell
+.\scripts\configure-github.ps1 -RunWorkflow
+```
+
+If `.env` also includes `DATABASE_URL` and `psql` is installed, apply the Supabase schema automatically:
+
+```powershell
+.\scripts\bootstrap.ps1 -ApplySchema
+```
+
+Start the local infinite loop:
+
+```powershell
+.\scripts\run-local-loop.ps1 -IntervalSeconds 300
+```
+
+## Required Secrets
+
+Set these in GitHub repository secrets:
+
+- `SUPABASE_URL`
+- `SUPABASE_KEY`
+- `OPENAI_API_KEY`
+- `STACKEXCHANGE_KEY`
+- `BUYMEACOFFEE_WEBHOOK_TOKEN`
+- `TIP_URL`
+
+Optional environment variables:
+
+- `TARGET_USD`, default `15`
+- `MAX_DRAFTS_PER_RUN`, default `3`
+- `STACKEXCHANGE_TAGS`, default `python;fastapi;supabase;openai-api`
+- `OPENAI_MODEL`, default `gpt-4o-mini`
+
+## Supabase Setup
+
+Run `supabase/schema.sql` in the Supabase SQL editor. The schema defines:
+
+- `runs`: one row per loop execution.
+- `opportunities`: deduplicated by `(source, external_id)`.
+- `drafts`: generated answer drafts, default status `draft`.
+- `events`: structured logs for each run.
+- `tip_events`: confirmed Buy Me a Coffee events, deduplicated by `(provider, external_id)`.
+
+## Exact API Requests
+
+Stack Exchange discovery:
+
+```http
+GET https://api.stackexchange.com/2.3/search/advanced?site=stackoverflow&order=desc&sort=activity&accepted=False&answers=0&closed=False&tagged=python;fastapi;supabase;openai-api&pagesize=20&filter=withbody&key=<STACKEXCHANGE_KEY>
+```
+
+OpenAI draft generation:
+
+```http
+POST https://api.openai.com/v1/responses
+Authorization: Bearer <OPENAI_API_KEY>
+Content-Type: application/json
+```
+
+Supabase event insert:
+
+```http
+POST <SUPABASE_URL>/rest/v1/events
+apikey: <SUPABASE_KEY>
+Authorization: Bearer <SUPABASE_KEY>
+Content-Type: application/json
+Prefer: return=representation
+```
+
+Supabase opportunity upsert:
+
+```http
+POST <SUPABASE_URL>/rest/v1/opportunities?on_conflict=source,external_id
+apikey: <SUPABASE_KEY>
+Authorization: Bearer <SUPABASE_KEY>
+Content-Type: application/json
+Prefer: resolution=merge-duplicates,return=representation
+```
+
+Supabase tip event insert:
+
+```http
+POST <SUPABASE_URL>/rest/v1/tip_events
+apikey: <SUPABASE_KEY>
+Authorization: Bearer <SUPABASE_KEY>
+Content-Type: application/json
+Prefer: return=representation
+```
+
+## Buy Me a Coffee Webhooks
+
+Configure Buy Me a Coffee to send events to your own HTTPS endpoint. In that endpoint, call the reusable handler:
+
+```python
+from farm_loop.webhook_handler import handle_buymeacoffee_webhook
+from farm_loop.supabase_client import SupabaseClient
+
+handle_buymeacoffee_webhook(
+    headers=request_headers,
+    payload=request_json,
+    expected_token=BUYMEACOFFEE_WEBHOOK_TOKEN,
+    supabase=SupabaseClient(SUPABASE_URL, SUPABASE_KEY),
+)
+```
+
+The loop stops generating new drafts once `sum(tip_events.amount_usd) >= TARGET_USD`, unless `--force-drafts` is passed.
+
+## Tests
+
+```powershell
+python -m unittest discover -s tests -v
+```
