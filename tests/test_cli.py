@@ -71,6 +71,22 @@ class CLITests(unittest.TestCase):
 
         self.assertEqual(args.intake_url, "https://forms.example.com/setup")
 
+    def test_parse_args_supports_site_base_url(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--portfolio-phase",
+                "generate",
+                "--dry-run",
+                "--site-output-dir",
+                "out/site",
+                "--site-base-url",
+                "https://revenue.example",
+            ]
+        )
+
+        self.assertEqual(args.site_base_url, "https://revenue.example")
+
     def test_parse_args_supports_launch_queue_output_dir(self):
         args = parse_args(
             [

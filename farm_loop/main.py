@@ -224,6 +224,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     asset_output_dir = args.asset_output_dir or settings.asset_output_dir
     asset_exporter = LocalAssetExporter(asset_output_dir) if asset_output_dir else None
     site_output_dir = args.site_output_dir or settings.site_output_dir
+    site_base_url = args.site_base_url or settings.site_base_url or ""
     click_redirect_url = args.click_redirect_url or settings.click_redirect_url or ""
     intake_url = args.intake_url or settings.service_intake_url or ""
     microtool_output_dir = args.microtool_output_dir or settings.microtool_output_dir
@@ -235,6 +236,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
             click_redirect_url=click_redirect_url,
             intake_url=intake_url,
             tools_path=tools_path,
+            site_base_url=site_base_url,
         )
         if site_output_dir
         else None
@@ -342,6 +344,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--site-output-dir",
         default=None,
         help="Write an owned static site for generated portfolio opportunities.",
+    )
+    parser.add_argument(
+        "--site-base-url",
+        default=None,
+        help="Optional public base URL for sitemap.xml and robots.txt.",
     )
     parser.add_argument(
         "--click-redirect-url",

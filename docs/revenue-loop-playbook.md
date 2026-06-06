@@ -10,6 +10,7 @@ Current operating target:
 - Manual keyword list: `KEYWORD_CSV_PATH=data/revenue_keywords.csv`.
 - Local review queue: `ASSET_OUTPUT_DIR=out/revenue-assets`.
 - Owned static site: `SITE_OUTPUT_DIR=out/site`.
+- Public site base URL: `SITE_BASE_URL=https://your-domain.example`.
 - Launch queue: `LAUNCH_QUEUE_OUTPUT_DIR=out/launch-queue`.
 - Interactive microtools: `MICROTOOL_OUTPUT_DIR=out/microtools`.
 - Offer catalog: `OFFER_OUTPUT_DIR=out/offers`.
@@ -58,7 +59,7 @@ Generate an owned static site:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --site-output-dir out/site
 ```
 
-The site is a local owned channel draft with an index and one page per opportunity. It can carry a support CTA when `TIP_URL` is configured, but it still needs manual review before public deployment.
+The site is a local owned channel draft with an index and one page per opportunity. It also writes `sitemap.xml` and `robots.txt`; set `SITE_BASE_URL` before publishing so the sitemap contains absolute public URLs. It can carry a support CTA when `TIP_URL` is configured, but it still needs manual review before public deployment.
 
 The site also writes `offers/index.html` as a central owned-channel catalog of all generated service, support, and product offers, plus `intake/index.html` for paid setup/service requests. Set `SERVICE_INTAKE_URL` before publishing service CTAs.
 
@@ -138,6 +139,7 @@ Owned static site deployment:
 - workflow file: `.github/workflows/pages-site.yml`
 - target: GitHub Pages
 - build command: `python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 12 --site-output-dir out/site --microtool-output-dir out/site/tools`
+- SEO outputs: `sitemap.xml` and `robots.txt`
 - deploy method: GitHub's official Pages actions after Pages is configured to deploy from GitHub Actions
 
 ## Best First Loops

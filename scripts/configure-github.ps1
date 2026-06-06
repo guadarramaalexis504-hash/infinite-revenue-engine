@@ -39,7 +39,8 @@ $secretNames = @(
 $optionalSecretNames = @(
     "CLICK_REDIRECT_URL",
     "CONVERSION_WEBHOOK_TOKEN",
-    "SERVICE_INTAKE_URL"
+    "SERVICE_INTAKE_URL",
+    "SITE_BASE_URL"
 )
 
 $envMap = @{}

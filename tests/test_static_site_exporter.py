@@ -30,16 +30,20 @@ class StaticSiteExporterTests(unittest.TestCase):
         assets = AssetGenerator().generate_all(self.opportunity)
 
         with tempfile.TemporaryDirectory() as directory:
-            written = StaticSiteExporter(directory, tip_url="https://buymeacoffee.com/example").export_portfolio(
-                [(self.opportunity, assets)]
-            )
+            written = StaticSiteExporter(
+                directory,
+                tip_url="https://buymeacoffee.com/example",
+                site_base_url="https://revenue.example",
+            ).export_portfolio([(self.opportunity, assets)])
             root = Path(directory)
             index = (root / "index.html").read_text(encoding="utf-8")
             page = (root / "offer-webhook-setup-service" / "index.html").read_text(encoding="utf-8")
             offer_catalog = (root / "offers" / "index.html").read_text(encoding="utf-8")
             intake = (root / "intake" / "index.html").read_text(encoding="utf-8")
+            sitemap = (root / "sitemap.xml").read_text(encoding="utf-8")
+            robots = (root / "robots.txt").read_text(encoding="utf-8")
 
-        self.assertEqual(len(written), 4)
+        self.assertEqual(len(written), 6)
         self.assertIn("Infinite Revenue Engine", index)
         self.assertIn("Webhook Setup Service", index)
         self.assertIn("offer-webhook-setup-service/", index)
@@ -67,6 +71,13 @@ class StaticSiteExporterTests(unittest.TestCase):
         self.assertIn("Webhook Setup Service", intake)
         self.assertIn("Scope", intake)
         self.assertIn("Configure SERVICE_INTAKE_URL before publishing intake CTAs", intake)
+        self.assertIn("<loc>https://revenue.example/</loc>", sitemap)
+        self.assertIn("<loc>https://revenue.example/offers/</loc>", sitemap)
+        self.assertIn("<loc>https://revenue.example/intake/</loc>", sitemap)
+        self.assertIn("<loc>https://revenue.example/offer-webhook-setup-service/</loc>", sitemap)
+        self.assertIn("User-agent: *", robots)
+        self.assertIn("Allow: /", robots)
+        self.assertIn("Sitemap: https://revenue.example/sitemap.xml", robots)
 
     def test_support_cta_uses_click_redirect_endpoint_when_configured(self):
         assets = AssetGenerator().generate_all(self.opportunity)

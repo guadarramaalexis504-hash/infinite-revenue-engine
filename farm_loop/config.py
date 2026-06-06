@@ -32,6 +32,7 @@ class Settings:
     idea_catalog_path: str = "data/revenue_ideas.json"
     asset_output_dir: str | None = None
     site_output_dir: str | None = None
+    site_base_url: str | None = None
     click_redirect_url: str | None = None
     service_intake_url: str | None = None
     launch_queue_output_dir: str | None = None
@@ -57,6 +58,7 @@ class Settings:
             idea_catalog_path=os.getenv("IDEA_CATALOG_PATH", "data/revenue_ideas.json"),
             asset_output_dir=os.getenv("ASSET_OUTPUT_DIR"),
             site_output_dir=os.getenv("SITE_OUTPUT_DIR"),
+            site_base_url=os.getenv("SITE_BASE_URL"),
             click_redirect_url=os.getenv("CLICK_REDIRECT_URL"),
             service_intake_url=os.getenv("SERVICE_INTAKE_URL"),
             launch_queue_output_dir=os.getenv("LAUNCH_QUEUE_OUTPUT_DIR"),

@@ -63,7 +63,7 @@ EMPTY=
     def test_optional_github_secret_names_include_click_redirect(self):
         self.assertEqual(
             optional_github_secret_names(),
-            ["CLICK_REDIRECT_URL", "CONVERSION_WEBHOOK_TOKEN", "SERVICE_INTAKE_URL"],
+            ["CLICK_REDIRECT_URL", "CONVERSION_WEBHOOK_TOKEN", "SERVICE_INTAKE_URL", "SITE_BASE_URL"],
         )
 
     def test_placeholder_vars_detects_example_values(self):
@@ -102,6 +102,7 @@ EMPTY=
         self.assertIn('"CLICK_REDIRECT_URL"', script)
         self.assertIn('"CONVERSION_WEBHOOK_TOKEN"', script)
         self.assertIn('"SERVICE_INTAKE_URL"', script)
+        self.assertIn('"SITE_BASE_URL"', script)
         self.assertIn("gh auth status", script)
         self.assertIn("No git remote found", script)
 
@@ -203,6 +204,7 @@ EMPTY=
         self.assertIn("OFFER_OUTPUT_DIR=out/offers", env_example)
         self.assertIn("CONVERSION_WEBHOOK_TOKEN=", env_example)
         self.assertIn("SERVICE_INTAKE_URL=", env_example)
+        self.assertIn("SITE_BASE_URL=", env_example)
         self.assertIn("out/", gitignore)
 
     def test_pages_workflow_passes_optional_click_redirect_url(self):
@@ -212,6 +214,8 @@ EMPTY=
         self.assertIn("--click-redirect-url \"${CLICK_REDIRECT_URL}\"", workflow)
         self.assertIn("SERVICE_INTAKE_URL: ${{ secrets.SERVICE_INTAKE_URL }}", workflow)
         self.assertIn("--intake-url \"${SERVICE_INTAKE_URL}\"", workflow)
+        self.assertIn("SITE_BASE_URL: ${{ secrets.SITE_BASE_URL }}", workflow)
+        self.assertIn("--site-base-url \"${SITE_BASE_URL}\"", workflow)
 
 
 if __name__ == "__main__":

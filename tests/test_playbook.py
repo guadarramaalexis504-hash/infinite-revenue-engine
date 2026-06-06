@@ -46,6 +46,9 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "offers/index.html",
             "SERVICE_INTAKE_URL",
             "intake/index.html",
+            "SITE_BASE_URL",
+            "sitemap.xml",
+            "robots.txt",
         ]:
             self.assertIn(required, body)
 

@@ -19,12 +19,14 @@ class StaticSiteExporter:
         click_redirect_url: str = "",
         intake_url: str = "",
         tools_path: str = "",
+        site_base_url: str = "",
     ) -> None:
         self.output_dir = Path(output_dir)
         self.tip_url = tip_url
         self.click_redirect_url = click_redirect_url
         self.intake_url = intake_url
         self.tools_path = tools_path
+        self.site_base_url = site_base_url.rstrip("/")
 
     def export_portfolio(self, opportunities_with_assets: list[tuple[RevenueOpportunity, list[AssetDraft]]]) -> list[str]:
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -50,7 +52,14 @@ class StaticSiteExporter:
 
         index_path = self.output_dir / "index.html"
         index_path.write_text(self._index_page(opportunities), encoding="utf-8")
-        return [str(index_path), str(offers_path), str(intake_path), *written]
+
+        sitemap_path = self.output_dir / "sitemap.xml"
+        sitemap_path.write_text(self._sitemap_page(opportunities), encoding="utf-8")
+
+        robots_path = self.output_dir / "robots.txt"
+        robots_path.write_text(self._robots_txt(), encoding="utf-8")
+
+        return [str(index_path), str(offers_path), str(intake_path), str(sitemap_path), str(robots_path), *written]
 
     def _index_page(self, opportunities: list[RevenueOpportunity]) -> str:
         cards = "\n".join(self._opportunity_card(opportunity) for opportunity in opportunities)
@@ -275,6 +284,44 @@ class StaticSiteExporter:
             return ""
         path = f"{prefix}{self.tools_path.lstrip('/')}"
         return f'<a class="nav-link" href="{escape(path)}">Interactive tools</a>'
+
+    def _sitemap_page(self, opportunities: list[RevenueOpportunity]) -> str:
+        paths = ["", "offers/", "intake/"]
+        if self.tools_path:
+            paths.append(self.tools_path.lstrip("/"))
+        paths.extend(f"{slugify(opportunity.external_id)}/" for opportunity in opportunities)
+        urls = "\n".join(f"  <url><loc>{escape(self._absolute_url(path))}</loc></url>" for path in self._unique_paths(paths))
+        return f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{urls}
+</urlset>
+"""
+
+    def _robots_txt(self) -> str:
+        return f"""User-agent: *
+Allow: /
+Sitemap: {self._absolute_url("sitemap.xml")}
+"""
+
+    def _absolute_url(self, path: str) -> str:
+        normalized = path.strip().lstrip("/")
+        if self.site_base_url:
+            if not normalized:
+                return f"{self.site_base_url}/"
+            return f"{self.site_base_url}/{normalized}"
+        if not normalized:
+            return "/"
+        return f"/{normalized}"
+
+    def _unique_paths(self, paths: list[str]) -> list[str]:
+        seen: set[str] = set()
+        unique: list[str] = []
+        for path in paths:
+            if path in seen:
+                continue
+            seen.add(path)
+            unique.append(path)
+        return unique
 
     def _page(self, title: str, body: str) -> str:
         return f"""<!doctype html>

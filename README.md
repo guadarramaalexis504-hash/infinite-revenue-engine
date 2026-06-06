@@ -40,7 +40,7 @@ Generate an owned static site from the same selected opportunities:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --site-output-dir out/site
 ```
 
-The site includes an index, one page per opportunity, `offers/index.html` as a central owned-channel offer catalog, and `intake/index.html` for paid setup/service requests. Set `SERVICE_INTAKE_URL` to a Tally, Google Form, Calendly, Stripe Payment Link, or other owned intake path before publishing service CTAs.
+The site includes an index, one page per opportunity, `offers/index.html` as a central owned-channel offer catalog, `intake/index.html` for paid setup/service requests, plus `sitemap.xml` and `robots.txt`. Set `SITE_BASE_URL` before publishing so search engines receive absolute sitemap URLs. Set `SERVICE_INTAKE_URL` to a Tally, Google Form, Calendly, Stripe Payment Link, or other owned intake path before publishing service CTAs.
 
 Generate a prioritized launch queue from the selected opportunities:
 
@@ -159,6 +159,7 @@ Optional environment variables:
 - `IDEA_CATALOG_PATH`, default `data/revenue_ideas.json`
 - `ASSET_OUTPUT_DIR`, optional local manual-review export path such as `out/revenue-assets`
 - `SITE_OUTPUT_DIR`, optional owned static site export path such as `out/site`
+- `SITE_BASE_URL`, optional public site URL used in `sitemap.xml` and `robots.txt`
 - `CLICK_REDIRECT_URL`, optional owned click redirect endpoint such as `https://your-domain.example/click`
 - `CONVERSION_WEBHOOK_TOKEN`, optional shared token for your owned conversion webhook endpoint
 - `SERVICE_INTAKE_URL`, optional setup/service intake form URL used by service CTAs
@@ -166,7 +167,7 @@ Optional environment variables:
 - `MICROTOOL_OUTPUT_DIR`, optional interactive microtool export path such as `out/microtools`
 - `OFFER_OUTPUT_DIR`, optional offer catalog export path such as `out/offers`
 
-`scripts/configure-github.ps1` sets the required secrets and also sets optional secrets such as `CLICK_REDIRECT_URL`, `CONVERSION_WEBHOOK_TOKEN`, and `SERVICE_INTAKE_URL` when present and not placeholders. The GitHub Actions workflow uses GitHub's built-in `github.token` for issue discovery rate limits.
+`scripts/configure-github.ps1` sets the required secrets and also sets optional secrets such as `CLICK_REDIRECT_URL`, `CONVERSION_WEBHOOK_TOKEN`, `SERVICE_INTAKE_URL`, and `SITE_BASE_URL` when present and not placeholders. The GitHub Actions workflow uses GitHub's built-in `github.token` for issue discovery rate limits.
 
 ## Click Redirect Handler
 
