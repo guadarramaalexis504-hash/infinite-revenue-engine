@@ -35,6 +35,7 @@ class Settings:
     click_redirect_url: str | None = None
     launch_queue_output_dir: str | None = None
     microtool_output_dir: str | None = None
+    offer_output_dir: str | None = None
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -58,6 +59,7 @@ class Settings:
             click_redirect_url=os.getenv("CLICK_REDIRECT_URL"),
             launch_queue_output_dir=os.getenv("LAUNCH_QUEUE_OUTPUT_DIR"),
             microtool_output_dir=os.getenv("MICROTOOL_OUTPUT_DIR"),
+            offer_output_dir=os.getenv("OFFER_OUTPUT_DIR"),
         )
 
     def require_runtime_secrets(self, dry_run: bool) -> None:

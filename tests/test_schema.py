@@ -34,6 +34,11 @@ class SchemaTests(unittest.TestCase):
         ]:
             self.assertIn(f"add column if not exists {column}", schema)
 
+    def test_schema_links_offers_to_opportunities(self):
+        schema = Path("supabase/schema.sql").read_text(encoding="utf-8")
+
+        self.assertIn("opportunity_id uuid references public.opportunities(id)", schema)
+
 
 if __name__ == "__main__":
     unittest.main()

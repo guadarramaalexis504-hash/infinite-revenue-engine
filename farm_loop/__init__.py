@@ -10,6 +10,7 @@ __all__ = [
     "launch_queue",
     "main",
     "microtool_exporter",
+    "offers",
     "revenue_dashboard",
     "revenue_engine",
     "revenue_scoring",

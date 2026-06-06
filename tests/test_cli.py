@@ -83,6 +83,20 @@ class CLITests(unittest.TestCase):
 
         self.assertEqual(args.microtool_output_dir, "out/microtools")
 
+    def test_parse_args_supports_offer_output_dir(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--portfolio-phase",
+                "generate",
+                "--dry-run",
+                "--offer-output-dir",
+                "out/offers",
+            ]
+        )
+
+        self.assertEqual(args.offer_output_dir, "out/offers")
+
     def test_tools_path_for_site_returns_relative_tools_url_inside_site_output(self):
         self.assertEqual(tools_path_for_site("out/site", "out/site/tools"), "tools/")
         self.assertEqual(tools_path_for_site("out/site", "out/site/tools/dev"), "tools/dev/")

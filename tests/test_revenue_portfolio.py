@@ -31,6 +31,7 @@ class FakeSupabase:
         self.experiments = []
         self.events = []
         self.launch_tasks = []
+        self.offers = []
 
     def upsert_revenue_opportunity(self, payload):
         self.opportunities.append(payload)
@@ -47,6 +48,10 @@ class FakeSupabase:
     def insert_launch_task(self, payload):
         self.launch_tasks.append(payload)
         return [{"id": f"launch-task-{len(self.launch_tasks)}"}]
+
+    def insert_offer(self, payload):
+        self.offers.append(payload)
+        return [{"id": f"offer-{len(self.offers)}"}]
 
     def insert_event(self, run_id, event_type, payload):
         self.events.append((event_type, payload))
@@ -88,6 +93,15 @@ class FakeMicrotoolExporter:
         return ["index.html", "kw-portfolio/index.html"]
 
 
+class FakeOfferExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, offers):
+        self.exports.append(offers)
+        return ["offers.json", "OFFERS.md"]
+
+
 class RevenuePortfolioTests(unittest.TestCase):
     def test_run_revenue_portfolio_once_scores_generates_assets_and_continues_past_milestones(self):
         supabase = FakeSupabase()
@@ -107,6 +121,9 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(summary.launch_tasks_created, 4)
         self.assertEqual(len(supabase.launch_tasks), 4)
         self.assertEqual(supabase.launch_tasks[0]["external_id"], "kw-portfolio")
+        self.assertEqual(summary.offers_created, 2)
+        self.assertEqual(len(supabase.offers), 2)
+        self.assertEqual(supabase.offers[0]["opportunity_id"], "opp-portfolio")
 
     def test_run_revenue_portfolio_once_can_export_local_review_assets(self):
         exporter = FakeAssetExporter()
@@ -170,6 +187,22 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(summary.microtools_exported, 2)
         self.assertEqual(len(microtool_exporter.exports), 1)
         self.assertEqual(microtool_exporter.exports[0][0][0].external_id, "kw-portfolio")
+
+    def test_run_revenue_portfolio_once_can_export_offer_catalog(self):
+        offer_exporter = FakeOfferExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            offer_exporter=offer_exporter,
+        )
+
+        self.assertEqual(summary.offers_created, 2)
+        self.assertEqual(summary.offers_exported, 2)
+        self.assertEqual(len(offer_exporter.exports), 1)
+        self.assertEqual(offer_exporter.exports[0][0].external_id, "kw-portfolio")
 
 
 if __name__ == "__main__":

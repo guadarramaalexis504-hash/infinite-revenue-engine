@@ -195,6 +195,7 @@ EMPTY=
         self.assertIn("CLICK_REDIRECT_URL=", env_example)
         self.assertIn("LAUNCH_QUEUE_OUTPUT_DIR=out/launch-queue", env_example)
         self.assertIn("MICROTOOL_OUTPUT_DIR=out/microtools", env_example)
+        self.assertIn("OFFER_OUTPUT_DIR=out/offers", env_example)
         self.assertIn("out/", gitignore)
 
     def test_pages_workflow_passes_optional_click_redirect_url(self):

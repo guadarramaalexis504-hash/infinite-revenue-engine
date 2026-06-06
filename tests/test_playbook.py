@@ -33,6 +33,9 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "--microtool-output-dir",
             "MICROTOOL_OUTPUT_DIR",
             "interactive microtools",
+            "--offer-output-dir",
+            "OFFER_OUTPUT_DIR",
+            "offer catalog",
         ]:
             self.assertIn(required, body)
 

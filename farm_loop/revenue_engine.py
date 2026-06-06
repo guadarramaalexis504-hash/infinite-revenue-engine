@@ -5,6 +5,7 @@ from typing import Any
 
 from .assets import AssetDraft, AssetGenerator
 from .launch_queue import LaunchTask, build_launch_queue
+from .offers import OfferDraft, generate_offers
 from .revenue_scoring import RevenueOpportunity, rank_revenue_opportunities
 
 
@@ -22,6 +23,8 @@ class RevenuePortfolioSummary:
     launch_tasks_created: int = 0
     launch_tasks_exported: int = 0
     microtools_exported: int = 0
+    offers_created: int = 0
+    offers_exported: int = 0
 
 
 def run_revenue_portfolio_once(
@@ -36,6 +39,7 @@ def run_revenue_portfolio_once(
     site_exporter: Any | None = None,
     launch_queue_exporter: Any | None = None,
     microtool_exporter: Any | None = None,
+    offer_exporter: Any | None = None,
 ) -> RevenuePortfolioSummary:
     if phase in {"summarize", "prune"}:
         if supabase and not dry_run:
@@ -50,6 +54,8 @@ def run_revenue_portfolio_once(
             launch_tasks_created=0,
             launch_tasks_exported=0,
             microtools_exported=0,
+            offers_created=0,
+            offers_exported=0,
         )
 
     discovered: list[RevenueOpportunity] = []
@@ -61,6 +67,7 @@ def run_revenue_portfolio_once(
     assets_created = 0
     assets_exported = 0
     portfolio_assets: list[tuple[RevenueOpportunity, list[AssetDraft]]] = []
+    offer_drafts: list[OfferDraft] = []
     opportunity_ids: dict[tuple[str, str], str | None] = {}
 
     for opportunity in selected:
@@ -92,6 +99,12 @@ def run_revenue_portfolio_once(
                 }
             )
 
+        offers = generate_offers(opportunity)
+        offer_drafts.extend(offers)
+        if supabase and not dry_run:
+            for offer in offers:
+                supabase.insert_offer(offer.to_payload(opportunity_id))
+
     site_pages_exported = 0
     if site_exporter:
         site_pages_exported = len(site_exporter.export_portfolio(portfolio_assets))
@@ -109,6 +122,10 @@ def run_revenue_portfolio_once(
     if microtool_exporter:
         microtools_exported = len(microtool_exporter.export_portfolio(portfolio_assets))
 
+    offers_exported = 0
+    if offer_exporter:
+        offers_exported = len(offer_exporter.export(offer_drafts))
+
     if supabase and not dry_run:
         supabase.insert_event(
             None,
@@ -122,6 +139,8 @@ def run_revenue_portfolio_once(
                 "launch_tasks_created": launch_tasks_created,
                 "launch_tasks_exported": launch_tasks_exported,
                 "microtools_exported": microtools_exported,
+                "offers_created": len(offer_drafts),
+                "offers_exported": offers_exported,
                 "milestones": milestones or DEFAULT_MILESTONES,
                 "phase": phase,
             },
@@ -137,6 +156,8 @@ def run_revenue_portfolio_once(
         launch_tasks_created=launch_tasks_created,
         launch_tasks_exported=launch_tasks_exported,
         microtools_exported=microtools_exported,
+        offers_created=len(offer_drafts),
+        offers_exported=offers_exported,
     )
 
 

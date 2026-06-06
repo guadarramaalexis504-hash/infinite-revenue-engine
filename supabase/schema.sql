@@ -103,6 +103,7 @@ create table if not exists public.assets (
 
 create table if not exists public.offers (
     id uuid primary key default gen_random_uuid(),
+    opportunity_id uuid references public.opportunities(id) on delete set null,
     asset_id uuid references public.assets(id) on delete set null,
     channel text not null,
     title text not null,
@@ -141,6 +142,9 @@ create table if not exists public.experiments (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
+
+alter table public.offers
+    add column if not exists opportunity_id uuid references public.opportunities(id) on delete set null;
 
 create table if not exists public.launch_tasks (
     id uuid primary key default gen_random_uuid(),

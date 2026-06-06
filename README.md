@@ -48,6 +48,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The launch queue writes `launch_queue.json` and `LAUNCH_QUEUE.md` with activation blockers, manual review tasks, owned publishing tasks, payment/support CTA tasks, and measurement tasks.
 
+Generate monetizable offer drafts:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --offer-output-dir out/offers
+```
+
+The offer catalog writes `offers.json` and `OFFERS.md` with draft prices, CTA labels, and owned-channel descriptions for support, setup services, digital products, and sponsorship-style offers.
+
 Generate interactive microtools for supported opportunities:
 
 ```powershell
@@ -144,6 +152,7 @@ Optional environment variables:
 - `CLICK_REDIRECT_URL`, optional owned click redirect endpoint such as `https://your-domain.example/click`
 - `LAUNCH_QUEUE_OUTPUT_DIR`, optional launch queue export path such as `out/launch-queue`
 - `MICROTOOL_OUTPUT_DIR`, optional interactive microtool export path such as `out/microtools`
+- `OFFER_OUTPUT_DIR`, optional offer catalog export path such as `out/offers`
 
 `scripts/configure-github.ps1` sets the required secrets and also sets `CLICK_REDIRECT_URL` when it is present and not a placeholder. The GitHub Actions workflow uses GitHub's built-in `github.token` for issue discovery rate limits.
 

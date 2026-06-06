@@ -12,6 +12,7 @@ Current operating target:
 - Owned static site: `SITE_OUTPUT_DIR=out/site`.
 - Launch queue: `LAUNCH_QUEUE_OUTPUT_DIR=out/launch-queue`.
 - Interactive microtools: `MICROTOOL_OUTPUT_DIR=out/microtools`.
+- Offer catalog: `OFFER_OUTPUT_DIR=out/offers`.
 - Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
 - Live-readiness check: `.\scripts\doctor.ps1`.
 - Milestones: `$15`, `$200`, `$1,000`, `$20,000`.
@@ -65,6 +66,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 ```
 
 The launch queue writes `launch_queue.json` and `LAUNCH_QUEUE.md`. It converts each selected opportunity into activation, review, owned publishing, monetization, and measurement tasks. In live Supabase runs, these tasks are inserted into `launch_tasks`.
+
+Generate an offer catalog:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --offer-output-dir out/offers
+```
+
+The offer catalog writes `offers.json` and `OFFERS.md`. It turns selected opportunities into draft support offers, setup services, digital products, or sponsorship-style CTAs with prices. In live Supabase runs, these offers are inserted into `offers`.
 
 Generate interactive microtools:
 
