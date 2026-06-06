@@ -9,6 +9,7 @@ class RevenueDashboardTests(unittest.TestCase):
             conversions=[
                 {"source": "microtool_seo", "offer_id": "offer-1", "amount_usd": 12},
                 {"source": "github_issue_helper", "offer_id": "offer-2", "amount_usd": 38},
+                {"source": "github_issue_helper", "offer_id": "offer-2", "amount_usd": 5},
             ],
             tips=[{"amount_usd": 5}],
             assets=[
@@ -16,15 +17,48 @@ class RevenueDashboardTests(unittest.TestCase):
                 {"status": "published"},
                 {"status": "failed"},
             ],
+            clicks=[
+                {"payload": {"utm_content": "support"}},
+                {"payload": {"content": "setup_service"}},
+                {"payload": {"utm_content": "setup_service"}},
+                {"payload": {"utm_content": "setup_service"}},
+            ],
+            offers=[
+                {"id": "offer-1", "title": "Support the tool"},
+                {"id": "offer-2", "title": "Fixed setup"},
+            ],
+            experiments=[
+                {"status": "planned"},
+                {"status": "lost"},
+            ],
             milestones=[15, 200, 1000, 20000],
         )
 
-        self.assertEqual(snapshot["total_revenue_usd"], 55)
+        self.assertEqual(snapshot["total_revenue_usd"], 60)
         self.assertEqual(snapshot["next_milestone_usd"], 200)
-        self.assertEqual(snapshot["milestone_progress_percent"], 27.5)
+        self.assertEqual(snapshot["milestone_progress_percent"], 30.0)
         self.assertEqual(snapshot["best_source"], "github_issue_helper")
+        self.assertEqual(snapshot["best_offer"], {"id": "offer-2", "title": "Fixed setup", "revenue_usd": 43.0})
+        self.assertEqual(snapshot["conversion_rate_percent"], 75.0)
+        self.assertEqual(snapshot["clicks_by_content"]["setup_service"], 3)
         self.assertEqual(snapshot["pending_assets"], 1)
         self.assertEqual(snapshot["failed_experiments"], 1)
+        self.assertIn("Double down on github_issue_helper", snapshot["recommended_next_actions"][0])
+
+    def test_dashboard_recommends_payment_activation_when_no_revenue(self):
+        snapshot = build_dashboard_snapshot(
+            conversions=[],
+            tips=[],
+            assets=[{"status": "draft"}],
+            milestones=[15, 200, 1000, 20000],
+            clicks=[],
+            offers=[],
+            experiments=[],
+        )
+
+        self.assertEqual(snapshot["total_revenue_usd"], 0)
+        self.assertEqual(snapshot["remaining_to_next_milestone_usd"], 15)
+        self.assertIn("Publish one owned asset", snapshot["recommended_next_actions"][0])
 
 
 if __name__ == "__main__":

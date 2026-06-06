@@ -74,7 +74,7 @@ GitHub Actions runs portfolio phases through `.github/workflows/farm-loop.yml`:
 
 - every 5 minutes: discover and score opportunities
 - hourly: generate top reviewable assets
-- daily: summarize portfolio progress
+- daily: summarize portfolio progress into `portfolio_snapshots`
 - weekly: prune low-performing loops
 
 `.github/workflows/pages-site.yml` builds the owned static site and deploys it to GitHub Pages through GitHub's official Pages Actions. It runs manually and once per day after Pages is configured for GitHub Actions in the repository settings.
@@ -188,6 +188,7 @@ Run `supabase/schema.sql` in the Supabase SQL editor. The schema defines:
 - `assets`: reviewable generated assets: microtool specs, article outlines, patch plans, product listings, landing copy, support offers.
 - `offers`, `click_events`, `conversion_events`, `experiments`: monetization and learning loop tracking.
 - `launch_tasks`: prioritized manual launch tasks for review, publishing, monetization, and measurement.
+- `portfolio_snapshots`: daily revenue dashboard snapshots with milestone progress, best source, best offer, click/conversion rate, and recommended next actions.
 
 ## Safety Rules
 

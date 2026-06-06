@@ -140,6 +140,59 @@ class SupabaseClient:
     def insert_tip_event(self, payload: dict) -> Any:
         return self.request("POST", "tip_events", json_body=payload)
 
+    def insert_portfolio_snapshot(self, payload: dict) -> Any:
+        return self.request("POST", "portfolio_snapshots", json_body={"payload": payload})
+
+    def _recent_rows(self, table: str, select: str, *, limit: int = 500) -> Any:
+        bounded_limit = max(1, min(int(limit), 1000))
+        return self.request(
+            "GET",
+            f"{table}?select={select}&order=created_at.desc&limit={bounded_limit}",
+            prefer="return=representation",
+        )
+
+    def list_conversion_events(self, *, limit: int = 500) -> Any:
+        return self._recent_rows(
+            "conversion_events",
+            "id,offer_id,source,amount_usd,payload,created_at",
+            limit=limit,
+        )
+
+    def list_tip_events(self, *, limit: int = 500) -> Any:
+        return self._recent_rows(
+            "tip_events",
+            "id,provider,external_id,amount_usd,payload,created_at",
+            limit=limit,
+        )
+
+    def list_assets(self, *, limit: int = 500) -> Any:
+        return self._recent_rows(
+            "assets",
+            "id,opportunity_id,asset_type,title,channel,status,created_at",
+            limit=limit,
+        )
+
+    def list_click_events(self, *, limit: int = 500) -> Any:
+        return self._recent_rows(
+            "click_events",
+            "id,offer_id,source,payload,created_at",
+            limit=limit,
+        )
+
+    def list_offers(self, *, limit: int = 500) -> Any:
+        return self._recent_rows(
+            "offers",
+            "id,opportunity_id,channel,title,price_usd,status,created_at",
+            limit=limit,
+        )
+
+    def list_experiments(self, *, limit: int = 500) -> Any:
+        return self._recent_rows(
+            "experiments",
+            "id,opportunity_id,name,status,payload,created_at",
+            limit=limit,
+        )
+
     def total_tips_usd(self) -> float:
         rows = self.request("GET", "tip_events?select=amount_usd", prefer="return=representation")
         total = 0.0

@@ -36,6 +36,8 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "--offer-output-dir",
             "OFFER_OUTPUT_DIR",
             "offer catalog",
+            "--portfolio-once --portfolio-phase summarize",
+            "portfolio_snapshots",
         ]:
             self.assertIn(required, body)
 

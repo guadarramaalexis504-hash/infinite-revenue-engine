@@ -128,6 +128,53 @@ class SupabaseClientTests(unittest.TestCase):
         self.assertEqual(session.calls[0]["url"], "https://project.supabase.co/rest/v1/launch_tasks")
         self.assertEqual(session.calls[0]["json"]["title"], "Publish owned page")
 
+    def test_dashboard_read_methods_use_bounded_recent_queries(self):
+        session = FakeSession()
+        client = SupabaseClient("https://project.supabase.co", "secret-key", session=session)
+
+        client.list_conversion_events(limit=25)
+        client.list_tip_events(limit=25)
+        client.list_assets(limit=25)
+        client.list_click_events(limit=25)
+        client.list_offers(limit=25)
+        client.list_experiments(limit=25)
+
+        urls = [call["url"] for call in session.calls]
+        self.assertIn(
+            "https://project.supabase.co/rest/v1/conversion_events?select=id,offer_id,source,amount_usd,payload,created_at&order=created_at.desc&limit=25",
+            urls,
+        )
+        self.assertIn(
+            "https://project.supabase.co/rest/v1/tip_events?select=id,provider,external_id,amount_usd,payload,created_at&order=created_at.desc&limit=25",
+            urls,
+        )
+        self.assertIn(
+            "https://project.supabase.co/rest/v1/assets?select=id,opportunity_id,asset_type,title,channel,status,created_at&order=created_at.desc&limit=25",
+            urls,
+        )
+        self.assertIn(
+            "https://project.supabase.co/rest/v1/click_events?select=id,offer_id,source,payload,created_at&order=created_at.desc&limit=25",
+            urls,
+        )
+        self.assertIn(
+            "https://project.supabase.co/rest/v1/offers?select=id,opportunity_id,channel,title,price_usd,status,created_at&order=created_at.desc&limit=25",
+            urls,
+        )
+        self.assertIn(
+            "https://project.supabase.co/rest/v1/experiments?select=id,opportunity_id,name,status,payload,created_at&order=created_at.desc&limit=25",
+            urls,
+        )
+
+    def test_insert_portfolio_snapshot_uses_snapshots_table(self):
+        session = FakeSession()
+        client = SupabaseClient("https://project.supabase.co", "secret-key", session=session)
+
+        client.insert_portfolio_snapshot({"total_revenue_usd": 25})
+
+        self.assertEqual(session.calls[0]["method"], "POST")
+        self.assertEqual(session.calls[0]["url"], "https://project.supabase.co/rest/v1/portfolio_snapshots")
+        self.assertEqual(session.calls[0]["json"]["payload"], {"total_revenue_usd": 25})
+
 
 if __name__ == "__main__":
     unittest.main()

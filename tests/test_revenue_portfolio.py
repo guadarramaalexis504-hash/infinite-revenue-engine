@@ -32,6 +32,10 @@ class FakeSupabase:
         self.events = []
         self.launch_tasks = []
         self.offers = []
+        self.portfolio_snapshots = []
+        self.conversion_events = []
+        self.tip_events = []
+        self.click_events = []
 
     def upsert_revenue_opportunity(self, payload):
         self.opportunities.append(payload)
@@ -55,6 +59,28 @@ class FakeSupabase:
 
     def insert_event(self, run_id, event_type, payload):
         self.events.append((event_type, payload))
+
+    def list_conversion_events(self):
+        return self.conversion_events
+
+    def list_tip_events(self):
+        return self.tip_events
+
+    def list_assets(self):
+        return self.assets
+
+    def list_click_events(self):
+        return self.click_events
+
+    def list_offers(self):
+        return self.offers
+
+    def list_experiments(self):
+        return self.experiments
+
+    def insert_portfolio_snapshot(self, payload):
+        self.portfolio_snapshots.append(payload)
+        return [{"id": f"snapshot-{len(self.portfolio_snapshots)}"}]
 
 
 class FakeAssetExporter:
@@ -203,6 +229,29 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(summary.offers_exported, 2)
         self.assertEqual(len(offer_exporter.exports), 1)
         self.assertEqual(offer_exporter.exports[0][0].external_id, "kw-portfolio")
+
+    def test_summarize_phase_persists_dashboard_snapshot(self):
+        supabase = FakeSupabase()
+        supabase.conversion_events = [
+            {"source": "microtool_seo", "offer_id": "offer-1", "amount_usd": 20},
+        ]
+        supabase.tip_events = [{"amount_usd": 5}]
+        supabase.assets = [{"status": "draft"}, {"status": "published"}]
+        supabase.offers = [{"id": "offer-1", "title": "Supabase setup"}]
+        supabase.click_events = [{"payload": {"utm_content": "setup_service"}}]
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=supabase,
+            phase="summarize",
+            milestones=[15, 200, 1000, 20000],
+        )
+
+        self.assertEqual(summary.status, "success")
+        self.assertEqual(summary.dashboard_snapshots_created, 1)
+        self.assertEqual(supabase.portfolio_snapshots[0]["total_revenue_usd"], 25)
+        self.assertEqual(supabase.portfolio_snapshots[0]["best_offer"]["title"], "Supabase setup")
+        self.assertEqual(supabase.events[-1][0], "revenue_portfolio_summarized")
 
 
 if __name__ == "__main__":

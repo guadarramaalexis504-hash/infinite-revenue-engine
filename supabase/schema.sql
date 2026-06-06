@@ -164,6 +164,12 @@ create table if not exists public.launch_tasks (
     updated_at timestamptz not null default now()
 );
 
+create table if not exists public.portfolio_snapshots (
+    id uuid primary key default gen_random_uuid(),
+    payload jsonb not null default '{}'::jsonb,
+    created_at timestamptz not null default now()
+);
+
 create index if not exists opportunities_expected_value_idx
     on public.opportunities(expected_value_usd desc);
 
@@ -175,6 +181,9 @@ create index if not exists conversion_events_source_created_at_idx
 
 create index if not exists launch_tasks_status_priority_idx
     on public.launch_tasks(status, priority, expected_value_usd desc);
+
+create index if not exists portfolio_snapshots_created_at_idx
+    on public.portfolio_snapshots(created_at desc);
 
 insert into public.revenue_milestones(amount_usd, label)
 values
@@ -210,3 +219,4 @@ alter table public.click_events enable row level security;
 alter table public.conversion_events enable row level security;
 alter table public.experiments enable row level security;
 alter table public.launch_tasks enable row level security;
+alter table public.portfolio_snapshots enable row level security;

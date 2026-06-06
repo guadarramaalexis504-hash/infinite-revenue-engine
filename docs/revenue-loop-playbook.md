@@ -101,8 +101,16 @@ Production cron phases in GitHub Actions:
 
 - every 5 minutes: discovery and scoring
 - hourly: asset generation
-- daily: summary event
+- daily: portfolio snapshot with revenue, attribution, milestone progress, and next actions
 - weekly: prune event
+
+Daily summary command:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase summarize
+```
+
+In live mode, this reads `conversion_events`, `tip_events`, `click_events`, `offers`, `assets`, and `experiments`, then stores the dashboard payload in `portfolio_snapshots`. The snapshot is the learning layer: it shows which channel or offer is producing revenue and recommends where to double down next.
 
 Owned static site deployment:
 

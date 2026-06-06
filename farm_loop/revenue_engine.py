@@ -6,6 +6,7 @@ from typing import Any
 from .assets import AssetDraft, AssetGenerator
 from .launch_queue import LaunchTask, build_launch_queue
 from .offers import OfferDraft, generate_offers
+from .revenue_dashboard import build_dashboard_snapshot
 from .revenue_scoring import RevenueOpportunity, rank_revenue_opportunities
 
 
@@ -25,6 +26,7 @@ class RevenuePortfolioSummary:
     microtools_exported: int = 0
     offers_created: int = 0
     offers_exported: int = 0
+    dashboard_snapshots_created: int = 0
 
 
 def run_revenue_portfolio_once(
@@ -41,9 +43,39 @@ def run_revenue_portfolio_once(
     microtool_exporter: Any | None = None,
     offer_exporter: Any | None = None,
 ) -> RevenuePortfolioSummary:
-    if phase in {"summarize", "prune"}:
+    if phase == "summarize":
+        dashboard_snapshots_created = 0
         if supabase and not dry_run:
-            supabase.insert_event(None, f"revenue_portfolio_{phase}", {"phase": phase})
+            snapshot = build_dashboard_snapshot(
+                conversions=supabase.list_conversion_events(),
+                tips=supabase.list_tip_events(),
+                assets=supabase.list_assets(),
+                clicks=supabase.list_click_events(),
+                offers=supabase.list_offers(),
+                experiments=supabase.list_experiments(),
+                milestones=milestones or DEFAULT_MILESTONES,
+            )
+            supabase.insert_portfolio_snapshot(snapshot)
+            dashboard_snapshots_created = 1
+            supabase.insert_event(None, "revenue_portfolio_summarized", snapshot)
+        return RevenuePortfolioSummary(
+            status="success",
+            discovered=0,
+            selected=0,
+            assets_created=0,
+            assets_exported=0,
+            site_pages_exported=0,
+            launch_tasks_created=0,
+            launch_tasks_exported=0,
+            microtools_exported=0,
+            offers_created=0,
+            offers_exported=0,
+            dashboard_snapshots_created=dashboard_snapshots_created,
+        )
+
+    if phase == "prune":
+        if supabase and not dry_run:
+            supabase.insert_event(None, "revenue_portfolio_prune", {"phase": phase})
         return RevenuePortfolioSummary(
             status="success",
             discovered=0,
