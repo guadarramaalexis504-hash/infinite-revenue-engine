@@ -52,6 +52,7 @@ def run_once(
     target_usd: float = 15.0,
     dry_run: bool = False,
     force_drafts: bool = False,
+    stop_after_target: bool = False,
 ) -> RunSummary:
     run_id = None if dry_run or not supabase else supabase.create_run()
     generated_drafts = 0
@@ -62,8 +63,7 @@ def run_once(
     try:
         _event(supabase, run_id, "run_started", {"dry_run": dry_run}, dry_run)
         total_tips = 0.0 if dry_run or not supabase else supabase.total_tips_usd()
-        if total_tips >= target_usd and not force_drafts:
-            status = "monitoring"
+        if total_tips >= target_usd:
             _event(
                 supabase,
                 run_id,
@@ -71,9 +71,11 @@ def run_once(
                 {"total_tips_usd": total_tips, "target_usd": target_usd},
                 dry_run,
             )
-            if supabase and not dry_run:
-                supabase.finish_run(run_id, status, None)
-            return RunSummary(status, 0, 0, 0, total_tips)
+            if stop_after_target and not force_drafts:
+                status = "monitoring"
+                if supabase and not dry_run:
+                    supabase.finish_run(run_id, status, None)
+                return RunSummary(status, 0, 0, 0, total_tips)
 
         result = source_client.search_unanswered(page_size=20)
         scanned_questions = len(result.questions)
@@ -170,6 +172,7 @@ def run_loop(args: argparse.Namespace) -> int:
                 target_usd=settings.target_usd,
                 dry_run=args.dry_run,
                 force_drafts=args.force_drafts,
+                stop_after_target=args.stop_after_target or settings.stop_after_target,
             )
             LOGGER.info("run_summary %s", json.dumps(asdict(summary), sort_keys=True))
         except Exception as exc:
@@ -189,6 +192,7 @@ def run_single(args: argparse.Namespace) -> int:
         target_usd=settings.target_usd,
         dry_run=args.dry_run,
         force_drafts=args.force_drafts,
+        stop_after_target=args.stop_after_target or settings.stop_after_target,
     )
     LOGGER.info("run_summary %s", json.dumps(asdict(summary), sort_keys=True))
     return 0
@@ -202,6 +206,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--interval-seconds", type=int, default=300)
     parser.add_argument("--dry-run", action="store_true", help="Avoid Supabase writes and OpenAI draft generation.")
     parser.add_argument("--force-drafts", action="store_true", help="Generate drafts even after TARGET_USD is reached.")
+    parser.add_argument("--stop-after-target", action="store_true", help="Pause draft generation once TARGET_USD is reached.")
     return parser.parse_args(argv)
 
 

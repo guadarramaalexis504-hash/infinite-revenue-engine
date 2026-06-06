@@ -7,6 +7,13 @@ from dataclasses import dataclass
 DEFAULT_TAGS = "python;fastapi;supabase;openai-api"
 
 
+def _env_bool(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 @dataclass(frozen=True)
 class Settings:
     supabase_url: str | None
@@ -18,6 +25,7 @@ class Settings:
     target_usd: float = 15.0
     max_drafts: int = 3
     openai_model: str = "gpt-4o-mini"
+    stop_after_target: bool = False
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -31,6 +39,7 @@ class Settings:
             target_usd=float(os.getenv("TARGET_USD", "15")),
             max_drafts=int(os.getenv("MAX_DRAFTS_PER_RUN", "3")),
             openai_model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+            stop_after_target=_env_bool("STOP_AFTER_TARGET", False),
         )
 
     def require_runtime_secrets(self, dry_run: bool) -> None:

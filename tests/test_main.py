@@ -87,7 +87,25 @@ class MainLoopTests(unittest.TestCase):
         self.assertIn("stackexchange_backoff", [event[1] for event in supabase.events])
         self.assertEqual(supabase.finished, [("run-1", "success", None)])
 
-    def test_run_once_switches_to_monitoring_after_target_is_reached(self):
+    def test_run_once_keeps_generating_after_target_by_default(self):
+        supabase = FakeSupabase(total=200)
+
+        summary = run_once(
+            source_client=FakeSource(),
+            supabase=supabase,
+            draft_generator=FakeDraftGenerator(),
+            tip_url="https://buymeacoffee.com/example",
+            max_drafts=3,
+            target_usd=15,
+        )
+
+        self.assertEqual(summary.status, "success")
+        self.assertEqual(summary.generated_drafts, 1)
+        self.assertEqual(supabase.opportunities[0]["external_id"], "900")
+        self.assertEqual(supabase.drafts[0]["opportunity_id"], "opp-1")
+        self.assertIn("target_reached", [event[1] for event in supabase.events])
+
+    def test_run_once_switches_to_monitoring_after_target_when_stop_after_target_enabled(self):
         supabase = FakeSupabase(total=15)
 
         summary = run_once(
@@ -97,6 +115,7 @@ class MainLoopTests(unittest.TestCase):
             tip_url="https://buymeacoffee.com/example",
             max_drafts=3,
             target_usd=15,
+            stop_after_target=True,
         )
 
         self.assertEqual(summary.status, "monitoring")

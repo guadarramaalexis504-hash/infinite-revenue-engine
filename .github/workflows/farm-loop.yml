@@ -24,6 +24,7 @@ jobs:
       BUYMEACOFFEE_WEBHOOK_TOKEN: ${{ secrets.BUYMEACOFFEE_WEBHOOK_TOKEN }}
       TIP_URL: ${{ secrets.TIP_URL }}
       TARGET_USD: "15"
+      STOP_AFTER_TARGET: "false"
       MAX_DRAFTS_PER_RUN: "3"
     steps:
       - name: Check out repository

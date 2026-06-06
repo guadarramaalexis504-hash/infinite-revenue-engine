@@ -1,6 +1,6 @@
 # Infinite Farm Loop Seguro
 
-Python loop for finding technical-answer opportunities, generating reviewable drafts, and tracking optional tips toward a 15 USD target. It does not scrape HTML, auto-post to forums, or execute payment-gated spam.
+Python loop for finding technical-answer opportunities, generating reviewable drafts, and tracking optional tips toward a 15 USD milestone. It keeps running after the milestone by default, so totals can keep accumulating. It does not scrape HTML, auto-post to forums, or execute payment-gated spam.
 
 ## Runtime
 
@@ -66,6 +66,7 @@ Set these in GitHub repository secrets:
 Optional environment variables:
 
 - `TARGET_USD`, default `15`
+- `STOP_AFTER_TARGET`, default `false`
 - `MAX_DRAFTS_PER_RUN`, default `3`
 - `STACKEXCHANGE_TAGS`, default `python;fastapi;supabase;openai-api`
 - `OPENAI_MODEL`, default `gpt-4o-mini`
@@ -142,7 +143,7 @@ handle_buymeacoffee_webhook(
 )
 ```
 
-The loop stops generating new drafts once `sum(tip_events.amount_usd) >= TARGET_USD`, unless `--force-drafts` is passed.
+The loop logs a `target_reached` event once `sum(tip_events.amount_usd) >= TARGET_USD`, but it keeps generating new drafts by default. Set `STOP_AFTER_TARGET=true` or pass `--stop-after-target` only if you want it to pause after the milestone.
 
 ## Tests
 
