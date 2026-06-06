@@ -17,11 +17,13 @@ class StaticSiteExporter:
         *,
         tip_url: str = "",
         click_redirect_url: str = "",
+        intake_url: str = "",
         tools_path: str = "",
     ) -> None:
         self.output_dir = Path(output_dir)
         self.tip_url = tip_url
         self.click_redirect_url = click_redirect_url
+        self.intake_url = intake_url
         self.tools_path = tools_path
 
     def export_portfolio(self, opportunities_with_assets: list[tuple[RevenueOpportunity, list[AssetDraft]]]) -> list[str]:
@@ -41,9 +43,14 @@ class StaticSiteExporter:
         offers_path = offers_dir / "index.html"
         offers_path.write_text(self._offers_page(opportunities), encoding="utf-8")
 
+        intake_dir = self.output_dir / "intake"
+        intake_dir.mkdir(parents=True, exist_ok=True)
+        intake_path = intake_dir / "index.html"
+        intake_path.write_text(self._intake_page(opportunities), encoding="utf-8")
+
         index_path = self.output_dir / "index.html"
         index_path.write_text(self._index_page(opportunities), encoding="utf-8")
-        return [str(index_path), str(offers_path), *written]
+        return [str(index_path), str(offers_path), str(intake_path), *written]
 
     def _index_page(self, opportunities: list[RevenueOpportunity]) -> str:
         cards = "\n".join(self._opportunity_card(opportunity) for opportunity in opportunities)
@@ -56,6 +63,7 @@ class StaticSiteExporter:
                 <strong>Infinite Revenue Engine</strong>
                 <span>Owned static site</span>
                 <a class="nav-link" href="offers/">Offers</a>
+                <a class="nav-link" href="intake/">Intake</a>
                 {tools_link}
               </header>
               <section class="hero">
@@ -100,6 +108,7 @@ class StaticSiteExporter:
                 <a href="../">Infinite Revenue Engine</a>
                 <span>manual review</span>
                 <a class="nav-link" href="../offers/">Offers</a>
+                <a class="nav-link" href="../intake/">Intake</a>
                 {tools_link}
               </header>
               <article class="detail">
@@ -135,6 +144,7 @@ class StaticSiteExporter:
               <header class="topbar">
                 <a href="../">Infinite Revenue Engine</a>
                 <span>owned offer catalog</span>
+                <a class="nav-link" href="../intake/">Intake</a>
               </header>
               <section class="hero">
                 <div>
@@ -151,11 +161,7 @@ class StaticSiteExporter:
 
     def _catalog_offer_card(self, opportunity: RevenueOpportunity, offer: OfferDraft) -> str:
         detail_path = f"../{slugify(opportunity.external_id)}/"
-        if self.tip_url:
-            url = build_tracking_url(self.tip_url, opportunity, content=offer.offer_type)
-            action = f'<a href="{escape(url)}">{escape(offer.cta_label)}</a>'
-        else:
-            action = "Configure TIP_URL before publishing offer CTAs."
+        action = self._offer_action(opportunity, offer)
         return f"""
         <article class="offer">
           <p class="channel">{escape(offer.channel.replace("_", " "))} / {escape(offer.offer_type.replace("_", " "))}</p>
@@ -166,6 +172,51 @@ class StaticSiteExporter:
           <p class="offer-action">{action}</p>
         </article>
         """
+
+    def _intake_page(self, opportunities: list[RevenueOpportunity]) -> str:
+        cards = "\n".join(self._intake_card(opportunity) for opportunity in opportunities)
+        return self._page(
+            "Setup Intake",
+            f"""
+            <main class="shell">
+              <header class="topbar">
+                <a href="../">Infinite Revenue Engine</a>
+                <span>service intake</span>
+                <a class="nav-link" href="../offers/">Offers</a>
+              </header>
+              <section class="hero">
+                <div>
+                  <h1>Setup Intake</h1>
+                  <p>Use this page to collect enough scope before accepting paid setup work.</p>
+                </div>
+              </section>
+              <section class="detail">
+                <h2>Scope</h2>
+                <p class="lead">Confirm project URL, stack, access limits, deadline, success criteria, and payment path before starting any paid work.</p>
+                {self._intake_cta(opportunities[0] if opportunities else None)}
+              </section>
+              <section class="offer-grid" aria-label="Setup intake opportunities">
+                {cards}
+              </section>
+            </main>
+            """,
+        )
+
+    def _intake_card(self, opportunity: RevenueOpportunity) -> str:
+        return f"""
+        <article class="offer">
+          <p class="channel">{escape(opportunity.channel.replace("_", " "))}</p>
+          <h2>{escape(opportunity.title)}</h2>
+          <p>{escape(opportunity.problem)}</p>
+          <p><a href="../{escape(slugify(opportunity.external_id))}/">Review opportunity</a></p>
+        </article>
+        """
+
+    def _intake_cta(self, opportunity: RevenueOpportunity | None) -> str:
+        if not self.intake_url or not opportunity:
+            return '<p class="notice">Configure SERVICE_INTAKE_URL before publishing intake CTAs.</p>'
+        url = build_tracking_url(self.intake_url, opportunity, content="intake")
+        return f'<p class="notice"><a href="{escape(url)}">Start setup intake</a></p>'
 
     def _asset_section(self, asset: AssetDraft) -> str:
         return f"""
@@ -199,11 +250,7 @@ class StaticSiteExporter:
         """
 
     def _offer_card(self, opportunity: RevenueOpportunity, offer: OfferDraft) -> str:
-        if self.tip_url:
-            url = build_tracking_url(self.tip_url, opportunity, content=offer.offer_type)
-            action = f'<a href="{escape(url)}">{escape(offer.cta_label)}</a>'
-        else:
-            action = "Configure TIP_URL before publishing offer CTAs."
+        action = self._offer_action(opportunity, offer)
         return f"""
         <article class="offer">
           <p class="channel">{escape(offer.offer_type.replace("_", " "))}</p>
@@ -213,6 +260,15 @@ class StaticSiteExporter:
           <p class="offer-action">{action}</p>
         </article>
         """
+
+    def _offer_action(self, opportunity: RevenueOpportunity, offer: OfferDraft) -> str:
+        if self.intake_url and offer.offer_type in {"fixed_scope_service", "setup_service"}:
+            url = build_tracking_url(self.intake_url, opportunity, content=f"{offer.offer_type}_intake")
+            return f'<a href="{escape(url)}">{escape(offer.cta_label)}</a>'
+        if self.tip_url:
+            url = build_tracking_url(self.tip_url, opportunity, content=offer.offer_type)
+            return f'<a href="{escape(url)}">{escape(offer.cta_label)}</a>'
+        return "Configure TIP_URL before publishing offer CTAs."
 
     def _tools_link(self, *, prefix: str) -> str:
         if not self.tools_path:

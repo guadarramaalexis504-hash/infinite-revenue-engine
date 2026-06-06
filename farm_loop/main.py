@@ -225,6 +225,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     asset_exporter = LocalAssetExporter(asset_output_dir) if asset_output_dir else None
     site_output_dir = args.site_output_dir or settings.site_output_dir
     click_redirect_url = args.click_redirect_url or settings.click_redirect_url or ""
+    intake_url = args.intake_url or settings.service_intake_url or ""
     microtool_output_dir = args.microtool_output_dir or settings.microtool_output_dir
     tools_path = tools_path_for_site(site_output_dir, microtool_output_dir) if site_output_dir and microtool_output_dir else ""
     site_exporter = (
@@ -232,6 +233,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
             site_output_dir,
             tip_url=settings.tip_url,
             click_redirect_url=click_redirect_url,
+            intake_url=intake_url,
             tools_path=tools_path,
         )
         if site_output_dir
@@ -345,6 +347,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--click-redirect-url",
         default=None,
         help="Optional owned click redirect endpoint used for support CTAs.",
+    )
+    parser.add_argument(
+        "--intake-url",
+        default=None,
+        help="Optional owned setup intake form URL used for service CTAs.",
     )
     parser.add_argument(
         "--launch-queue-output-dir",

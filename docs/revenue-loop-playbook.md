@@ -14,6 +14,7 @@ Current operating target:
 - Interactive microtools: `MICROTOOL_OUTPUT_DIR=out/microtools`.
 - Offer catalog: `OFFER_OUTPUT_DIR=out/offers`.
 - Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
+- Optional service intake: `SERVICE_INTAKE_URL=https://your-form-or-checkout.example`.
 - Live-readiness check: `.\scripts\doctor.ps1`.
 - Milestones: `$15`, `$200`, `$1,000`, `$20,000`.
 - Default behavior: keep running after milestones because `STOP_AFTER_TARGET=false`.
@@ -59,7 +60,7 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The site is a local owned channel draft with an index and one page per opportunity. It can carry a support CTA when `TIP_URL` is configured, but it still needs manual review before public deployment.
 
-The site also writes `offers/index.html` as a central owned-channel catalog of all generated service, support, and product offers.
+The site also writes `offers/index.html` as a central owned-channel catalog of all generated service, support, and product offers, plus `intake/index.html` for paid setup/service requests. Set `SERVICE_INTAKE_URL` before publishing service CTAs.
 
 Generate a prioritized launch queue:
 
@@ -100,6 +101,7 @@ Attribution:
 - direct links work with only UTM parameters
 - when `CLICK_REDIRECT_URL` is configured, support CTAs use an owned click redirect before the final support/payment URL
 - the click redirect handler validates allowed target hosts and inserts rows into `click_events` with `source='revenue_site'`
+- service offers use `SERVICE_INTAKE_URL` first and add UTM attribution such as `utm_content=fixed_scope_service_intake`
 - confirmed payment events can be recorded through `--record-conversion` or a custom webhook calling `handle_conversion_webhook`
 
 Local continuous review loop:
@@ -302,6 +304,7 @@ Revenue should be counted only from confirmed `tip_events` and `conversion_event
 - If no remote exists locally, use `.\scripts\configure-github.ps1 -Repo owner/repo -RunWorkflow`.
 - Payment path: Buy Me a Coffee, Stripe, Gumroad, Lemon Squeezy, or GitHub Sponsors.
 - Optional conversion webhook token: `CONVERSION_WEBHOOK_TOKEN`.
+- Service intake URL: `SERVICE_INTAKE_URL`.
 - Owned publishing surface: repo, website, landing pages, newsletter, or store.
 - Manual review process for assets before public release.
 - Basic analytics for click and conversion attribution.

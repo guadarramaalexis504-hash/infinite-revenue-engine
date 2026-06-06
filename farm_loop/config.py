@@ -33,6 +33,7 @@ class Settings:
     asset_output_dir: str | None = None
     site_output_dir: str | None = None
     click_redirect_url: str | None = None
+    service_intake_url: str | None = None
     launch_queue_output_dir: str | None = None
     microtool_output_dir: str | None = None
     offer_output_dir: str | None = None
@@ -57,6 +58,7 @@ class Settings:
             asset_output_dir=os.getenv("ASSET_OUTPUT_DIR"),
             site_output_dir=os.getenv("SITE_OUTPUT_DIR"),
             click_redirect_url=os.getenv("CLICK_REDIRECT_URL"),
+            service_intake_url=os.getenv("SERVICE_INTAKE_URL"),
             launch_queue_output_dir=os.getenv("LAUNCH_QUEUE_OUTPUT_DIR"),
             microtool_output_dir=os.getenv("MICROTOOL_OUTPUT_DIR"),
             offer_output_dir=os.getenv("OFFER_OUTPUT_DIR"),

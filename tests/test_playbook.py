@@ -44,6 +44,8 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "--record-conversion",
             "CONVERSION_WEBHOOK_TOKEN",
             "offers/index.html",
+            "SERVICE_INTAKE_URL",
+            "intake/index.html",
         ]:
             self.assertIn(required, body)
 
