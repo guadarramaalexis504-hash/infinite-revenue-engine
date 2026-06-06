@@ -45,6 +45,10 @@ class StaticSiteExporterTests(unittest.TestCase):
         self.assertIn("https://buymeacoffee.com/example?", page)
         self.assertIn("utm_campaign=offer-webhook-setup-service", page)
         self.assertIn("ire_external_id=offer-webhook-setup-service", page)
+        self.assertIn("Ways to work with this", page)
+        self.assertIn("$199.00", page)
+        self.assertIn("Book fixed setup", page)
+        self.assertIn("utm_content=fixed_scope_service", page)
         self.assertIn("manual review", page.lower())
         self.assertNotIn("stackoverflow.com", page.lower())
 
@@ -75,6 +79,17 @@ class StaticSiteExporterTests(unittest.TestCase):
         self.assertIn('href="tools/"', index)
         self.assertIn("Interactive tools", index)
         self.assertIn('href="../tools/"', page)
+
+    def test_offer_cards_show_payment_setup_notice_without_tip_url(self):
+        assets = AssetGenerator().generate_all(self.opportunity)
+
+        with tempfile.TemporaryDirectory() as directory:
+            StaticSiteExporter(directory).export_portfolio([(self.opportunity, assets)])
+            page = (Path(directory) / "offer-webhook-setup-service" / "index.html").read_text(encoding="utf-8")
+
+        self.assertIn("Ways to work with this", page)
+        self.assertIn("$199.00", page)
+        self.assertIn("Configure TIP_URL before publishing offer CTAs", page)
 
 
 if __name__ == "__main__":

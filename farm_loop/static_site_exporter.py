@@ -5,6 +5,7 @@ from pathlib import Path
 
 from .asset_exporter import slugify
 from .assets import AssetDraft
+from .offers import OfferDraft, generate_offers
 from .revenue_scoring import RevenueOpportunity
 from .tracking import build_click_redirect_url, build_tracking_url
 
@@ -82,6 +83,7 @@ class StaticSiteExporter:
     def _opportunity_page(self, opportunity: RevenueOpportunity, assets: list[AssetDraft]) -> str:
         asset_sections = "\n".join(self._asset_section(asset) for asset in assets)
         cta = self._support_cta(opportunity)
+        offers = self._offer_section(opportunity)
         tools_link = self._tools_link(prefix="../")
         return self._page(
             opportunity.title,
@@ -102,6 +104,7 @@ class StaticSiteExporter:
                   <div><dt>Build time</dt><dd>{opportunity.build_minutes} min</dd></div>
                 </dl>
                 {cta}
+                {offers}
                 <section class="asset-list" aria-label="Review drafts">
                   <h2>Review drafts</h2>
                   {asset_sections}
@@ -132,6 +135,31 @@ class StaticSiteExporter:
         else:
             url = build_tracking_url(self.tip_url, opportunity, content="support_cta")
         return f'<p class="notice">Useful? <a href="{escape(url)}">Support this work</a>.</p>'
+
+    def _offer_section(self, opportunity: RevenueOpportunity) -> str:
+        cards = "\n".join(self._offer_card(opportunity, offer) for offer in generate_offers(opportunity))
+        return f"""
+        <section class="offer-list" aria-label="Ways to work with this">
+          <h2>Ways to work with this</h2>
+          <div class="offer-grid">{cards}</div>
+        </section>
+        """
+
+    def _offer_card(self, opportunity: RevenueOpportunity, offer: OfferDraft) -> str:
+        if self.tip_url:
+            url = build_tracking_url(self.tip_url, opportunity, content=offer.offer_type)
+            action = f'<a href="{escape(url)}">{escape(offer.cta_label)}</a>'
+        else:
+            action = "Configure TIP_URL before publishing offer CTAs."
+        return f"""
+        <article class="offer">
+          <p class="channel">{escape(offer.offer_type.replace("_", " "))}</p>
+          <h3>{escape(offer.title)}</h3>
+          <strong>${offer.price_usd:.2f}</strong>
+          <p>{escape(offer.description)}</p>
+          <p class="offer-action">{action}</p>
+        </article>
+        """
 
     def _tools_link(self, *, prefix: str) -> str:
         if not self.tools_path:
@@ -174,7 +202,7 @@ class StaticSiteExporter:
     h2, h3 {{ letter-spacing: 0; }}
     .hero p, .lead {{ max-width: 760px; color: var(--muted); font-size: 1.08rem; }}
     .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }}
-    .card, .asset, .detail {{ background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }}
+    .card, .asset, .detail, .offer {{ background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }}
     .card {{ padding: 18px; min-height: 260px; display: flex; flex-direction: column; gap: 10px; }}
     .card h2 {{ margin: 0; font-size: 1.25rem; }}
     .card p {{ margin: 0; color: var(--muted); }}
@@ -187,6 +215,11 @@ class StaticSiteExporter:
     .metrics {{ max-width: 720px; margin: 26px 0; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }}
     .notice {{ background: var(--accent-soft); border: 1px solid #b6dbd2; border-radius: 8px; padding: 14px 16px; }}
     .asset-list {{ margin-top: 32px; display: grid; gap: 14px; }}
+    .offer-list {{ margin-top: 28px; }}
+    .offer-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }}
+    .offer {{ padding: 16px; }}
+    .offer strong {{ display: block; margin: 8px 0; font-size: 1.2rem; }}
+    .offer-action {{ font-weight: 700; }}
     .asset {{ padding: 18px; }}
     pre {{ white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; color: var(--muted); font-family: Consolas, monospace; font-size: 0.9rem; }}
     @media (max-width: 640px) {{
