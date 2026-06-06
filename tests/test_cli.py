@@ -97,6 +97,33 @@ class CLITests(unittest.TestCase):
 
         self.assertEqual(args.offer_output_dir, "out/offers")
 
+    def test_parse_args_supports_manual_conversion_recording(self):
+        args = parse_args(
+            [
+                "--record-conversion",
+                "--dry-run",
+                "--conversion-provider",
+                "gumroad",
+                "--conversion-external-id",
+                "sale-123",
+                "--conversion-amount-usd",
+                "29",
+                "--conversion-source",
+                "digital_product",
+                "--conversion-offer-id",
+                "offer-product",
+                "--conversion-payload-json",
+                '{"product":"Template pack"}',
+            ]
+        )
+
+        self.assertTrue(args.record_conversion)
+        self.assertEqual(args.conversion_provider, "gumroad")
+        self.assertEqual(args.conversion_external_id, "sale-123")
+        self.assertEqual(args.conversion_amount_usd, 29)
+        self.assertEqual(args.conversion_source, "digital_product")
+        self.assertEqual(args.conversion_offer_id, "offer-product")
+
     def test_tools_path_for_site_returns_relative_tools_url_inside_site_output(self):
         self.assertEqual(tools_path_for_site("out/site", "out/site/tools"), "tools/")
         self.assertEqual(tools_path_for_site("out/site", "out/site/tools/dev"), "tools/dev/")

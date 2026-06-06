@@ -41,6 +41,8 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "--portfolio-once --portfolio-phase prune",
             "won",
             "paused",
+            "--record-conversion",
+            "CONVERSION_WEBHOOK_TOKEN",
         ]:
             self.assertIn(required, body)
 

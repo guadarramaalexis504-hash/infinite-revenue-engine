@@ -8,6 +8,7 @@ TOKEN_HEADERS = {
     "x-bmac-token",
     "x-verification-token",
     "verification-token",
+    "x-revenue-webhook-token",
 }
 
 

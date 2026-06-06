@@ -11,6 +11,7 @@ from typing import Any
 
 from .asset_exporter import LocalAssetExporter
 from .config import Settings
+from .conversions import build_manual_conversion_payload
 from .drafts import DraftGenerator
 from .launch_queue import LaunchQueueExporter
 from .microtool_exporter import MicrotoolExporter
@@ -258,6 +259,47 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_record_conversion(args: argparse.Namespace) -> int:
+    payload_json = _parse_json_object(args.conversion_payload_json)
+    conversion_payload = build_manual_conversion_payload(
+        provider=args.conversion_provider,
+        external_id=args.conversion_external_id or "",
+        amount_usd=args.conversion_amount_usd,
+        source=args.conversion_source,
+        offer_id=args.conversion_offer_id,
+        payload=payload_json,
+    )
+    if args.dry_run:
+        LOGGER.info("dry_run_conversion %s", json.dumps(conversion_payload, sort_keys=True))
+        return 0
+
+    settings = Settings.from_env()
+    if not settings.supabase_url or not settings.supabase_key:
+        raise ValueError("Missing required environment variables: SUPABASE_URL, SUPABASE_KEY")
+    supabase = SupabaseClient(settings.supabase_url, settings.supabase_key)
+    rows = supabase.insert_conversion_event(conversion_payload)
+    supabase.insert_event(
+        None,
+        "conversion_recorded",
+        {
+            "source": conversion_payload["source"],
+            "external_id": conversion_payload["external_id"],
+            "amount_usd": conversion_payload["amount_usd"],
+        },
+    )
+    LOGGER.info("conversion_recorded %s", json.dumps({"rows": rows}, sort_keys=True))
+    return 0
+
+
+def _parse_json_object(value: str | None) -> dict[str, Any]:
+    if not value:
+        return {}
+    parsed = json.loads(value)
+    if not isinstance(parsed, dict):
+        raise ValueError("--conversion-payload-json must decode to a JSON object")
+    return parsed
+
+
 def tools_path_for_site(site_output_dir: str | None, microtool_output_dir: str | None) -> str:
     if not site_output_dir or not microtool_output_dir:
         return ""
@@ -277,6 +319,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     mode.add_argument("--once", action="store_true", help="Run one cycle and exit.")
     mode.add_argument("--loop", action="store_true", help="Run continuously.")
     mode.add_argument("--portfolio-once", action="store_true", help="Run one revenue portfolio cycle and exit.")
+    mode.add_argument("--record-conversion", action="store_true", help="Record one confirmed conversion and exit.")
     parser.add_argument("--interval-seconds", type=int, default=300)
     parser.add_argument("--dry-run", action="store_true", help="Avoid Supabase writes and OpenAI draft generation.")
     parser.add_argument("--force-drafts", action="store_true", help="Generate drafts even after TARGET_USD is reached.")
@@ -318,6 +361,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="Write monetizable offer drafts to JSON and Markdown files.",
     )
+    parser.add_argument("--conversion-provider", default="manual", help="Payment provider, e.g. manual, stripe, gumroad.")
+    parser.add_argument("--conversion-external-id", default=None, help="Provider sale/event id used for dedupe.")
+    parser.add_argument("--conversion-amount-usd", type=float, default=0.0, help="Confirmed conversion amount in USD.")
+    parser.add_argument("--conversion-source", default="manual", help="Revenue source/channel attribution.")
+    parser.add_argument("--conversion-offer-id", default=None, help="Optional Supabase offers.id attribution.")
+    parser.add_argument("--conversion-payload-json", default="{}", help="Optional JSON payload to store with the conversion.")
     return parser.parse_args(argv)
 
 
@@ -325,6 +374,8 @@ def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     args = parse_args(argv)
     try:
+        if args.record_conversion:
+            return run_record_conversion(args)
         if args.portfolio_once:
             return run_portfolio_single(args)
         if args.loop:

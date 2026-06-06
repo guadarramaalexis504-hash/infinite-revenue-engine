@@ -56,6 +56,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The offer catalog writes `offers.json` and `OFFERS.md` with draft prices, CTA labels, and owned-channel descriptions for support, setup services, digital products, and sponsorship-style offers.
 
+Record a confirmed sale from any payment path:
+
+```powershell
+python -m farm_loop.main --record-conversion --conversion-provider gumroad --conversion-external-id sale-123 --conversion-amount-usd 29 --conversion-source digital_product --conversion-offer-id offer-id
+```
+
+Use `--dry-run` first to verify the payload without writing to Supabase. Conversion external ids are stored as `<provider>:<id>` so Stripe, Gumroad, Lemon Squeezy, manual invoices, and other providers can share `conversion_events` safely.
+
 Generate interactive microtools for supported opportunities:
 
 ```powershell
@@ -150,6 +158,7 @@ Optional environment variables:
 - `ASSET_OUTPUT_DIR`, optional local manual-review export path such as `out/revenue-assets`
 - `SITE_OUTPUT_DIR`, optional owned static site export path such as `out/site`
 - `CLICK_REDIRECT_URL`, optional owned click redirect endpoint such as `https://your-domain.example/click`
+- `CONVERSION_WEBHOOK_TOKEN`, optional shared token for your owned conversion webhook endpoint
 - `LAUNCH_QUEUE_OUTPUT_DIR`, optional launch queue export path such as `out/launch-queue`
 - `MICROTOOL_OUTPUT_DIR`, optional interactive microtool export path such as `out/microtools`
 - `OFFER_OUTPUT_DIR`, optional offer catalog export path such as `out/offers`
@@ -173,6 +182,25 @@ return redirect(result["location"])
 ```
 
 The handler rejects non-HTTPS targets and hosts outside the allowlist.
+
+## Conversion Webhooks
+
+Host a small HTTPS endpoint for confirmed payment events and call the reusable handler with a server-side Supabase key:
+
+```python
+from farm_loop.webhook_handler import handle_conversion_webhook
+from farm_loop.supabase_client import SupabaseClient
+
+handle_conversion_webhook(
+    headers=request_headers,
+    payload=request_json,
+    expected_token=CONVERSION_WEBHOOK_TOKEN,
+    provider="stripe",
+    supabase=SupabaseClient(SUPABASE_URL, SUPABASE_KEY),
+)
+```
+
+The handler accepts `X-Revenue-Webhook-Token`, extracts USD amount, provider/event id, optional `offer_id`, and attribution source metadata, then inserts `conversion_events`.
 
 ## Supabase Setup
 

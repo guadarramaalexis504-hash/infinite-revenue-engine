@@ -61,7 +61,7 @@ EMPTY=
         )
 
     def test_optional_github_secret_names_include_click_redirect(self):
-        self.assertEqual(optional_github_secret_names(), ["CLICK_REDIRECT_URL"])
+        self.assertEqual(optional_github_secret_names(), ["CLICK_REDIRECT_URL", "CONVERSION_WEBHOOK_TOKEN"])
 
     def test_placeholder_vars_detects_example_values(self):
         env = {
@@ -97,6 +97,7 @@ EMPTY=
         self.assertIn("[string]$Repo", script)
         self.assertIn("$optionalSecretNames", script)
         self.assertIn('"CLICK_REDIRECT_URL"', script)
+        self.assertIn('"CONVERSION_WEBHOOK_TOKEN"', script)
         self.assertIn("gh auth status", script)
         self.assertIn("No git remote found", script)
 
@@ -196,6 +197,7 @@ EMPTY=
         self.assertIn("LAUNCH_QUEUE_OUTPUT_DIR=out/launch-queue", env_example)
         self.assertIn("MICROTOOL_OUTPUT_DIR=out/microtools", env_example)
         self.assertIn("OFFER_OUTPUT_DIR=out/offers", env_example)
+        self.assertIn("CONVERSION_WEBHOOK_TOKEN=", env_example)
         self.assertIn("out/", gitignore)
 
     def test_pages_workflow_passes_optional_click_redirect_url(self):

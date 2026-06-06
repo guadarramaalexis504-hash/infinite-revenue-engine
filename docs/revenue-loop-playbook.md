@@ -75,6 +75,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The offer catalog writes `offers.json` and `OFFERS.md`. It turns selected opportunities into draft support offers, setup services, digital products, or sponsorship-style CTAs with prices. In live Supabase runs, these offers are inserted into `offers`.
 
+Record a confirmed conversion:
+
+```powershell
+python -m farm_loop.main --record-conversion --conversion-provider stripe --conversion-external-id evt_123 --conversion-amount-usd 99 --conversion-source paid_setup_kit --conversion-offer-id offer-id
+```
+
+This writes to `conversion_events` in live mode and supports dry-run validation first. Use it for confirmed Stripe, Gumroad, Lemon Squeezy, manual invoice, affiliate, or sponsorship revenue when a provider-specific integration is not wired yet.
+
 Generate interactive microtools:
 
 ```powershell
@@ -90,6 +98,7 @@ Attribution:
 - direct links work with only UTM parameters
 - when `CLICK_REDIRECT_URL` is configured, support CTAs use an owned click redirect before the final support/payment URL
 - the click redirect handler validates allowed target hosts and inserts rows into `click_events` with `source='revenue_site'`
+- confirmed payment events can be recorded through `--record-conversion` or a custom webhook calling `handle_conversion_webhook`
 
 Local continuous review loop:
 
@@ -290,6 +299,7 @@ Revenue should be counted only from confirmed `tip_events` and `conversion_event
 - GitHub remote and authenticated `gh` or repository UI access so workflows can be dispatched.
 - If no remote exists locally, use `.\scripts\configure-github.ps1 -Repo owner/repo -RunWorkflow`.
 - Payment path: Buy Me a Coffee, Stripe, Gumroad, Lemon Squeezy, or GitHub Sponsors.
+- Optional conversion webhook token: `CONVERSION_WEBHOOK_TOKEN`.
 - Owned publishing surface: repo, website, landing pages, newsletter, or store.
 - Manual review process for assets before public release.
 - Basic analytics for click and conversion attribution.
