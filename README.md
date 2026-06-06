@@ -40,6 +40,8 @@ Generate an owned static site from the same selected opportunities:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --site-output-dir out/site
 ```
 
+The site includes an index, one page per opportunity, and `offers/index.html` as a central owned-channel offer catalog.
+
 Generate a prioritized launch queue from the selected opportunities:
 
 ```powershell

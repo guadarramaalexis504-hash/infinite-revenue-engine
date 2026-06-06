@@ -27,6 +27,7 @@ class StaticSiteExporter:
     def export_portfolio(self, opportunities_with_assets: list[tuple[RevenueOpportunity, list[AssetDraft]]]) -> list[str]:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         written: list[str] = []
+        opportunities = [item[0] for item in opportunities_with_assets]
 
         for opportunity, assets in opportunities_with_assets:
             page_dir = self.output_dir / slugify(opportunity.external_id)
@@ -35,9 +36,14 @@ class StaticSiteExporter:
             page_path.write_text(self._opportunity_page(opportunity, assets), encoding="utf-8")
             written.append(str(page_path))
 
+        offers_dir = self.output_dir / "offers"
+        offers_dir.mkdir(parents=True, exist_ok=True)
+        offers_path = offers_dir / "index.html"
+        offers_path.write_text(self._offers_page(opportunities), encoding="utf-8")
+
         index_path = self.output_dir / "index.html"
-        index_path.write_text(self._index_page([item[0] for item in opportunities_with_assets]), encoding="utf-8")
-        return [str(index_path), *written]
+        index_path.write_text(self._index_page(opportunities), encoding="utf-8")
+        return [str(index_path), str(offers_path), *written]
 
     def _index_page(self, opportunities: list[RevenueOpportunity]) -> str:
         cards = "\n".join(self._opportunity_card(opportunity) for opportunity in opportunities)
@@ -49,6 +55,7 @@ class StaticSiteExporter:
               <header class="topbar">
                 <strong>Infinite Revenue Engine</strong>
                 <span>Owned static site</span>
+                <a class="nav-link" href="offers/">Offers</a>
                 {tools_link}
               </header>
               <section class="hero">
@@ -92,6 +99,7 @@ class StaticSiteExporter:
               <header class="topbar">
                 <a href="../">Infinite Revenue Engine</a>
                 <span>manual review</span>
+                <a class="nav-link" href="../offers/">Offers</a>
                 {tools_link}
               </header>
               <article class="detail">
@@ -113,6 +121,51 @@ class StaticSiteExporter:
             </main>
             """,
         )
+
+    def _offers_page(self, opportunities: list[RevenueOpportunity]) -> str:
+        cards = "\n".join(
+            self._catalog_offer_card(opportunity, offer)
+            for opportunity in opportunities
+            for offer in generate_offers(opportunity)
+        )
+        return self._page(
+            "Offer Catalog",
+            f"""
+            <main class="shell">
+              <header class="topbar">
+                <a href="../">Infinite Revenue Engine</a>
+                <span>owned offer catalog</span>
+              </header>
+              <section class="hero">
+                <div>
+                  <h1>Offer Catalog</h1>
+                  <p>Reviewable services, support CTAs, and digital product offers from the current revenue portfolio.</p>
+                </div>
+              </section>
+              <section class="offer-grid" aria-label="Monetizable offers">
+                {cards}
+              </section>
+            </main>
+            """,
+        )
+
+    def _catalog_offer_card(self, opportunity: RevenueOpportunity, offer: OfferDraft) -> str:
+        detail_path = f"../{slugify(opportunity.external_id)}/"
+        if self.tip_url:
+            url = build_tracking_url(self.tip_url, opportunity, content=offer.offer_type)
+            action = f'<a href="{escape(url)}">{escape(offer.cta_label)}</a>'
+        else:
+            action = "Configure TIP_URL before publishing offer CTAs."
+        return f"""
+        <article class="offer">
+          <p class="channel">{escape(offer.channel.replace("_", " "))} / {escape(offer.offer_type.replace("_", " "))}</p>
+          <h2>{escape(offer.title)}</h2>
+          <strong>${offer.price_usd:.2f}</strong>
+          <p>{escape(offer.description)}</p>
+          <p><a href="{escape(detail_path)}">View opportunity</a></p>
+          <p class="offer-action">{action}</p>
+        </article>
+        """
 
     def _asset_section(self, asset: AssetDraft) -> str:
         return f"""

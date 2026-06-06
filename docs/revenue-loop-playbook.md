@@ -59,6 +59,8 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The site is a local owned channel draft with an index and one page per opportunity. It can carry a support CTA when `TIP_URL` is configured, but it still needs manual review before public deployment.
 
+The site also writes `offers/index.html` as a central owned-channel catalog of all generated service, support, and product offers.
+
 Generate a prioritized launch queue:
 
 ```powershell
