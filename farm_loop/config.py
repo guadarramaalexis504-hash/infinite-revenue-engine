@@ -29,6 +29,7 @@ class Settings:
     openai_model: str = "gpt-4o-mini"
     stop_after_target: bool = False
     keyword_csv_path: str = "data/revenue_keywords.csv"
+    idea_catalog_path: str = "data/revenue_ideas.json"
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -46,6 +47,7 @@ class Settings:
             openai_model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
             stop_after_target=_env_bool("STOP_AFTER_TARGET", False),
             keyword_csv_path=os.getenv("KEYWORD_CSV_PATH", "data/revenue_keywords.csv"),
+            idea_catalog_path=os.getenv("IDEA_CATALOG_PATH", "data/revenue_ideas.json"),
         )
 
     def require_runtime_secrets(self, dry_run: bool) -> None:

@@ -11,6 +11,7 @@ __all__ = [
     "revenue_scoring",
     "scoring",
     "sources_github",
+    "sources_idea_catalog",
     "sources_keywords",
     "sources_stackexchange",
     "supabase_client",

@@ -31,6 +31,7 @@ jobs:
       STOP_AFTER_TARGET: "false"
       MAX_DRAFTS_PER_RUN: "3"
       KEYWORD_CSV_PATH: "data/revenue_keywords.csv"
+      IDEA_CATALOG_PATH: "data/revenue_ideas.json"
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

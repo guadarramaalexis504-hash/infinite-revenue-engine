@@ -86,6 +86,11 @@ EMPTY=
         self.assertIn("gh secret set $name --app actions", script)
         self.assertLess(script.index("foreach ($name in $secretNames)"), script.index("gh secret set $name"))
 
+    def test_workflow_sets_idea_catalog_path_for_portfolio_runs(self):
+        workflow = Path(".github/workflows/farm-loop.yml").read_text(encoding="utf-8")
+
+        self.assertIn('IDEA_CATALOG_PATH: "data/revenue_ideas.json"', workflow)
+
 
 if __name__ == "__main__":
     unittest.main()

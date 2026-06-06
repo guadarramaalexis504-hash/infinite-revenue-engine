@@ -15,6 +15,7 @@ from .sources_stackexchange import StackExchangeClient
 from .supabase_client import SupabaseClient
 from .revenue_engine import run_revenue_portfolio_once
 from .sources_github import GitHubIssuesClient
+from .sources_idea_catalog import IdeaCatalogSource
 from .sources_keywords import KeywordCSVSource
 
 
@@ -211,6 +212,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     sources = [
         GitHubIssuesClient(token=settings.github_token),
         KeywordCSVSource(settings.keyword_csv_path),
+        IdeaCatalogSource(settings.idea_catalog_path),
     ]
     summary = run_revenue_portfolio_once(
         sources=sources,
