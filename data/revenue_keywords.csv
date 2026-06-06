@@ -1,0 +1,6 @@
+id,title,problem,tags,channel,payout_estimate_usd,conversion_probability,estimated_cost_usd,risk_penalty_usd,build_minutes
+microtool-github-actions-yaml,GitHub Actions YAML checker,Developers break workflow YAML and need a quick preflight checker,github-actions;yaml;ci,microtool_seo,250,0.08,4,1,30
+microtool-supabase-rls,Supabase RLS policy checker,Developers need to spot unsafe or missing RLS policies before shipping,supabase;rls;postgres,microtool_seo,300,0.08,5,1,45
+kit-supabase-actions,Supabase plus GitHub Actions setup kit,Small teams need Supabase schema and cron automation configured end to end,supabase;github-actions;automation,paid_setup_kit,299,0.05,8,2,60
+template-fastapi-openai,FastAPI OpenAI starter template,Builders need a clean API starter with retries logging and env validation,fastapi;openai-api;python,digital_product,99,0.07,5,1,50
+article-api-cost-calculator,API cost calculator microtool,AI builders need to estimate request costs before launching,openai-api;costs;calculator,article_affiliate,180,0.05,4,1,35

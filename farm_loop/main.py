@@ -13,6 +13,9 @@ from .drafts import DraftGenerator
 from .scoring import rank_questions, to_opportunity_payload
 from .sources_stackexchange import StackExchangeClient
 from .supabase_client import SupabaseClient
+from .revenue_engine import run_revenue_portfolio_once
+from .sources_github import GitHubIssuesClient
+from .sources_keywords import KeywordCSVSource
 
 
 LOGGER = logging.getLogger("farm_loop")
@@ -198,15 +201,46 @@ def run_single(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_portfolio_single(args: argparse.Namespace) -> int:
+    settings = Settings.from_env()
+    supabase = None
+    if not args.dry_run:
+        settings.require_runtime_secrets(False)
+        supabase = SupabaseClient(settings.supabase_url or "", settings.supabase_key or "")
+
+    sources = [
+        GitHubIssuesClient(token=settings.github_token),
+        KeywordCSVSource(settings.keyword_csv_path),
+    ]
+    summary = run_revenue_portfolio_once(
+        sources=sources,
+        supabase=supabase,
+        max_opportunities=args.max_opportunities,
+        milestones=settings.revenue_milestones or [15, 200, 1000, 20000],
+        dry_run=args.dry_run,
+        phase=args.portfolio_phase,
+    )
+    LOGGER.info("portfolio_summary %s", json.dumps(asdict(summary), sort_keys=True))
+    return 0
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Safe review-first technical answer opportunity loop.")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--once", action="store_true", help="Run one cycle and exit.")
     mode.add_argument("--loop", action="store_true", help="Run continuously.")
+    mode.add_argument("--portfolio-once", action="store_true", help="Run one revenue portfolio cycle and exit.")
     parser.add_argument("--interval-seconds", type=int, default=300)
     parser.add_argument("--dry-run", action="store_true", help="Avoid Supabase writes and OpenAI draft generation.")
     parser.add_argument("--force-drafts", action="store_true", help="Generate drafts even after TARGET_USD is reached.")
     parser.add_argument("--stop-after-target", action="store_true", help="Pause draft generation once TARGET_USD is reached.")
+    parser.add_argument(
+        "--portfolio-phase",
+        choices=["discover", "generate", "summarize", "prune"],
+        default="discover",
+        help="Portfolio phase label for scheduled workflows.",
+    )
+    parser.add_argument("--max-opportunities", type=int, default=10)
     return parser.parse_args(argv)
 
 
@@ -214,6 +248,8 @@ def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     args = parse_args(argv)
     try:
+        if args.portfolio_once:
+            return run_portfolio_single(args)
         if args.loop:
             return run_loop(args)
         return run_single(args)

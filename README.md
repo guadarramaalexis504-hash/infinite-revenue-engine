@@ -1,6 +1,6 @@
-# Infinite Farm Loop Seguro
+# Infinite Revenue Engine
 
-Python loop for finding technical-answer opportunities, generating reviewable drafts, and tracking optional tips toward a 15 USD milestone. It keeps running after the milestone by default, so totals can keep accumulating. It does not scrape HTML, auto-post to forums, or execute payment-gated spam.
+Python loop for finding revenue opportunities, generating reviewable assets, and tracking optional tips/conversions toward milestones like 15, 200, 1000, and 20000 USD. It keeps running after each milestone by default, so totals can keep accumulating. It does not scrape HTML, auto-post to forums, or execute payment-gated spam.
 
 ## Runtime
 
@@ -22,7 +22,18 @@ Run continuously locally:
 python -m farm_loop.main --loop --interval-seconds 300
 ```
 
-GitHub Actions runs `python -m farm_loop.main --once` every 5 minutes through `.github/workflows/farm-loop.yml`.
+Run one V2 portfolio cycle:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase discover --dry-run
+```
+
+GitHub Actions runs portfolio phases through `.github/workflows/farm-loop.yml`:
+
+- every 5 minutes: discover and score opportunities
+- hourly: generate top reviewable assets
+- daily: summarize portfolio progress
+- weekly: prune low-performing loops
 
 ## One-Command Automation
 
@@ -66,10 +77,13 @@ Set these in GitHub repository secrets:
 Optional environment variables:
 
 - `TARGET_USD`, default `15`
+- `REVENUE_MILESTONES`, default `15,200,1000,20000`
 - `STOP_AFTER_TARGET`, default `false`
 - `MAX_DRAFTS_PER_RUN`, default `3`
 - `STACKEXCHANGE_TAGS`, default `python;fastapi;supabase;openai-api`
 - `OPENAI_MODEL`, default `gpt-4o-mini`
+- `GITHUB_TOKEN`, optional but recommended for GitHub API rate limits
+- `KEYWORD_CSV_PATH`, default `data/revenue_keywords.csv`
 
 ## Supabase Setup
 
@@ -80,6 +94,17 @@ Run `supabase/schema.sql` in the Supabase SQL editor. The schema defines:
 - `drafts`: generated answer drafts, default status `draft`.
 - `events`: structured logs for each run.
 - `tip_events`: confirmed Buy Me a Coffee events, deduplicated by `(provider, external_id)`.
+- `revenue_milestones`: milestone definitions such as 15, 200, 1000, and 20000.
+- `channels`: allowed revenue lanes such as microtools, GitHub issue helper, digital products, affiliates, and paid setup kits.
+- `assets`: reviewable generated assets: microtool specs, article outlines, patch plans, product listings, landing copy, support offers.
+- `offers`, `click_events`, `conversion_events`, `experiments`: monetization and learning loop tracking.
+
+## Safety Rules
+
+- Stack Overflow and Stack Exchange are discovery sources only. Do not publish AI-generated answers there.
+- Public publishing is manual review only.
+- Use owned sites, owned repos, newsletters, Gumroad/Lemon Squeezy/Stripe, Buy Me a Coffee, or GitHub Sponsors for monetization.
+- `aipickd` is off-limits. Current Supabase target is `Sonident`.
 
 ## Exact API Requests
 

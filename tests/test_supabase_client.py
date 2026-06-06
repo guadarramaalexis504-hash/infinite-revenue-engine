@@ -73,6 +73,41 @@ class SupabaseClientTests(unittest.TestCase):
             "https://project.supabase.co/rest/v1/tip_events?select=amount_usd",
         )
 
+    def test_upsert_revenue_opportunity_targets_existing_opportunities_table(self):
+        session = FakeSession()
+        client = SupabaseClient("https://project.supabase.co", "secret-key", session=session)
+
+        client.upsert_revenue_opportunity(
+            {
+                "source": "github",
+                "external_id": "1001",
+                "title": "Need RLS example",
+                "url": "https://github.com/acme/tool/issues/7",
+                "problem": "Need docs",
+                "channel": "github_issue_helper",
+                "expected_value_usd": 8.6,
+            }
+        )
+
+        call = session.calls[0]
+        self.assertEqual(call["method"], "POST")
+        self.assertEqual(
+            call["url"],
+            "https://project.supabase.co/rest/v1/opportunities?on_conflict=source,external_id",
+        )
+        self.assertEqual(call["headers"]["Prefer"], "resolution=merge-duplicates,return=representation")
+        self.assertEqual(call["json"]["channel"], "github_issue_helper")
+
+    def test_insert_asset_and_experiment_use_new_tables(self):
+        session = FakeSession()
+        client = SupabaseClient("https://project.supabase.co", "secret-key", session=session)
+
+        client.insert_asset({"asset_type": "microtool_spec", "title": "Tool"})
+        client.insert_experiment({"name": "exp", "status": "planned"})
+
+        self.assertEqual(session.calls[0]["url"], "https://project.supabase.co/rest/v1/assets")
+        self.assertEqual(session.calls[1]["url"], "https://project.supabase.co/rest/v1/experiments")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -21,11 +21,14 @@ class Settings:
     openai_api_key: str | None
     stackexchange_key: str | None
     tip_url: str
+    github_token: str | None = None
     tags: str = DEFAULT_TAGS
     target_usd: float = 15.0
+    revenue_milestones: list[float] | None = None
     max_drafts: int = 3
     openai_model: str = "gpt-4o-mini"
     stop_after_target: bool = False
+    keyword_csv_path: str = "data/revenue_keywords.csv"
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -34,12 +37,15 @@ class Settings:
             supabase_key=os.getenv("SUPABASE_KEY"),
             openai_api_key=os.getenv("OPENAI_API_KEY"),
             stackexchange_key=os.getenv("STACKEXCHANGE_KEY"),
+            github_token=os.getenv("GITHUB_TOKEN"),
             tip_url=os.getenv("TIP_URL", ""),
             tags=os.getenv("STACKEXCHANGE_TAGS", DEFAULT_TAGS),
             target_usd=float(os.getenv("TARGET_USD", "15")),
+            revenue_milestones=_parse_milestones(os.getenv("REVENUE_MILESTONES", "15,200,1000,20000")),
             max_drafts=int(os.getenv("MAX_DRAFTS_PER_RUN", "3")),
             openai_model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
             stop_after_target=_env_bool("STOP_AFTER_TARGET", False),
+            keyword_csv_path=os.getenv("KEYWORD_CSV_PATH", "data/revenue_keywords.csv"),
         )
 
     def require_runtime_secrets(self, dry_run: bool) -> None:
@@ -56,3 +62,7 @@ class Settings:
             missing.append("TIP_URL")
         if missing:
             raise ValueError(f"Missing required environment variables: {', '.join(missing)}")
+
+
+def _parse_milestones(value: str) -> list[float]:
+    return [float(item.strip()) for item in value.split(",") if item.strip()]

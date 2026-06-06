@@ -113,8 +113,23 @@ class SupabaseClient:
             prefer="resolution=merge-duplicates,return=representation",
         )
 
+    def upsert_revenue_opportunity(self, payload: dict) -> Any:
+        return self.upsert_opportunity(payload)
+
     def insert_draft(self, payload: dict) -> Any:
         return self.request("POST", "drafts", json_body=payload)
+
+    def insert_asset(self, payload: dict) -> Any:
+        return self.request("POST", "assets", json_body=payload)
+
+    def insert_offer(self, payload: dict) -> Any:
+        return self.request("POST", "offers", json_body=payload)
+
+    def insert_experiment(self, payload: dict) -> Any:
+        return self.request("POST", "experiments", json_body=payload)
+
+    def insert_conversion_event(self, payload: dict) -> Any:
+        return self.request("POST", "conversion_events", json_body=payload)
 
     def insert_tip_event(self, payload: dict) -> Any:
         return self.request("POST", "tip_events", json_body=payload)
@@ -128,3 +143,14 @@ class SupabaseClient:
             except (TypeError, ValueError):
                 continue
         return total
+
+    def total_revenue_usd(self) -> float:
+        tips = self.total_tips_usd()
+        rows = self.request("GET", "conversion_events?select=amount_usd", prefer="return=representation")
+        conversions = 0.0
+        for row in rows or []:
+            try:
+                conversions += float(row.get("amount_usd") or 0)
+            except (TypeError, ValueError):
+                continue
+        return round(tips + conversions, 2)

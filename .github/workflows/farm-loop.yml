@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   schedule:
     - cron: "*/5 * * * *"
+    - cron: "17 * * * *"
+    - cron: "33 13 * * *"
+    - cron: "47 13 * * 1"
 
 concurrency:
   group: farm-loop-${{ github.ref }}
@@ -24,8 +27,10 @@ jobs:
       BUYMEACOFFEE_WEBHOOK_TOKEN: ${{ secrets.BUYMEACOFFEE_WEBHOOK_TOKEN }}
       TIP_URL: ${{ secrets.TIP_URL }}
       TARGET_USD: "15"
+      REVENUE_MILESTONES: "15,200,1000,20000"
       STOP_AFTER_TARGET: "false"
       MAX_DRAFTS_PER_RUN: "3"
+      KEYWORD_CSV_PATH: "data/revenue_keywords.csv"
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -39,4 +44,17 @@ jobs:
         run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
 
       - name: Run farm loop once
-        run: python -m farm_loop.main --once
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '*/5 * * * *'
+        run: python -m farm_loop.main --portfolio-once --portfolio-phase discover --max-opportunities 10
+
+      - name: Generate top assets
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '17 * * * *'
+        run: python -m farm_loop.main --portfolio-once --portfolio-phase generate --max-opportunities 10
+
+      - name: Summarize revenue portfolio
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '33 13 * * *'
+        run: python -m farm_loop.main --portfolio-once --portfolio-phase summarize
+
+      - name: Prune low-performing loops
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '47 13 * * 1'
+        run: python -m farm_loop.main --portfolio-once --portfolio-phase prune
