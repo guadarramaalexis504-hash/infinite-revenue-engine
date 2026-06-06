@@ -8,6 +8,7 @@ Current operating target:
 - Protected pipeline: `aipickd` stays off-limits unless explicitly authorized.
 - Local idea catalog: `IDEA_CATALOG_PATH=data/revenue_ideas.json`.
 - Manual keyword list: `KEYWORD_CSV_PATH=data/revenue_keywords.csv`.
+- Local review queue: `ASSET_OUTPUT_DIR=out/revenue-assets`.
 - Milestones: `$15`, `$200`, `$1,000`, `$20,000`.
 - Default behavior: keep running after milestones because `STOP_AFTER_TARGET=false`.
 
@@ -35,6 +36,14 @@ Generate top assets dry-run:
 ```powershell
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10
 ```
+
+Generate top assets into a local review queue:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --asset-output-dir out/revenue-assets
+```
+
+Each selected opportunity gets a folder with `manifest.json` and Markdown drafts. These files are still manual review only; they are not auto-published.
 
 Local continuous review loop:
 

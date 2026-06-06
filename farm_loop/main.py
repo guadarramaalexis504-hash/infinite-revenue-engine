@@ -8,6 +8,7 @@ import time
 from dataclasses import asdict, dataclass
 from typing import Any
 
+from .asset_exporter import LocalAssetExporter
 from .config import Settings
 from .drafts import DraftGenerator
 from .scoring import rank_questions, to_opportunity_payload
@@ -214,6 +215,8 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         KeywordCSVSource(settings.keyword_csv_path),
         IdeaCatalogSource(settings.idea_catalog_path),
     ]
+    asset_output_dir = args.asset_output_dir or settings.asset_output_dir
+    asset_exporter = LocalAssetExporter(asset_output_dir) if asset_output_dir else None
     summary = run_revenue_portfolio_once(
         sources=sources,
         supabase=supabase,
@@ -221,6 +224,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         milestones=settings.revenue_milestones or [15, 200, 1000, 20000],
         dry_run=args.dry_run,
         phase=args.portfolio_phase,
+        asset_exporter=asset_exporter,
     )
     LOGGER.info("portfolio_summary %s", json.dumps(asdict(summary), sort_keys=True))
     return 0
@@ -243,6 +247,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Portfolio phase label for scheduled workflows.",
     )
     parser.add_argument("--max-opportunities", type=int, default=10)
+    parser.add_argument(
+        "--asset-output-dir",
+        default=None,
+        help="Write generated portfolio assets to a local manual-review directory.",
+    )
     return parser.parse_args(argv)
 
 

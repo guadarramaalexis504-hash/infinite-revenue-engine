@@ -15,6 +15,9 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "$20,000",
             "GitHub remote",
             "Payment path",
+            "--asset-output-dir",
+            "ASSET_OUTPUT_DIR",
+            "local review queue",
         ]:
             self.assertIn(required, body)
 

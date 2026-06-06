@@ -11,6 +11,20 @@ class CLITests(unittest.TestCase):
         self.assertEqual(args.portfolio_phase, "summarize")
         self.assertTrue(args.dry_run)
 
+    def test_parse_args_supports_local_asset_output_dir(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--portfolio-phase",
+                "generate",
+                "--dry-run",
+                "--asset-output-dir",
+                "out/review-queue",
+            ]
+        )
+
+        self.assertEqual(args.asset_output_dir, "out/review-queue")
+
 
 if __name__ == "__main__":
     unittest.main()

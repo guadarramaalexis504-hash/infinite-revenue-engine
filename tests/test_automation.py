@@ -91,6 +91,13 @@ EMPTY=
 
         self.assertIn('IDEA_CATALOG_PATH: "data/revenue_ideas.json"', workflow)
 
+    def test_env_example_documents_local_asset_output_dir(self):
+        env_example = Path(".env.example").read_text(encoding="utf-8")
+        gitignore = Path(".gitignore").read_text(encoding="utf-8")
+
+        self.assertIn("ASSET_OUTPUT_DIR=out/revenue-assets", env_example)
+        self.assertIn("out/", gitignore)
+
 
 if __name__ == "__main__":
     unittest.main()

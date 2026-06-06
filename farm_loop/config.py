@@ -30,6 +30,7 @@ class Settings:
     stop_after_target: bool = False
     keyword_csv_path: str = "data/revenue_keywords.csv"
     idea_catalog_path: str = "data/revenue_ideas.json"
+    asset_output_dir: str | None = None
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -48,6 +49,7 @@ class Settings:
             stop_after_target=_env_bool("STOP_AFTER_TARGET", False),
             keyword_csv_path=os.getenv("KEYWORD_CSV_PATH", "data/revenue_keywords.csv"),
             idea_catalog_path=os.getenv("IDEA_CATALOG_PATH", "data/revenue_ideas.json"),
+            asset_output_dir=os.getenv("ASSET_OUTPUT_DIR"),
         )
 
     def require_runtime_secrets(self, dry_run: bool) -> None:

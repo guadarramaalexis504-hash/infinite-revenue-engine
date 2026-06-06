@@ -28,6 +28,12 @@ Run one V2 portfolio cycle:
 python -m farm_loop.main --portfolio-once --portfolio-phase discover --dry-run
 ```
 
+Export reviewable local assets from the portfolio:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --asset-output-dir out/revenue-assets
+```
+
 GitHub Actions runs portfolio phases through `.github/workflows/farm-loop.yml`:
 
 - every 5 minutes: discover and score opportunities
@@ -84,6 +90,8 @@ Optional environment variables:
 - `OPENAI_MODEL`, default `gpt-4o-mini`
 - `GITHUB_TOKEN`, optional but recommended for GitHub API rate limits
 - `KEYWORD_CSV_PATH`, default `data/revenue_keywords.csv`
+- `IDEA_CATALOG_PATH`, default `data/revenue_ideas.json`
+- `ASSET_OUTPUT_DIR`, optional local manual-review export path such as `out/revenue-assets`
 
 ## Supabase Setup
 

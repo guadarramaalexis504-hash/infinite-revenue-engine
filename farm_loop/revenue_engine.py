@@ -16,6 +16,7 @@ class RevenuePortfolioSummary:
     discovered: int
     selected: int
     assets_created: int
+    assets_exported: int = 0
 
 
 def run_revenue_portfolio_once(
@@ -26,11 +27,12 @@ def run_revenue_portfolio_once(
     milestones: list[float] | None = None,
     dry_run: bool = False,
     phase: str = "discover",
+    asset_exporter: Any | None = None,
 ) -> RevenuePortfolioSummary:
     if phase in {"summarize", "prune"}:
         if supabase and not dry_run:
             supabase.insert_event(None, f"revenue_portfolio_{phase}", {"phase": phase})
-        return RevenuePortfolioSummary(status="success", discovered=0, selected=0, assets_created=0)
+        return RevenuePortfolioSummary(status="success", discovered=0, selected=0, assets_created=0, assets_exported=0)
 
     discovered: list[RevenueOpportunity] = []
     for source in sources:
@@ -39,6 +41,7 @@ def run_revenue_portfolio_once(
     selected = rank_revenue_opportunities(discovered, max_items=max_opportunities)
     generator = AssetGenerator()
     assets_created = 0
+    assets_exported = 0
 
     for opportunity in selected:
         opportunity_id = None
@@ -52,6 +55,9 @@ def run_revenue_portfolio_once(
             if supabase and not dry_run:
                 supabase.insert_asset(asset.to_payload(opportunity_id, opportunity))
             assets_created += 1
+        if asset_exporter:
+            asset_exporter.export_opportunity(opportunity, assets)
+            assets_exported += len(assets)
 
         if supabase and not dry_run:
             supabase.insert_experiment(
@@ -72,6 +78,7 @@ def run_revenue_portfolio_once(
                 "discovered": len(discovered),
                 "selected": len(selected),
                 "assets_created": assets_created,
+                "assets_exported": assets_exported,
                 "milestones": milestones or DEFAULT_MILESTONES,
                 "phase": phase,
             },
@@ -82,4 +89,5 @@ def run_revenue_portfolio_once(
         discovered=len(discovered),
         selected=len(selected),
         assets_created=assets_created,
+        assets_exported=assets_exported,
     )

@@ -1,6 +1,7 @@
 """Safe autonomous loop for finding reviewable technical-answer opportunities."""
 
 __all__ = [
+    "asset_exporter",
     "automation",
     "assets",
     "config",

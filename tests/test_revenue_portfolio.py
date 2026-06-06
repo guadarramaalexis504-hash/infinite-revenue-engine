@@ -47,6 +47,15 @@ class FakeSupabase:
         self.events.append((event_type, payload))
 
 
+class FakeAssetExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export_opportunity(self, opportunity, assets):
+        self.exports.append((opportunity, assets))
+        return [f"{opportunity.external_id}/{asset.asset_type}.md" for asset in assets]
+
+
 class RevenuePortfolioTests(unittest.TestCase):
     def test_run_revenue_portfolio_once_scores_generates_assets_and_continues_past_milestones(self):
         supabase = FakeSupabase()
@@ -63,6 +72,22 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(summary.status, "success")
         self.assertEqual(supabase.opportunities[0]["external_id"], "kw-portfolio")
         self.assertEqual(supabase.experiments[0]["status"], "planned")
+
+    def test_run_revenue_portfolio_once_can_export_local_review_assets(self):
+        exporter = FakeAssetExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            asset_exporter=exporter,
+        )
+
+        self.assertEqual(summary.assets_created, 6)
+        self.assertEqual(summary.assets_exported, 6)
+        self.assertEqual(len(exporter.exports), 1)
+        self.assertEqual(exporter.exports[0][0].external_id, "kw-portfolio")
 
 
 if __name__ == "__main__":
