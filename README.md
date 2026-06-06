@@ -56,6 +56,8 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The first supported interactive microtools are a Supabase RLS policy checker and a GitHub Actions YAML checker. They are static HTML files for owned channels and still require manual review before publishing.
 
+The GitHub Pages workflow writes those microtools under `out/site/tools` so they are included in the deployed Pages artifact with the owned static site.
+
 Support links on generated pages include attribution parameters such as `utm_campaign=<external_id>` plus `ire_source` and `ire_external_id`, so future analytics or webhook handlers can tie clicks/conversions back to a specific opportunity.
 
 If `CLICK_REDIRECT_URL` is set, support links point to your owned click redirect endpoint first, so clicks can be saved to Supabase `click_events` before sending the visitor to the final support/payment URL.

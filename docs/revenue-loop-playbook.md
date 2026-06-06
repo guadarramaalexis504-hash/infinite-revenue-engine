@@ -99,7 +99,7 @@ Owned static site deployment:
 
 - workflow file: `.github/workflows/pages-site.yml`
 - target: GitHub Pages
-- build command: `python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 12 --site-output-dir out/site`
+- build command: `python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 12 --site-output-dir out/site --microtool-output-dir out/site/tools`
 - deploy method: GitHub's official Pages actions after Pages is configured to deploy from GitHub Actions
 
 ## Best First Loops

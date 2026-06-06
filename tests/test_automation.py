@@ -179,6 +179,7 @@ EMPTY=
             "actions/upload-pages-artifact@v4",
             "actions/deploy-pages@v4",
             "--site-output-dir out/site",
+            "--microtool-output-dir out/site/tools",
             "path: out/site",
             "environment:",
             "name: github-pages",
