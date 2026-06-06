@@ -7,6 +7,7 @@ from .assets import AssetDraft, AssetGenerator
 from .launch_queue import LaunchTask, build_launch_queue
 from .offers import OfferDraft, generate_offers
 from .revenue_dashboard import build_dashboard_snapshot
+from .revenue_pruning import build_prune_plan
 from .revenue_scoring import RevenueOpportunity, rank_revenue_opportunities
 
 
@@ -27,6 +28,8 @@ class RevenuePortfolioSummary:
     offers_created: int = 0
     offers_exported: int = 0
     dashboard_snapshots_created: int = 0
+    prune_decisions_created: int = 0
+    experiments_updated: int = 0
 
 
 def run_revenue_portfolio_once(
@@ -74,8 +77,42 @@ def run_revenue_portfolio_once(
         )
 
     if phase == "prune":
+        prune_decisions_created = 0
+        experiments_updated = 0
+        launch_tasks_created = 0
         if supabase and not dry_run:
-            supabase.insert_event(None, "revenue_portfolio_prune", {"phase": phase})
+            decisions = build_prune_plan(
+                experiments=supabase.list_experiments(),
+                offers=supabase.list_offers(),
+                clicks=supabase.list_click_events(),
+                conversions=supabase.list_conversion_events(),
+            )
+            prune_decisions_created = len(decisions)
+            for decision in decisions:
+                if decision.new_status:
+                    supabase.update_experiment_status(
+                        decision.experiment_id,
+                        decision.new_status,
+                        {
+                            "prune_action": decision.action,
+                            "prune_reason": decision.reason,
+                        },
+                    )
+                    experiments_updated += 1
+                if decision.launch_task:
+                    supabase.insert_launch_task(decision.launch_task)
+                    launch_tasks_created += 1
+            supabase.insert_event(
+                None,
+                "revenue_portfolio_pruned",
+                {
+                    "phase": phase,
+                    "decisions": [asdict(decision) for decision in decisions],
+                    "prune_decisions_created": prune_decisions_created,
+                    "experiments_updated": experiments_updated,
+                    "launch_tasks_created": launch_tasks_created,
+                },
+            )
         return RevenuePortfolioSummary(
             status="success",
             discovered=0,
@@ -83,11 +120,13 @@ def run_revenue_portfolio_once(
             assets_created=0,
             assets_exported=0,
             site_pages_exported=0,
-            launch_tasks_created=0,
+            launch_tasks_created=launch_tasks_created,
             launch_tasks_exported=0,
             microtools_exported=0,
             offers_created=0,
             offers_exported=0,
+            prune_decisions_created=prune_decisions_created,
+            experiments_updated=experiments_updated,
         )
 
     discovered: list[RevenueOpportunity] = []

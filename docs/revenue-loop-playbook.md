@@ -102,7 +102,7 @@ Production cron phases in GitHub Actions:
 - every 5 minutes: discovery and scoring
 - hourly: asset generation
 - daily: portfolio snapshot with revenue, attribution, milestone progress, and next actions
-- weekly: prune event
+- weekly: pruning pass for winners, stale zero-signal experiments, and click-without-revenue offers
 
 Daily summary command:
 
@@ -111,6 +111,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase summarize
 ```
 
 In live mode, this reads `conversion_events`, `tip_events`, `click_events`, `offers`, `assets`, and `experiments`, then stores the dashboard payload in `portfolio_snapshots`. The snapshot is the learning layer: it shows which channel or offer is producing revenue and recommends where to double down next.
+
+Weekly prune command:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase prune
+```
+
+In live mode, pruning reads `experiments`, `offers`, `click_events`, and `conversion_events`. It never deletes records. It marks experiments with confirmed revenue as `won`, pauses stale experiments with no clicks or revenue, and creates `launch_tasks` for offers that get clicks but no confirmed revenue.
 
 Owned static site deployment:
 
@@ -261,6 +269,7 @@ Prune:
 - no conversion after repeated qualified traffic
 - high manual labor with low repeatability
 - channels that require spam or unauthorized posting
+- do not delete history; mark experiments `paused`, `lost`, or `won` and preserve the measurement trail
 
 ## Milestones
 

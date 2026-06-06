@@ -175,6 +175,17 @@ class SupabaseClientTests(unittest.TestCase):
         self.assertEqual(session.calls[0]["url"], "https://project.supabase.co/rest/v1/portfolio_snapshots")
         self.assertEqual(session.calls[0]["json"]["payload"], {"total_revenue_usd": 25})
 
+    def test_update_experiment_status_patches_single_experiment(self):
+        session = FakeSession()
+        client = SupabaseClient("https://project.supabase.co", "secret-key", session=session)
+
+        client.update_experiment_status("exp-1", "paused", {"reason": "No signal"})
+
+        self.assertEqual(session.calls[0]["method"], "PATCH")
+        self.assertEqual(session.calls[0]["url"], "https://project.supabase.co/rest/v1/experiments?id=eq.exp-1")
+        self.assertEqual(session.calls[0]["json"]["status"], "paused")
+        self.assertEqual(session.calls[0]["json"]["payload"], {"reason": "No signal"})
+
 
 if __name__ == "__main__":
     unittest.main()

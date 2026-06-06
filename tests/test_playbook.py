@@ -38,6 +38,9 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "offer catalog",
             "--portfolio-once --portfolio-phase summarize",
             "portfolio_snapshots",
+            "--portfolio-once --portfolio-phase prune",
+            "won",
+            "paused",
         ]:
             self.assertIn(required, body)
 

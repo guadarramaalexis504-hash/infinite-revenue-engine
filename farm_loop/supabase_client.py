@@ -193,6 +193,18 @@ class SupabaseClient:
             limit=limit,
         )
 
+    def update_experiment_status(self, experiment_id: str, status: str, payload: dict) -> Any:
+        path = f"experiments?id=eq.{quote(str(experiment_id), safe='')}"
+        return self.request(
+            "PATCH",
+            path,
+            json_body={
+                "status": status,
+                "payload": payload,
+                "updated_at": datetime.now(timezone.utc).isoformat(),
+            },
+        )
+
     def total_tips_usd(self) -> float:
         rows = self.request("GET", "tip_events?select=amount_usd", prefer="return=representation")
         total = 0.0

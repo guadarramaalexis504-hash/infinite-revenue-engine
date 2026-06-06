@@ -36,6 +36,7 @@ class FakeSupabase:
         self.conversion_events = []
         self.tip_events = []
         self.click_events = []
+        self.experiment_updates = []
 
     def upsert_revenue_opportunity(self, payload):
         self.opportunities.append(payload)
@@ -81,6 +82,10 @@ class FakeSupabase:
     def insert_portfolio_snapshot(self, payload):
         self.portfolio_snapshots.append(payload)
         return [{"id": f"snapshot-{len(self.portfolio_snapshots)}"}]
+
+    def update_experiment_status(self, experiment_id, status, payload):
+        self.experiment_updates.append((experiment_id, status, payload))
+        return [{"id": experiment_id, "status": status}]
 
 
 class FakeAssetExporter:
@@ -252,6 +257,56 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(supabase.portfolio_snapshots[0]["total_revenue_usd"], 25)
         self.assertEqual(supabase.portfolio_snapshots[0]["best_offer"]["title"], "Supabase setup")
         self.assertEqual(supabase.events[-1][0], "revenue_portfolio_summarized")
+
+    def test_prune_phase_marks_winners_pauses_stale_experiments_and_creates_revision_tasks(self):
+        supabase = FakeSupabase()
+        supabase.experiments = [
+            {
+                "id": "exp-won",
+                "opportunity_id": "opp-won",
+                "name": "microtool:won",
+                "status": "running",
+                "created_at": "2026-05-01T00:00:00+00:00",
+            },
+            {
+                "id": "exp-clicks",
+                "opportunity_id": "opp-clicks",
+                "name": "microtool:clicks",
+                "status": "running",
+                "created_at": "2026-05-01T00:00:00+00:00",
+            },
+            {
+                "id": "exp-stale",
+                "opportunity_id": "opp-stale",
+                "name": "microtool:stale",
+                "status": "running",
+                "created_at": "2026-05-01T00:00:00+00:00",
+            },
+        ]
+        supabase.offers = [
+            {"id": "offer-won", "opportunity_id": "opp-won", "title": "Won offer"},
+            {"id": "offer-clicks", "opportunity_id": "opp-clicks", "title": "Clicky offer"},
+        ]
+        supabase.click_events = [
+            {"offer_id": "offer-clicks"},
+            {"offer_id": "offer-clicks"},
+            {"offer_id": "offer-clicks"},
+        ]
+        supabase.conversion_events = [{"offer_id": "offer-won", "amount_usd": 49}]
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=supabase,
+            phase="prune",
+        )
+
+        self.assertEqual(summary.prune_decisions_created, 3)
+        self.assertEqual(summary.experiments_updated, 2)
+        self.assertEqual(summary.launch_tasks_created, 1)
+        self.assertIn(("exp-won", "won"), [(row[0], row[1]) for row in supabase.experiment_updates])
+        self.assertIn(("exp-stale", "paused"), [(row[0], row[1]) for row in supabase.experiment_updates])
+        self.assertEqual(supabase.launch_tasks[0]["category"], "monetize")
+        self.assertEqual(supabase.events[-1][0], "revenue_portfolio_pruned")
 
 
 if __name__ == "__main__":
