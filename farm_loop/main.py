@@ -17,6 +17,7 @@ from .drafts import DraftGenerator
 from .launch_queue import LaunchQueueExporter
 from .microtool_exporter import MicrotoolExporter
 from .offers import OfferCatalogExporter
+from .opportunity_roadmap import OpportunityRoadmapExporter
 from .scoring import rank_questions, to_opportunity_payload
 from .sources_stackexchange import StackExchangeClient
 from .supabase_client import SupabaseClient
@@ -248,6 +249,10 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     microtool_exporter = MicrotoolExporter(microtool_output_dir, tip_url=settings.tip_url) if microtool_output_dir else None
     offer_output_dir = args.offer_output_dir or settings.offer_output_dir
     offer_exporter = OfferCatalogExporter(offer_output_dir) if offer_output_dir else None
+    roadmap_output_dir = args.roadmap_output_dir or settings.roadmap_output_dir
+    roadmap_exporter = OpportunityRoadmapExporter(roadmap_output_dir) if roadmap_output_dir else None
+    if roadmap_exporter and not activation_report:
+        activation_report = collect_activation_report()
     summary = run_revenue_portfolio_once(
         sources=sources,
         supabase=supabase,
@@ -260,6 +265,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         launch_queue_exporter=launch_queue_exporter,
         microtool_exporter=microtool_exporter,
         offer_exporter=offer_exporter,
+        roadmap_exporter=roadmap_exporter,
         activation_report=activation_report,
     )
     LOGGER.info("portfolio_summary %s", json.dumps(asdict(summary), sort_keys=True))
@@ -377,6 +383,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--offer-output-dir",
         default=None,
         help="Write monetizable offer drafts to JSON and Markdown files.",
+    )
+    parser.add_argument(
+        "--roadmap-output-dir",
+        default=None,
+        help="Write a ranked opportunity roadmap for all discovered ideas.",
     )
     parser.add_argument("--conversion-provider", default="manual", help="Payment provider, e.g. manual, stripe, gumroad.")
     parser.add_argument("--conversion-external-id", default=None, help="Provider sale/event id used for dedupe.")

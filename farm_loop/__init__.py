@@ -11,6 +11,7 @@ __all__ = [
     "main",
     "microtool_exporter",
     "offers",
+    "opportunity_roadmap",
     "revenue_dashboard",
     "revenue_engine",
     "revenue_scoring",

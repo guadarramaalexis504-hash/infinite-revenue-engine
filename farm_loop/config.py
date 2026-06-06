@@ -38,6 +38,7 @@ class Settings:
     launch_queue_output_dir: str | None = None
     microtool_output_dir: str | None = None
     offer_output_dir: str | None = None
+    roadmap_output_dir: str | None = None
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -64,6 +65,7 @@ class Settings:
             launch_queue_output_dir=os.getenv("LAUNCH_QUEUE_OUTPUT_DIR"),
             microtool_output_dir=os.getenv("MICROTOOL_OUTPUT_DIR"),
             offer_output_dir=os.getenv("OFFER_OUTPUT_DIR"),
+            roadmap_output_dir=os.getenv("ROADMAP_OUTPUT_DIR"),
         )
 
     def require_runtime_secrets(self, dry_run: bool) -> None:

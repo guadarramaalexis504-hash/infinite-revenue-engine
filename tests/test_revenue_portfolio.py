@@ -133,6 +133,22 @@ class FakeOfferExporter:
         return ["offers.json", "OFFERS.md"]
 
 
+class FakeRoadmapExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, *, discovered, selected, milestones, activation_report):
+        self.exports.append(
+            {
+                "discovered": discovered,
+                "selected": selected,
+                "milestones": milestones,
+                "activation_report": activation_report,
+            }
+        )
+        return ["opportunity_roadmap.json", "OPPORTUNITY_ROADMAP.md"]
+
+
 class RevenuePortfolioTests(unittest.TestCase):
     def test_run_revenue_portfolio_once_scores_generates_assets_and_continues_past_milestones(self):
         supabase = FakeSupabase()
@@ -257,6 +273,25 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(summary.offers_exported, 2)
         self.assertEqual(len(offer_exporter.exports), 1)
         self.assertEqual(offer_exporter.exports[0][0].external_id, "kw-portfolio")
+
+    def test_run_revenue_portfolio_once_can_export_opportunity_roadmap(self):
+        roadmap_exporter = FakeRoadmapExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            roadmap_exporter=roadmap_exporter,
+            activation_report={"ready": False, "next_actions": ["Run gh auth login"]},
+            milestones=[15, 200, 1000, 20000],
+        )
+
+        self.assertEqual(summary.roadmap_exported, 2)
+        self.assertEqual(len(roadmap_exporter.exports), 1)
+        self.assertEqual(roadmap_exporter.exports[0]["discovered"][0].external_id, "kw-portfolio")
+        self.assertEqual(roadmap_exporter.exports[0]["selected"][0].external_id, "kw-portfolio")
+        self.assertEqual(roadmap_exporter.exports[0]["activation_report"]["ready"], False)
 
     def test_summarize_phase_persists_dashboard_snapshot(self):
         supabase = FakeSupabase()

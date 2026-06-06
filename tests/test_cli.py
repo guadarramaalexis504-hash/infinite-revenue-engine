@@ -129,6 +129,20 @@ class CLITests(unittest.TestCase):
 
         self.assertEqual(args.offer_output_dir, "out/offers")
 
+    def test_parse_args_supports_roadmap_output_dir(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--portfolio-phase",
+                "generate",
+                "--dry-run",
+                "--roadmap-output-dir",
+                "out/roadmap",
+            ]
+        )
+
+        self.assertEqual(args.roadmap_output_dir, "out/roadmap")
+
     def test_parse_args_supports_manual_conversion_recording(self):
         args = parse_args(
             [

@@ -27,6 +27,7 @@ class RevenuePortfolioSummary:
     microtools_exported: int = 0
     offers_created: int = 0
     offers_exported: int = 0
+    roadmap_exported: int = 0
     dashboard_snapshots_created: int = 0
     prune_decisions_created: int = 0
     experiments_updated: int = 0
@@ -45,6 +46,7 @@ def run_revenue_portfolio_once(
     launch_queue_exporter: Any | None = None,
     microtool_exporter: Any | None = None,
     offer_exporter: Any | None = None,
+    roadmap_exporter: Any | None = None,
     activation_report: dict | None = None,
 ) -> RevenuePortfolioSummary:
     if phase == "summarize":
@@ -74,6 +76,7 @@ def run_revenue_portfolio_once(
             microtools_exported=0,
             offers_created=0,
             offers_exported=0,
+            roadmap_exported=0,
             dashboard_snapshots_created=dashboard_snapshots_created,
         )
 
@@ -126,6 +129,7 @@ def run_revenue_portfolio_once(
             microtools_exported=0,
             offers_created=0,
             offers_exported=0,
+            roadmap_exported=0,
             prune_decisions_created=prune_decisions_created,
             experiments_updated=experiments_updated,
         )
@@ -198,6 +202,17 @@ def run_revenue_portfolio_once(
     if offer_exporter:
         offers_exported = len(offer_exporter.export(offer_drafts))
 
+    roadmap_exported = 0
+    if roadmap_exporter:
+        roadmap_exported = len(
+            roadmap_exporter.export(
+                discovered=discovered,
+                selected=selected,
+                milestones=milestones or DEFAULT_MILESTONES,
+                activation_report=activation_report,
+            )
+        )
+
     if supabase and not dry_run:
         supabase.insert_event(
             None,
@@ -213,6 +228,7 @@ def run_revenue_portfolio_once(
                 "microtools_exported": microtools_exported,
                 "offers_created": len(offer_drafts),
                 "offers_exported": offers_exported,
+                "roadmap_exported": roadmap_exported,
                 "milestones": milestones or DEFAULT_MILESTONES,
                 "phase": phase,
             },
@@ -230,6 +246,7 @@ def run_revenue_portfolio_once(
         microtools_exported=microtools_exported,
         offers_created=len(offer_drafts),
         offers_exported=offers_exported,
+        roadmap_exported=roadmap_exported,
     )
 
 

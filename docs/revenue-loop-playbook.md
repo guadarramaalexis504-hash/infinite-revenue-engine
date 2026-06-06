@@ -14,6 +14,7 @@ Current operating target:
 - Launch queue: `LAUNCH_QUEUE_OUTPUT_DIR=out/launch-queue`.
 - Interactive microtools: `MICROTOOL_OUTPUT_DIR=out/microtools`.
 - Offer catalog: `OFFER_OUTPUT_DIR=out/offers`.
+- Opportunity roadmap: `ROADMAP_OUTPUT_DIR=out/roadmap`.
 - Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
 - Optional service intake: `SERVICE_INTAKE_URL=https://your-form-or-checkout.example`.
 - Live-readiness check: `.\scripts\doctor.ps1`.
@@ -78,6 +79,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 ```
 
 The offer catalog writes `offers.json` and `OFFERS.md`. It turns selected opportunities into draft support offers, setup services, digital products, or sponsorship-style CTAs with prices. In live Supabase runs, these offers are inserted into `offers`.
+
+Generate an opportunity roadmap:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --roadmap-output-dir out/roadmap
+```
+
+The opportunity roadmap writes `opportunity_roadmap.json` and `OPPORTUNITY_ROADMAP.md`. It keeps all ranked ideas, channel summaries, activation blockers, and a milestone plan for `$15`, `$200`, `$1,000`, and `$20,000`, so the backlog stays visible even when only the top few assets are generated in one run.
 
 Record a confirmed conversion:
 

@@ -202,6 +202,7 @@ EMPTY=
         self.assertIn("LAUNCH_QUEUE_OUTPUT_DIR=out/launch-queue", env_example)
         self.assertIn("MICROTOOL_OUTPUT_DIR=out/microtools", env_example)
         self.assertIn("OFFER_OUTPUT_DIR=out/offers", env_example)
+        self.assertIn("ROADMAP_OUTPUT_DIR=out/roadmap", env_example)
         self.assertIn("CONVERSION_WEBHOOK_TOKEN=", env_example)
         self.assertIn("SERVICE_INTAKE_URL=", env_example)
         self.assertIn("SITE_BASE_URL=", env_example)
