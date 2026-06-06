@@ -6,6 +6,7 @@ from pathlib import Path
 from .asset_exporter import slugify
 from .assets import AssetDraft
 from .revenue_scoring import RevenueOpportunity
+from .tracking import build_tracking_url
 
 
 class StaticSiteExporter:
@@ -69,7 +70,7 @@ class StaticSiteExporter:
 
     def _opportunity_page(self, opportunity: RevenueOpportunity, assets: list[AssetDraft]) -> str:
         asset_sections = "\n".join(self._asset_section(asset) for asset in assets)
-        cta = self._support_cta()
+        cta = self._support_cta(opportunity)
         return self._page(
             opportunity.title,
             f"""
@@ -105,10 +106,11 @@ class StaticSiteExporter:
         </section>
         """
 
-    def _support_cta(self) -> str:
+    def _support_cta(self, opportunity: RevenueOpportunity) -> str:
         if not self.tip_url:
             return '<p class="notice">Configure TIP_URL before publishing a support CTA.</p>'
-        return f'<p class="notice">Useful? <a href="{escape(self.tip_url)}">Support this work</a>.</p>'
+        url = build_tracking_url(self.tip_url, opportunity, content="support_cta")
+        return f'<p class="notice">Useful? <a href="{escape(url)}">Support this work</a>.</p>'
 
     def _page(self, title: str, body: str) -> str:
         return f"""<!doctype html>

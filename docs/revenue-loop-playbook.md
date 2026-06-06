@@ -54,6 +54,12 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The site is a local owned channel draft with an index and one page per opportunity. It can carry a support CTA when `TIP_URL` is configured, but it still needs manual review before public deployment.
 
+Attribution:
+
+- support CTAs include `utm_source=revenue_site`, `utm_medium=<channel>`, `utm_campaign=<external_id>`, and `utm_content=support_cta`
+- internal attribution fields use `ire_source` and `ire_external_id`
+- future click collectors should insert rows into `click_events` with `source='revenue_site'`
+
 Local continuous review loop:
 
 ```powershell

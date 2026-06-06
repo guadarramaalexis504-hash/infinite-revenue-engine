@@ -40,6 +40,8 @@ Generate an owned static site from the same selected opportunities:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --site-output-dir out/site
 ```
 
+Support links on generated pages include attribution parameters such as `utm_campaign=<external_id>` plus `ire_source` and `ire_external_id`, so future analytics or webhook handlers can tie clicks/conversions back to a specific opportunity.
+
 GitHub Actions runs portfolio phases through `.github/workflows/farm-loop.yml`:
 
 - every 5 minutes: discover and score opportunities

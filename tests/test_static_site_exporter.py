@@ -42,7 +42,9 @@ class StaticSiteExporterTests(unittest.TestCase):
         self.assertIn("Webhook Setup Service", index)
         self.assertIn("offer-webhook-setup-service/", index)
         self.assertIn("payment webhooks saved into a database", page)
-        self.assertIn("https://buymeacoffee.com/example", page)
+        self.assertIn("https://buymeacoffee.com/example?", page)
+        self.assertIn("utm_campaign=offer-webhook-setup-service", page)
+        self.assertIn("ire_external_id=offer-webhook-setup-service", page)
         self.assertIn("manual review", page.lower())
         self.assertNotIn("stackoverflow.com", page.lower())
 

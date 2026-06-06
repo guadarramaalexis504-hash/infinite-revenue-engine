@@ -23,6 +23,8 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "owned static site",
             ".github/workflows/pages-site.yml",
             "GitHub Pages",
+            "utm_campaign",
+            "click_events",
         ]:
             self.assertIn(required, body)
 

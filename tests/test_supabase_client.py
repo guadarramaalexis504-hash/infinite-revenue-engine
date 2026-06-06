@@ -108,6 +108,16 @@ class SupabaseClientTests(unittest.TestCase):
         self.assertEqual(session.calls[0]["url"], "https://project.supabase.co/rest/v1/assets")
         self.assertEqual(session.calls[1]["url"], "https://project.supabase.co/rest/v1/experiments")
 
+    def test_insert_click_event_uses_click_events_table(self):
+        session = FakeSession()
+        client = SupabaseClient("https://project.supabase.co", "secret-key", session=session)
+
+        client.insert_click_event({"source": "revenue_site", "payload": {"ok": True}})
+
+        self.assertEqual(session.calls[0]["method"], "POST")
+        self.assertEqual(session.calls[0]["url"], "https://project.supabase.co/rest/v1/click_events")
+        self.assertEqual(session.calls[0]["json"]["source"], "revenue_site")
+
 
 if __name__ == "__main__":
     unittest.main()
