@@ -21,6 +21,28 @@ def build_tracking_url(base_url: str, opportunity: RevenueOpportunity, *, conten
     return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
 
 
+def build_click_redirect_url(
+    click_endpoint_url: str,
+    opportunity: RevenueOpportunity,
+    *,
+    target_url: str,
+    content: str,
+) -> str:
+    tracked_target = build_tracking_url(target_url, opportunity, content=content)
+    parts = urlsplit(click_endpoint_url)
+    query = parse_qsl(parts.query, keep_blank_values=True)
+    query.extend(
+        [
+            ("target", tracked_target),
+            ("opportunity_source", opportunity.source),
+            ("opportunity_external_id", opportunity.external_id),
+            ("channel", opportunity.channel),
+            ("content", content),
+        ]
+    )
+    return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
+
+
 def build_click_event_payload(
     opportunity: RevenueOpportunity,
     *,

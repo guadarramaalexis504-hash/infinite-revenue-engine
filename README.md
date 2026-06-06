@@ -42,6 +42,8 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 Support links on generated pages include attribution parameters such as `utm_campaign=<external_id>` plus `ire_source` and `ire_external_id`, so future analytics or webhook handlers can tie clicks/conversions back to a specific opportunity.
 
+If `CLICK_REDIRECT_URL` is set, support links point to your owned click redirect endpoint first, so clicks can be saved to Supabase `click_events` before sending the visitor to the final support/payment URL.
+
 GitHub Actions runs portfolio phases through `.github/workflows/farm-loop.yml`:
 
 - every 5 minutes: discover and score opportunities
@@ -109,6 +111,25 @@ Optional environment variables:
 - `IDEA_CATALOG_PATH`, default `data/revenue_ideas.json`
 - `ASSET_OUTPUT_DIR`, optional local manual-review export path such as `out/revenue-assets`
 - `SITE_OUTPUT_DIR`, optional owned static site export path such as `out/site`
+- `CLICK_REDIRECT_URL`, optional owned click redirect endpoint such as `https://your-domain.example/click`
+
+## Click Redirect Handler
+
+Host a small HTTPS endpoint and call the reusable handler with a server-side Supabase key:
+
+```python
+from farm_loop.click_handler import handle_click_redirect
+from farm_loop.supabase_client import SupabaseClient
+
+result = handle_click_redirect(
+    query=request_args,
+    supabase=SupabaseClient(SUPABASE_URL, SUPABASE_KEY),
+    allowed_target_hosts={"buymeacoffee.com"},
+)
+return redirect(result["location"])
+```
+
+The handler rejects non-HTTPS targets and hosts outside the allowlist.
 
 ## Supabase Setup
 

@@ -4,6 +4,7 @@ __all__ = [
     "asset_exporter",
     "automation",
     "assets",
+    "click_handler",
     "config",
     "drafts",
     "main",

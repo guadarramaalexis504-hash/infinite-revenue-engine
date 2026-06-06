@@ -114,7 +114,14 @@ EMPTY=
 
         self.assertIn("ASSET_OUTPUT_DIR=out/revenue-assets", env_example)
         self.assertIn("SITE_OUTPUT_DIR=out/site", env_example)
+        self.assertIn("CLICK_REDIRECT_URL=https://your-domain.example/click", env_example)
         self.assertIn("out/", gitignore)
+
+    def test_pages_workflow_passes_optional_click_redirect_url(self):
+        workflow = Path(".github/workflows/pages-site.yml").read_text(encoding="utf-8")
+
+        self.assertIn("CLICK_REDIRECT_URL: ${{ secrets.CLICK_REDIRECT_URL }}", workflow)
+        self.assertIn("--click-redirect-url \"${CLICK_REDIRECT_URL}\"", workflow)
 
 
 if __name__ == "__main__":

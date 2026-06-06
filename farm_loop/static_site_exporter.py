@@ -6,13 +6,14 @@ from pathlib import Path
 from .asset_exporter import slugify
 from .assets import AssetDraft
 from .revenue_scoring import RevenueOpportunity
-from .tracking import build_tracking_url
+from .tracking import build_click_redirect_url, build_tracking_url
 
 
 class StaticSiteExporter:
-    def __init__(self, output_dir: str | Path, *, tip_url: str = "") -> None:
+    def __init__(self, output_dir: str | Path, *, tip_url: str = "", click_redirect_url: str = "") -> None:
         self.output_dir = Path(output_dir)
         self.tip_url = tip_url
+        self.click_redirect_url = click_redirect_url
 
     def export_portfolio(self, opportunities_with_assets: list[tuple[RevenueOpportunity, list[AssetDraft]]]) -> list[str]:
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -109,7 +110,15 @@ class StaticSiteExporter:
     def _support_cta(self, opportunity: RevenueOpportunity) -> str:
         if not self.tip_url:
             return '<p class="notice">Configure TIP_URL before publishing a support CTA.</p>'
-        url = build_tracking_url(self.tip_url, opportunity, content="support_cta")
+        if self.click_redirect_url:
+            url = build_click_redirect_url(
+                self.click_redirect_url,
+                opportunity,
+                target_url=self.tip_url,
+                content="support_cta",
+            )
+        else:
+            url = build_tracking_url(self.tip_url, opportunity, content="support_cta")
         return f'<p class="notice">Useful? <a href="{escape(url)}">Support this work</a>.</p>'
 
     def _page(self, title: str, body: str) -> str:

@@ -48,6 +48,21 @@ class StaticSiteExporterTests(unittest.TestCase):
         self.assertIn("manual review", page.lower())
         self.assertNotIn("stackoverflow.com", page.lower())
 
+    def test_support_cta_uses_click_redirect_endpoint_when_configured(self):
+        assets = AssetGenerator().generate_all(self.opportunity)
+
+        with tempfile.TemporaryDirectory() as directory:
+            StaticSiteExporter(
+                directory,
+                tip_url="https://buymeacoffee.com/example",
+                click_redirect_url="https://example.com/click",
+            ).export_portfolio([(self.opportunity, assets)])
+            page = (Path(directory) / "offer-webhook-setup-service" / "index.html").read_text(encoding="utf-8")
+
+        self.assertIn("https://example.com/click?", page)
+        self.assertIn("target=https%3A%2F%2Fbuymeacoffee.com%2Fexample", page)
+        self.assertIn("opportunity_external_id=offer-webhook-setup-service", page)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -21,6 +21,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ github.token }}
       TIP_URL: ${{ secrets.TIP_URL }}
+      CLICK_REDIRECT_URL: ${{ secrets.CLICK_REDIRECT_URL }}
       KEYWORD_CSV_PATH: "data/revenue_keywords.csv"
       IDEA_CATALOG_PATH: "data/revenue_ideas.json"
     steps:
@@ -36,7 +37,7 @@ jobs:
         run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
 
       - name: Generate owned static site
-        run: python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 12 --site-output-dir out/site
+        run: python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 12 --site-output-dir out/site --click-redirect-url "${CLICK_REDIRECT_URL}"
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

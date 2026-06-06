@@ -219,7 +219,12 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     asset_output_dir = args.asset_output_dir or settings.asset_output_dir
     asset_exporter = LocalAssetExporter(asset_output_dir) if asset_output_dir else None
     site_output_dir = args.site_output_dir or settings.site_output_dir
-    site_exporter = StaticSiteExporter(site_output_dir, tip_url=settings.tip_url) if site_output_dir else None
+    click_redirect_url = args.click_redirect_url or settings.click_redirect_url or ""
+    site_exporter = (
+        StaticSiteExporter(site_output_dir, tip_url=settings.tip_url, click_redirect_url=click_redirect_url)
+        if site_output_dir
+        else None
+    )
     summary = run_revenue_portfolio_once(
         sources=sources,
         supabase=supabase,
@@ -260,6 +265,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--site-output-dir",
         default=None,
         help="Write an owned static site for generated portfolio opportunities.",
+    )
+    parser.add_argument(
+        "--click-redirect-url",
+        default=None,
+        help="Optional owned click redirect endpoint used for support CTAs.",
     )
     return parser.parse_args(argv)
 

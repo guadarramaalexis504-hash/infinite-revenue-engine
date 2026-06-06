@@ -39,6 +39,22 @@ class CLITests(unittest.TestCase):
 
         self.assertEqual(args.site_output_dir, "out/site")
 
+    def test_parse_args_supports_click_redirect_url(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--portfolio-phase",
+                "generate",
+                "--dry-run",
+                "--site-output-dir",
+                "out/site",
+                "--click-redirect-url",
+                "https://example.com/click",
+            ]
+        )
+
+        self.assertEqual(args.click_redirect_url, "https://example.com/click")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -25,6 +25,8 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "GitHub Pages",
             "utm_campaign",
             "click_events",
+            "CLICK_REDIRECT_URL",
+            "click redirect",
         ]:
             self.assertIn(required, body)
 

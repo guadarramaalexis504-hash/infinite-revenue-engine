@@ -10,6 +10,7 @@ Current operating target:
 - Manual keyword list: `KEYWORD_CSV_PATH=data/revenue_keywords.csv`.
 - Local review queue: `ASSET_OUTPUT_DIR=out/revenue-assets`.
 - Owned static site: `SITE_OUTPUT_DIR=out/site`.
+- Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
 - Milestones: `$15`, `$200`, `$1,000`, `$20,000`.
 - Default behavior: keep running after milestones because `STOP_AFTER_TARGET=false`.
 
@@ -58,7 +59,9 @@ Attribution:
 
 - support CTAs include `utm_source=revenue_site`, `utm_medium=<channel>`, `utm_campaign=<external_id>`, and `utm_content=support_cta`
 - internal attribution fields use `ire_source` and `ire_external_id`
-- future click collectors should insert rows into `click_events` with `source='revenue_site'`
+- direct links work with only UTM parameters
+- when `CLICK_REDIRECT_URL` is configured, support CTAs use an owned click redirect before the final support/payment URL
+- the click redirect handler validates allowed target hosts and inserts rows into `click_events` with `source='revenue_site'`
 
 Local continuous review loop:
 

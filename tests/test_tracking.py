@@ -1,7 +1,9 @@
 import unittest
 
 from farm_loop.revenue_scoring import RevenueOpportunity
-from farm_loop.tracking import build_click_event_payload, build_tracking_url
+from urllib.parse import parse_qs, urlsplit
+
+from farm_loop.tracking import build_click_event_payload, build_click_redirect_url, build_tracking_url
 
 
 class TrackingTests(unittest.TestCase):
@@ -51,6 +53,24 @@ class TrackingTests(unittest.TestCase):
         self.assertEqual(payload["payload"]["channel"], "paid_setup_kit")
         self.assertEqual(payload["payload"]["target_url"], "https://buymeacoffee.com/example")
         self.assertEqual(payload["payload"]["content"], "support_cta")
+
+    def test_build_click_redirect_url_wraps_tracked_target_for_owned_endpoint(self):
+        url = build_click_redirect_url(
+            "https://example.com/click",
+            self.opportunity,
+            target_url="https://buymeacoffee.com/example",
+            content="support_cta",
+        )
+        query = parse_qs(urlsplit(url).query)
+
+        self.assertEqual(urlsplit(url).scheme, "https")
+        self.assertEqual(urlsplit(url).netloc, "example.com")
+        self.assertEqual(query["opportunity_source"], ["idea_catalog"])
+        self.assertEqual(query["opportunity_external_id"], ["offer-webhook-setup-service"])
+        self.assertEqual(query["channel"], ["paid_setup_kit"])
+        self.assertEqual(query["content"], ["support_cta"])
+        self.assertIn("utm_campaign=offer-webhook-setup-service", query["target"][0])
+        self.assertIn("ire_external_id=offer-webhook-setup-service", query["target"][0])
 
 
 if __name__ == "__main__":
