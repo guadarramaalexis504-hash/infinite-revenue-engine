@@ -233,7 +233,7 @@ class FakeActivationManifestExporter:
                 "activation_report": activation_report,
             }
         )
-        return ["activation_manifest.json", "ACTIVATE_NOW.md", "RUNBOOK.md"]
+        return ["activation_manifest.json", "ACTIVATE_NOW.md", "RUNBOOK.md", "CLAUDE_HANDOFF.md"]
 
 
 class RevenuePortfolioTests(unittest.TestCase):
@@ -512,7 +512,7 @@ class RevenuePortfolioTests(unittest.TestCase):
             activation_report={"ready": False, "next_actions": ["Run gh auth login"]},
         )
 
-        self.assertEqual(summary.activation_manifest_exported, 3)
+        self.assertEqual(summary.activation_manifest_exported, 4)
         self.assertEqual(len(activation_exporter.exports), 1)
         self.assertEqual(
             activation_exporter.exports[0]["opportunities_with_assets"][0][0].external_id,

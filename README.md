@@ -72,7 +72,7 @@ Generate an activation manifest with exact next files and commands:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --activation-manifest-output-dir out/activation
 ```
 
-The activation manifest writes `activation_manifest.json`, `ACTIVATE_NOW.md`, and `RUNBOOK.md`. It links each selected opportunity to local review files, owned pages, checkout setup, tracking deploy docs, offer keys, and dry-run conversion commands.
+The activation manifest writes `activation_manifest.json`, `ACTIVATE_NOW.md`, `RUNBOOK.md`, and `CLAUDE_HANDOFF.md`. It links each selected opportunity to local review files, owned pages, checkout setup, tracking deploy docs, offer keys, dry-run conversion commands, and safe handoff instructions for another coding agent.
 
 Generate the full local revenue bundle in one command:
 

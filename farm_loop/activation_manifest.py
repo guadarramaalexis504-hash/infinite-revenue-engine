@@ -50,9 +50,18 @@ def build_activation_manifest_rows(
 
 
 class ActivationManifestExporter:
-    def __init__(self, output_dir: str | Path, *, artifact_dirs: dict[str, str | Path] | None = None) -> None:
+    def __init__(
+        self,
+        output_dir: str | Path,
+        *,
+        artifact_dirs: dict[str, str | Path] | None = None,
+        repo_root: str | Path | None = None,
+        protected_workspaces: list[str | Path] | None = None,
+    ) -> None:
         self.output_dir = Path(output_dir)
         self.artifact_dirs = artifact_dirs or {}
+        self.repo_root = Path(repo_root) if repo_root else Path.cwd()
+        self.protected_workspaces = [str(path) for path in protected_workspaces or _default_protected_workspaces()]
 
     def export(
         self,
@@ -71,10 +80,15 @@ class ActivationManifestExporter:
         json_path = self.output_dir / "activation_manifest.json"
         markdown_path = self.output_dir / "ACTIVATE_NOW.md"
         runbook_path = self.output_dir / "RUNBOOK.md"
+        handoff_path = self.output_dir / "CLAUDE_HANDOFF.md"
         json_path.write_text(json.dumps(rows, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         markdown_path.write_text(_to_markdown(rows), encoding="utf-8")
         runbook_path.write_text(_runbook(rows), encoding="utf-8")
-        return [json_path, markdown_path, runbook_path]
+        handoff_path.write_text(
+            _claude_handoff(rows, repo_root=self.repo_root, protected_workspaces=self.protected_workspaces),
+            encoding="utf-8",
+        )
+        return [json_path, markdown_path, runbook_path, handoff_path]
 
 
 def _activation_blockers(report: dict | None) -> list[str]:
@@ -215,4 +229,85 @@ def _runbook(rows: list[dict]) -> str:
                 "",
             ]
         )
+    return "\n".join(lines)
+
+
+def _default_protected_workspaces() -> list[str]:
+    return [
+        "Any aipickd or aipickd-pipeline workspace outside this repository.",
+    ]
+
+
+def _claude_handoff(rows: list[dict], *, repo_root: Path, protected_workspaces: list[str]) -> str:
+    lines = [
+        "# Claude Activation Handoff",
+        "",
+        "## Operating Boundary",
+        "",
+        f"- Work only in: `{repo_root.as_posix()}`",
+        "- Do not use destructive git commands.",
+        "- Do not print, commit, or paste secret values.",
+        "- Do not auto-post generated content to third-party communities.",
+    ]
+    for workspace in protected_workspaces:
+        lines.append(f"- Protected workspace: `{str(workspace).replace(chr(92), '/')}`")
+
+    blockers = rows[0].get("activation_blockers", []) if rows else []
+    lines.extend(
+        [
+            "",
+            "## First Commands",
+            "",
+            "Run these before changing activation state:",
+            "",
+            "```powershell",
+            "git status --short --branch",
+            "git log -3 --oneline",
+            "python -m unittest discover -s tests -v",
+            "python -m farm_loop.automation --json",
+            "```",
+            "",
+            "## Supabase",
+            "",
+            "- The database schema lives at `supabase/schema.sql`.",
+            "- Apply the schema only to the intended Supabase project.",
+            "- Do not drop tables manually.",
+            "- Use a server-side Supabase secret/service-role key for `SUPABASE_KEY`, not anon or publishable keys.",
+            "- If `DATABASE_URL` is configured and `psql` exists, run `.\\scripts\\bootstrap.ps1 -ApplySchema`.",
+            "- Otherwise apply `supabase/schema.sql` in the Supabase SQL editor.",
+            "",
+            "## GitHub",
+            "",
+            "- Authenticate with `gh auth login`.",
+            "- If no remote exists, create or attach the intended repository without rewriting history.",
+            "- Workflows must exist on the default branch before cron schedules can run.",
+            "- After `.env` has real values, run `.\\scripts\\configure-github.ps1 -Repo OWNER/REPO -RunWorkflow`.",
+            "",
+            "## Activation Blockers",
+            "",
+        ]
+    )
+    if blockers:
+        lines.extend(f"- {blocker}" for blocker in blockers)
+    else:
+        lines.append("- No activation blockers were reported in this manifest run.")
+
+    lines.extend(
+        [
+            "",
+            "## Final Verification",
+            "",
+            "```powershell",
+            ".\\scripts\\doctor.ps1",
+            "python -m unittest discover -s tests -v",
+            "python -m farm_loop.main --portfolio-once --portfolio-phase discover --dry-run --max-opportunities 5",
+            "```",
+            "",
+            "Then verify GitHub Actions ran and Supabase received rows in `runs`, `opportunities`, `assets`, `offers`, and `events`.",
+            "",
+            "## Revenue Reality",
+            "",
+            "The engine discovers, scores, generates, tracks, and prunes opportunities. It does not guarantee income. Revenue starts only after payment links, webhooks, owned publishing, and traffic are connected.",
+        ]
+    )
     return "\n".join(lines)

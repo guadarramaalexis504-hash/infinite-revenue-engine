@@ -178,7 +178,7 @@ Generate an activation manifest:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --activation-manifest-output-dir out/activation
 ```
 
-The activation manifest writes `activation_manifest.json`, `ACTIVATE_NOW.md`, and `RUNBOOK.md`. It turns the selected portfolio into exact local file paths, offer keys, checkout/payment readiness, blocker list, and dry-run conversion commands so each item has a concrete publish-and-measure path.
+The activation manifest writes `activation_manifest.json`, `ACTIVATE_NOW.md`, `RUNBOOK.md`, and `CLAUDE_HANDOFF.md`. It turns the selected portfolio into exact local file paths, offer keys, checkout/payment readiness, blocker list, dry-run conversion commands, and safe agent handoff instructions so each item has a concrete publish-and-measure path.
 
 Generate the full revenue bundle:
 

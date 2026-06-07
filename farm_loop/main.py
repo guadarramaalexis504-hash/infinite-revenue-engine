@@ -441,7 +441,11 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         "launch_queue_output_dir": launch_queue_output_dir or "",
     }
     activation_manifest_exporter = (
-        ActivationManifestExporter(activation_manifest_output_dir, artifact_dirs=artifact_dirs)
+        ActivationManifestExporter(
+            activation_manifest_output_dir,
+            artifact_dirs=artifact_dirs,
+            repo_root=Path.cwd(),
+        )
         if activation_manifest_output_dir
         else None
     )

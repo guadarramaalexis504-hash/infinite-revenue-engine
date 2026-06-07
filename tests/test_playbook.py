@@ -44,6 +44,7 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "--activation-manifest-output-dir",
             "ACTIVATION_MANIFEST_OUTPUT_DIR",
             "ACTIVATE_NOW.md",
+            "CLAUDE_HANDOFF.md",
             "activation manifest",
             "--bundle-output-dir",
             "BUNDLE_OUTPUT_DIR",

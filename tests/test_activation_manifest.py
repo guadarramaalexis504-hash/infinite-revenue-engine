@@ -80,6 +80,8 @@ class ActivationManifestTests(unittest.TestCase):
             output_dir = Path(directory) / "activation"
             exporter = ActivationManifestExporter(
                 output_dir,
+                repo_root="C:/Users/guada/OneDrive/Documentos/15 dlrs",
+                protected_workspaces=["C:/Users/guada/OneDrive/Documentos/New project/aipickd-pipeline"],
                 artifact_dirs={
                     "site_output_dir": Path(directory) / "site",
                     "microtool_output_dir": Path(directory) / "site" / "tools",
@@ -95,10 +97,11 @@ class ActivationManifestTests(unittest.TestCase):
             manifest = json.loads((output_dir / "activation_manifest.json").read_text(encoding="utf-8"))
             markdown = (output_dir / "ACTIVATE_NOW.md").read_text(encoding="utf-8")
             runbook = (output_dir / "RUNBOOK.md").read_text(encoding="utf-8")
+            handoff = (output_dir / "CLAUDE_HANDOFF.md").read_text(encoding="utf-8")
 
         self.assertEqual(
             sorted(path.name for path in written),
-            ["ACTIVATE_NOW.md", "RUNBOOK.md", "activation_manifest.json"],
+            ["ACTIVATE_NOW.md", "CLAUDE_HANDOFF.md", "RUNBOOK.md", "activation_manifest.json"],
         )
         expected_root = Path(directory).as_posix()
         self.assertEqual(
@@ -108,6 +111,12 @@ class ActivationManifestTests(unittest.TestCase):
         self.assertIn("Webhook/sale test", runbook)
         self.assertIn("microtool-supabase-rls", markdown)
         self.assertIn("https://buymeacoffee.com/example", markdown)
+        self.assertIn("C:/Users/guada/OneDrive/Documentos/15 dlrs", handoff)
+        self.assertIn("aipickd-pipeline", handoff)
+        self.assertIn("Do not use destructive git commands", handoff)
+        self.assertIn("supabase/schema.sql", handoff)
+        self.assertIn(".\\scripts\\configure-github.ps1", handoff)
+        self.assertIn("python -m unittest discover -s tests -v", handoff)
 
 
 if __name__ == "__main__":
