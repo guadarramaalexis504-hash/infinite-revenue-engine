@@ -33,6 +33,64 @@ class ConversionTests(unittest.TestCase):
         self.assertEqual(parsed["payload"]["provider_external_id"], "evt_123")
         self.assertEqual(parsed["payload"]["offer_key"], "idea_catalog:setup-kit:fixed_scope_service")
 
+    def test_parse_lemon_squeezy_order_uses_custom_data_and_total_usd_cents(self):
+        payload = {
+            "meta": {
+                "event_name": "order_created",
+                "custom_data": {
+                    "offer_id": "offer-lemon",
+                    "offer_key": "idea_catalog:template:digital_product",
+                    "source": "digital_product",
+                },
+            },
+            "data": {
+                "type": "orders",
+                "id": "42",
+                "attributes": {
+                    "identifier": "order-uuid-42",
+                    "currency": "EUR",
+                    "total_usd": 1199,
+                    "status": "paid",
+                },
+            },
+        }
+
+        parsed = parse_confirmed_conversion_event(payload, provider="lemon_squeezy")
+
+        self.assertEqual(parsed["offer_id"], "offer-lemon")
+        self.assertEqual(parsed["source"], "digital_product")
+        self.assertEqual(parsed["external_id"], "lemon_squeezy:42")
+        self.assertEqual(parsed["amount_usd"], 11.99)
+        self.assertEqual(parsed["payload"]["offer_key"], "idea_catalog:template:digital_product")
+        self.assertEqual(parsed["payload"]["provider_event_name"], "order_created")
+
+    def test_parse_lemon_squeezy_rejects_unpaid_orders(self):
+        payload = {
+            "meta": {"event_name": "order_created", "custom_data": {"offer_key": "idea_catalog:x:support"}},
+            "data": {"id": "42", "attributes": {"status": "pending", "total_usd": 1199, "currency": "USD"}},
+        }
+
+        with self.assertRaisesRegex(ValueError, "not a confirmed paid conversion"):
+            parse_confirmed_conversion_event(payload, provider="lemon_squeezy")
+
+    def test_parse_gumroad_ping_payload_uses_sale_id_price_and_attribution_fields(self):
+        payload = {
+            "sale_id": "sale-123",
+            "price": "29.00",
+            "currency": "USD",
+            "offer_key": "idea_catalog:report:paid_report",
+            "source": "niche_report",
+            "product_permalink": "report-pack",
+        }
+
+        parsed = parse_confirmed_conversion_event(payload, provider="gumroad")
+
+        self.assertEqual(parsed["external_id"], "gumroad:sale-123")
+        self.assertEqual(parsed["amount_usd"], 29.0)
+        self.assertEqual(parsed["source"], "niche_report")
+        self.assertEqual(parsed["payload"]["offer_key"], "idea_catalog:report:paid_report")
+        self.assertEqual(parsed["payload"]["product_permalink"], "report-pack")
+
     def test_parse_conversion_rejects_non_usd_payloads(self):
         payload = {
             "id": "evt_123",

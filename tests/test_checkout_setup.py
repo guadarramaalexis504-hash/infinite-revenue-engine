@@ -47,6 +47,9 @@ class CheckoutSetupTests(unittest.TestCase):
         self.assertEqual(rows[0]["provider_webhooks"]["stripe"], "https://revenue.example/webhooks/conversion/stripe")
         self.assertEqual(rows[0]["provider_webhooks"]["manual"], "https://revenue.example/webhooks/conversion/manual")
         self.assertEqual(rows[0]["click_redirect_url"], "https://revenue.example/click")
+        self.assertIn("metadata", rows[0]["provider_payload_hints"]["stripe"])
+        self.assertIn("meta.custom_data", rows[0]["provider_payload_hints"]["lemon_squeezy"])
+        self.assertIn("form-encoded", rows[0]["provider_payload_hints"]["gumroad"])
 
     def test_checkout_setup_exporter_writes_json_and_markdown(self):
         offers = generate_offers(
@@ -70,6 +73,8 @@ class CheckoutSetupTests(unittest.TestCase):
         self.assertIn("Webhook Setup Service", markdown)
         self.assertIn("offer_key", markdown)
         self.assertIn("https://revenue.example/webhooks/conversion/stripe", markdown)
+        self.assertIn("meta.custom_data", markdown)
+        self.assertIn("?token=CONVERSION_WEBHOOK_TOKEN", markdown)
 
 
 if __name__ == "__main__":

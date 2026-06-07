@@ -63,8 +63,12 @@ def create_tracking_app(
                 provider = path.removeprefix("/webhooks/conversion/").strip("/")
                 if not provider:
                     return _json_response(start_response, "404 Not Found", {"error": "Missing conversion provider"})
+                headers = _headers(environ)
+                query = _query(environ)
+                if "X-Revenue-Webhook-Token" not in headers and query.get("token"):
+                    headers["X-Revenue-Webhook-Token"] = query["token"]
                 result = handle_conversion_webhook(
-                    headers=_headers(environ),
+                    headers=headers,
                     payload=_json_body(environ),
                     expected_token=settings.conversion_webhook_token or "",
                     provider=provider,
@@ -100,7 +104,12 @@ def _headers(environ: dict[str, Any]) -> dict[str, str]:
 def _json_body(environ: dict[str, Any]) -> dict[str, Any]:
     length = int(environ.get("CONTENT_LENGTH") or "0")
     raw = environ["wsgi.input"].read(length)
-    payload = json.loads(raw.decode("utf-8") if raw else "{}")
+    content_type = str(environ.get("CONTENT_TYPE") or "").split(";", 1)[0].strip().lower()
+    body = raw.decode("utf-8") if raw else ""
+    if content_type == "application/x-www-form-urlencoded":
+        parsed = parse_qs(body, keep_blank_values=True)
+        return {key: values[-1] if values else "" for key, values in parsed.items()}
+    payload = json.loads(body if body else "{}")
     if not isinstance(payload, dict):
         raise ValueError("JSON request body must be an object")
     return payload

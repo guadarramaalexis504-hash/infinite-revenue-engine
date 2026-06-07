@@ -249,6 +249,8 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 This writes `checkout_setup.json` and `CHECKOUT_SETUP.md` with metadata keys, provider webhook URLs, and manual conversion fallback commands for each generated offer.
 
+Provider details are included in `CHECKOUT_SETUP.md`: Stripe uses Checkout Session metadata, Gumroad Ping can post form-encoded sale fields and can use `?token=CONVERSION_WEBHOOK_TOKEN`, and Lemon Squeezy should receive metadata as checkout custom data so it comes back under `meta.custom_data`.
+
 Generate a deployable tracking app bundle:
 
 ```powershell

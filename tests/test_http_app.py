@@ -29,15 +29,18 @@ class FakeSupabase:
         self.events.append((run_id, event_type, payload))
 
 
-def call_app(app, *, method="GET", path="/", query="", body=None, headers=None):
-    body_bytes = b"" if body is None else json.dumps(body).encode("utf-8")
+def call_app(app, *, method="GET", path="/", query="", body=None, headers=None, content_type="application/json"):
+    if isinstance(body, bytes):
+        body_bytes = body
+    else:
+        body_bytes = b"" if body is None else json.dumps(body).encode("utf-8")
     environ = {
         "REQUEST_METHOD": method,
         "PATH_INFO": path,
         "QUERY_STRING": query,
         "wsgi.input": io.BytesIO(body_bytes),
         "CONTENT_LENGTH": str(len(body_bytes)),
-        "CONTENT_TYPE": "application/json",
+        "CONTENT_TYPE": content_type,
     }
     for key, value in (headers or {}).items():
         environ[f"HTTP_{key.upper().replace('-', '_')}"] = value
@@ -137,6 +140,47 @@ class TrackingHttpAppTests(unittest.TestCase):
         self.assertEqual(json.loads(body)["status"], "recorded")
         self.assertEqual(supabase.conversions[0]["external_id"], "stripe:evt_123")
         self.assertEqual(supabase.conversions[0]["amount_usd"], 99.0)
+
+    def test_conversion_webhook_accepts_form_encoded_gumroad_ping(self):
+        supabase = FakeSupabase()
+        body = (
+            b"sale_id=sale-123&price=19.00&currency=USD"
+            b"&source=niche_report"
+            b"&offer_key=idea_catalog%3Areport%3Apaid_report"
+            b"&product_permalink=report-pack"
+        )
+
+        status, _headers, response = call_app(
+            self.make_app(supabase),
+            method="POST",
+            path="/webhooks/conversion/gumroad",
+            body=body,
+            headers={"X-Revenue-Webhook-Token": "conversion-token"},
+            content_type="application/x-www-form-urlencoded",
+        )
+
+        self.assertEqual(status, "200 OK")
+        self.assertEqual(json.loads(response)["status"], "recorded")
+        self.assertEqual(supabase.conversions[0]["external_id"], "gumroad:sale-123")
+        self.assertEqual(supabase.conversions[0]["amount_usd"], 19.0)
+        self.assertEqual(supabase.conversions[0]["payload"]["offer_key"], "idea_catalog:report:paid_report")
+
+    def test_conversion_webhook_accepts_token_query_for_providers_without_custom_headers(self):
+        supabase = FakeSupabase()
+        body = b"sale_id=sale-123&price=19.00&currency=USD&source=niche_report"
+
+        status, _headers, response = call_app(
+            self.make_app(supabase),
+            method="POST",
+            path="/webhooks/conversion/gumroad",
+            query="token=conversion-token",
+            body=body,
+            content_type="application/x-www-form-urlencoded",
+        )
+
+        self.assertEqual(status, "200 OK")
+        self.assertEqual(json.loads(response)["status"], "recorded")
+        self.assertEqual(supabase.conversions[0]["external_id"], "gumroad:sale-123")
 
     def test_click_endpoint_rejects_disallowed_target_host(self):
         status, _headers, body = call_app(

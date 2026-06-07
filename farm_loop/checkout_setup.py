@@ -36,6 +36,7 @@ def build_checkout_setup_rows(
                 "payment_url": offer.payment_url,
                 "checkout_metadata": metadata,
                 "provider_webhooks": _provider_webhooks(webhook_base),
+                "provider_payload_hints": _provider_payload_hints(),
                 "click_redirect_url": click_redirect_url,
                 "manual_conversion_command": _manual_conversion_command(offer),
             }
@@ -75,6 +76,15 @@ def _provider_webhooks(webhook_base: str) -> dict[str, str]:
     return {provider: f"{webhook_base}/{provider}" for provider in PROVIDERS}
 
 
+def _provider_payload_hints() -> dict[str, str]:
+    return {
+        "stripe": "Put checkout_metadata keys in Checkout Session metadata.",
+        "gumroad": "Gumroad Ping can POST form-encoded sale fields; include offer_key and source as available URL/custom fields, or use the webhook URL with ?token=CONVERSION_WEBHOOK_TOKEN.",
+        "lemon_squeezy": "Pass checkout_metadata keys in Lemon Squeezy custom data so webhooks return them under meta.custom_data.",
+        "manual": "Use the manual conversion command after invoice, sponsorship, affiliate, or support payment confirmation.",
+    }
+
+
 def _manual_conversion_command(offer: OfferDraft) -> str:
     return (
         "python -m farm_loop.main --record-conversion --dry-run "
@@ -111,6 +121,9 @@ def _to_markdown(rows: list[dict]) -> str:
         )
         for provider, url in row["provider_webhooks"].items():
             lines.append(f"- {provider}: {url or 'configure CONVERSION_WEBHOOK_BASE_URL'}")
+        lines.extend(["", "Provider payload notes:"])
+        for provider, hint in row["provider_payload_hints"].items():
+            lines.append(f"- {provider}: {hint}")
         lines.extend(
             [
                 "",
