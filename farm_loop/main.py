@@ -16,6 +16,7 @@ from .config import Settings
 from .conversions import build_manual_conversion_payload
 from .drafts import DraftGenerator
 from .launch_queue import LaunchQueueExporter
+from .lead_magnet_exporter import LeadMagnetExporter
 from .microtool_exporter import MicrotoolExporter
 from .offers import OfferCatalogExporter, parse_offer_payment_urls
 from .opportunity_roadmap import OpportunityRoadmapExporter
@@ -308,6 +309,22 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         if tracking_deploy_output_dir
         else None
     )
+    lead_magnet_output_dir = (
+        args.lead_magnet_output_dir
+        or cli_bundle_paths.get("lead_magnet_output_dir")
+        or settings.lead_magnet_output_dir
+        or env_bundle_paths.get("lead_magnet_output_dir")
+    )
+    lead_capture_url = args.lead_capture_url or settings.lead_capture_url or ""
+    lead_magnet_exporter = (
+        LeadMagnetExporter(
+            lead_magnet_output_dir,
+            lead_capture_url=lead_capture_url,
+            click_redirect_url=click_redirect_url,
+        )
+        if lead_magnet_output_dir
+        else None
+    )
     roadmap_output_dir = (
         args.roadmap_output_dir
         or cli_bundle_paths.get("roadmap_output_dir")
@@ -331,6 +348,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         offer_exporter=offer_exporter,
         checkout_setup_exporter=checkout_setup_exporter,
         tracking_deploy_exporter=tracking_deploy_exporter,
+        lead_magnet_exporter=lead_magnet_exporter,
         roadmap_exporter=roadmap_exporter,
         activation_report=activation_report,
         offer_payment_urls=offer_payment_urls,
@@ -404,6 +422,7 @@ def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
         "offer_output_dir": (base_path / "offers").as_posix(),
         "checkout_setup_output_dir": (base_path / "checkout-setup").as_posix(),
         "tracking_deploy_output_dir": (base_path / "tracking-deploy").as_posix(),
+        "lead_magnet_output_dir": (base_path / "lead-magnets").as_posix(),
         "roadmap_output_dir": (base_path / "roadmap").as_posix(),
         "launch_queue_output_dir": (base_path / "launch-queue").as_posix(),
     }
@@ -491,6 +510,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--tracking-public-base-url",
         default=None,
         help="Public HTTPS base URL for the deployed tracking app, e.g. https://track.example.com.",
+    )
+    parser.add_argument(
+        "--lead-magnet-output-dir",
+        default=None,
+        help="Write lead magnet landing pages, checklists, and opt-in metadata.",
+    )
+    parser.add_argument(
+        "--lead-capture-url",
+        default=None,
+        help="Owned opt-in form or newsletter URL used by generated lead magnet CTAs.",
     )
     parser.add_argument(
         "--roadmap-output-dir",

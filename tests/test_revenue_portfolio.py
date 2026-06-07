@@ -151,6 +151,15 @@ class FakeTrackingDeployExporter:
         return ["Dockerfile", ".env.tracking.example", "tracking_deploy.json", "DEPLOY_TRACKING_APP.md"]
 
 
+class FakeLeadMagnetExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, opportunities):
+        self.exports.append(opportunities)
+        return ["lead_magnets.json", "LEAD_MAGNETS.md", "index.html", "checklist.md"]
+
+
 class FakeRoadmapExporter:
     def __init__(self):
         self.exports = []
@@ -321,6 +330,21 @@ class RevenuePortfolioTests(unittest.TestCase):
 
         self.assertEqual(summary.tracking_deploy_exported, 4)
         self.assertEqual(tracking_exporter.exports, 1)
+
+    def test_run_revenue_portfolio_once_can_export_lead_magnets(self):
+        lead_exporter = FakeLeadMagnetExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            lead_magnet_exporter=lead_exporter,
+        )
+
+        self.assertEqual(summary.lead_magnets_exported, 4)
+        self.assertEqual(len(lead_exporter.exports), 1)
+        self.assertEqual(lead_exporter.exports[0][0].external_id, "kw-portfolio")
 
     def test_run_revenue_portfolio_once_can_export_opportunity_roadmap(self):
         roadmap_exporter = FakeRoadmapExporter()

@@ -10,6 +10,7 @@ __all__ = [
     "drafts",
     "http_app",
     "launch_queue",
+    "lead_magnet_exporter",
     "main",
     "microtool_exporter",
     "offers",

@@ -29,6 +29,7 @@ class RevenuePortfolioSummary:
     offers_exported: int = 0
     checkout_setup_exported: int = 0
     tracking_deploy_exported: int = 0
+    lead_magnets_exported: int = 0
     roadmap_exported: int = 0
     dashboard_snapshots_created: int = 0
     prune_decisions_created: int = 0
@@ -50,6 +51,7 @@ def run_revenue_portfolio_once(
     offer_exporter: Any | None = None,
     checkout_setup_exporter: Any | None = None,
     tracking_deploy_exporter: Any | None = None,
+    lead_magnet_exporter: Any | None = None,
     roadmap_exporter: Any | None = None,
     activation_report: dict | None = None,
     offer_payment_urls: dict[str, str] | None = None,
@@ -215,6 +217,10 @@ def run_revenue_portfolio_once(
     if tracking_deploy_exporter:
         tracking_deploy_exported = len(tracking_deploy_exporter.export())
 
+    lead_magnets_exported = 0
+    if lead_magnet_exporter:
+        lead_magnets_exported = len(lead_magnet_exporter.export(selected))
+
     roadmap_exported = 0
     if roadmap_exporter:
         roadmap_exported = len(
@@ -243,6 +249,7 @@ def run_revenue_portfolio_once(
                 "offers_exported": offers_exported,
                 "checkout_setup_exported": checkout_setup_exported,
                 "tracking_deploy_exported": tracking_deploy_exported,
+                "lead_magnets_exported": lead_magnets_exported,
                 "roadmap_exported": roadmap_exported,
                 "milestones": milestones or DEFAULT_MILESTONES,
                 "phase": phase,
@@ -263,6 +270,7 @@ def run_revenue_portfolio_once(
         offers_exported=offers_exported,
         checkout_setup_exported=checkout_setup_exported,
         tracking_deploy_exported=tracking_deploy_exported,
+        lead_magnets_exported=lead_magnets_exported,
         roadmap_exported=roadmap_exported,
     )
 

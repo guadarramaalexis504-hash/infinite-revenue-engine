@@ -67,6 +67,7 @@ class PortfolioCLIActivationTests(unittest.TestCase):
             offer_output_dir="env/offers",
             checkout_setup_output_dir="env/checkout-setup",
             tracking_deploy_output_dir="env/tracking-deploy",
+            lead_magnet_output_dir="env/lead-magnets",
             roadmap_output_dir="env/roadmap",
         )
         args = parse_args(
@@ -103,6 +104,7 @@ class PortfolioCLIActivationTests(unittest.TestCase):
         self.assertEqual(kwargs["offer_exporter"].output_dir, Path("out/revenue-bundle/offers"))
         self.assertEqual(kwargs["checkout_setup_exporter"].output_dir, Path("out/revenue-bundle/checkout-setup"))
         self.assertEqual(kwargs["tracking_deploy_exporter"].output_dir, Path("out/revenue-bundle/tracking-deploy"))
+        self.assertEqual(kwargs["lead_magnet_exporter"].output_dir, Path("out/revenue-bundle/lead-magnets"))
         self.assertEqual(kwargs["roadmap_exporter"].output_dir, Path("out/revenue-bundle/roadmap"))
         self.assertEqual(kwargs["launch_queue_exporter"].output_dir, Path("out/revenue-bundle/launch-queue"))
         self.assertEqual(kwargs["activation_report"], report)

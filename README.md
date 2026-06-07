@@ -72,7 +72,7 @@ Generate the full local revenue bundle in one command:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, the opportunity roadmap, and the launch queue using one standard folder tree.
+The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, the opportunity roadmap, and the launch queue using one standard folder tree.
 
 Record a confirmed sale from any payment path:
 
@@ -188,6 +188,8 @@ Optional environment variables:
 - `CONVERSION_WEBHOOK_BASE_URL`, optional public webhook base such as `https://your-domain.example/webhooks/conversion`
 - `TRACKING_DEPLOY_OUTPUT_DIR`, optional server-side tracking app deploy bundle path such as `out/tracking-deploy`
 - `TRACKING_PUBLIC_BASE_URL`, optional public tracking app base URL such as `https://track.your-domain.example`
+- `LEAD_MAGNET_OUTPUT_DIR`, optional lead magnet export path such as `out/lead-magnets`
+- `LEAD_CAPTURE_URL`, optional owned opt-in form or newsletter URL used by lead magnet CTAs
 - `ROADMAP_OUTPUT_DIR`, optional ranked opportunity roadmap path such as `out/roadmap`
 - `BUNDLE_OUTPUT_DIR`, optional all-in-one local revenue bundle path such as `out/revenue-bundle`
 
@@ -238,6 +240,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 ```
 
 This writes `Dockerfile`, `.env.tracking.example`, `tracking_deploy.json`, and `DEPLOY_TRACKING_APP.md` for the server-side click and conversion webhook app. Host it behind HTTPS, then set `CLICK_REDIRECT_URL` and `CONVERSION_WEBHOOK_BASE_URL` to its public endpoints before regenerating the site/offers.
+
+Generate lead magnet pages and checklists:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 20 --lead-magnet-output-dir out/lead-magnets --lead-capture-url https://your-form.example/signup
+```
+
+This writes `lead_magnets.json`, `LEAD_MAGNETS.md`, an index page, and one landing/checklist pair per selected lead magnet opportunity. Use this for opt-in assets on owned channels before selling templates, setup services, or support.
 
 ## Click Redirect Handler
 

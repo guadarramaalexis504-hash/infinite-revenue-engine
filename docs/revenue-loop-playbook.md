@@ -16,10 +16,12 @@ Current operating target:
 - Offer catalog: `OFFER_OUTPUT_DIR=out/offers`.
 - Checkout setup: `CHECKOUT_SETUP_OUTPUT_DIR=out/checkout-setup`.
 - Tracking deploy bundle: `TRACKING_DEPLOY_OUTPUT_DIR=out/tracking-deploy`.
+- Lead magnets: `LEAD_MAGNET_OUTPUT_DIR=out/lead-magnets`.
 - Opportunity roadmap: `ROADMAP_OUTPUT_DIR=out/roadmap`.
 - Revenue bundle: `BUNDLE_OUTPUT_DIR=out/revenue-bundle`.
 - Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
 - Optional service intake: `SERVICE_INTAKE_URL=https://your-form-or-checkout.example`.
+- Optional lead capture: `LEAD_CAPTURE_URL=https://your-form-or-newsletter.example`.
 - Optional checkout mapping: `OFFER_PAYMENT_URLS=fixed_scope_service=https://buy.stripe.com/setup,digital_product=https://gumroad.com/l/template`.
 - Live-readiness check: `.\scripts\doctor.ps1`.
 - Milestones: `$15`, `$200`, `$1,000`, `$20,000`.
@@ -100,6 +102,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 This writes `Dockerfile`, `.env.tracking.example`, `tracking_deploy.json`, and `DEPLOY_TRACKING_APP.md` for the server-side click redirect and conversion webhook app. Deploy it behind HTTPS, then set `CLICK_REDIRECT_URL=https://track.your-domain.example/click` and `CONVERSION_WEBHOOK_BASE_URL=https://track.your-domain.example/webhooks/conversion`.
 
+Generate lead magnet pages and checklists:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 20 --lead-magnet-output-dir out/lead-magnets --lead-capture-url https://your-form-or-newsletter.example
+```
+
+This writes `lead_magnets.json`, `LEAD_MAGNETS.md`, an index page, and one landing/checklist pair per selected lead magnet opportunity. Use these only on owned channels with explicit opt-in and a clear next paid offer.
+
 Generate an opportunity roadmap:
 
 ```powershell
@@ -114,7 +124,7 @@ Generate the full revenue bundle:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
+The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
 
 Attach real payment links to generated offers:
 
@@ -370,6 +380,7 @@ Revenue should be counted only from confirmed `tip_events` and `conversion_event
 - Optional conversion webhook token: `CONVERSION_WEBHOOK_TOKEN`.
 - Optional click redirect allowlist: `CLICK_ALLOWED_HOSTS`.
 - Service intake URL: `SERVICE_INTAKE_URL`.
+- Lead capture URL: `LEAD_CAPTURE_URL`.
 - Owned publishing surface: repo, website, landing pages, newsletter, or store.
 - Manual review process for assets before public release.
 - Basic analytics for click and conversion attribution.
