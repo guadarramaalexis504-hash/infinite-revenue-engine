@@ -16,7 +16,7 @@ from .conversions import build_manual_conversion_payload
 from .drafts import DraftGenerator
 from .launch_queue import LaunchQueueExporter
 from .microtool_exporter import MicrotoolExporter
-from .offers import OfferCatalogExporter
+from .offers import OfferCatalogExporter, parse_offer_payment_urls
 from .opportunity_roadmap import OpportunityRoadmapExporter
 from .scoring import rank_questions, to_opportunity_payload
 from .sources_stackexchange import StackExchangeClient
@@ -241,6 +241,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     site_base_url = args.site_base_url or settings.site_base_url or ""
     click_redirect_url = args.click_redirect_url or settings.click_redirect_url or ""
     intake_url = args.intake_url or settings.service_intake_url or ""
+    offer_payment_urls = parse_offer_payment_urls(args.offer_payment_urls or settings.offer_payment_urls)
     microtool_output_dir = (
         args.microtool_output_dir
         or cli_bundle_paths.get("microtool_output_dir")
@@ -256,6 +257,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
             intake_url=intake_url,
             tools_path=tools_path,
             site_base_url=site_base_url,
+            offer_payment_urls=offer_payment_urls,
         )
         if site_output_dir
         else None
@@ -299,6 +301,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         offer_exporter=offer_exporter,
         roadmap_exporter=roadmap_exporter,
         activation_report=activation_report,
+        offer_payment_urls=offer_payment_urls,
     )
     LOGGER.info("portfolio_summary %s", json.dumps(asdict(summary), sort_keys=True))
     return 0
@@ -428,6 +431,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--offer-output-dir",
         default=None,
         help="Write monetizable offer drafts to JSON and Markdown files.",
+    )
+    parser.add_argument(
+        "--offer-payment-urls",
+        default=None,
+        help="Comma-separated offer_type=url or channel=url checkout links used in generated offer CTAs.",
     )
     parser.add_argument(
         "--roadmap-output-dir",

@@ -56,6 +56,8 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "CONVERSION_WEBHOOK_TOKEN",
             "offers/index.html",
             "SERVICE_INTAKE_URL",
+            "OFFER_PAYMENT_URLS",
+            "--offer-payment-urls",
             "intake/index.html",
             "SITE_BASE_URL",
             "sitemap.xml",

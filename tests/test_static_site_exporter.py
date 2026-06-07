@@ -127,6 +127,27 @@ class StaticSiteExporterTests(unittest.TestCase):
         self.assertIn("https://forms.example.com/setup?", intake)
         self.assertIn("utm_content=intake", intake)
 
+    def test_offer_payment_urls_override_tip_and_intake_with_click_tracking(self):
+        assets = AssetGenerator().generate_all(self.opportunity)
+
+        with tempfile.TemporaryDirectory() as directory:
+            StaticSiteExporter(
+                directory,
+                tip_url="https://buymeacoffee.com/example",
+                intake_url="https://forms.example.com/setup",
+                click_redirect_url="https://revenue.example/click",
+                offer_payment_urls={"fixed_scope_service": "https://buy.stripe.com/webhook-setup"},
+            ).export_portfolio([(self.opportunity, assets)])
+            root = Path(directory)
+            page = (root / "offer-webhook-setup-service" / "index.html").read_text(encoding="utf-8")
+            offer_catalog = (root / "offers" / "index.html").read_text(encoding="utf-8")
+
+        self.assertIn("https://revenue.example/click?", page)
+        self.assertIn("target=https%3A%2F%2Fbuy.stripe.com%2Fwebhook-setup", page)
+        self.assertIn("utm_content%3Dfixed_scope_service", page)
+        self.assertIn("target=https%3A%2F%2Fbuy.stripe.com%2Fwebhook-setup", offer_catalog)
+        self.assertNotIn("fixed_scope_service_intake", page)
+
     def test_offer_cards_show_payment_setup_notice_without_tip_url(self):
         assets = AssetGenerator().generate_all(self.opportunity)
 
@@ -137,9 +158,9 @@ class StaticSiteExporterTests(unittest.TestCase):
 
         self.assertIn("Ways to work with this", page)
         self.assertIn("$199.00", page)
-        self.assertIn("Configure TIP_URL before publishing offer CTAs", page)
+        self.assertIn("Configure TIP_URL or OFFER_PAYMENT_URLS before publishing offer CTAs", page)
         self.assertIn("Offer Catalog", offer_catalog)
-        self.assertIn("Configure TIP_URL before publishing offer CTAs", offer_catalog)
+        self.assertIn("Configure TIP_URL or OFFER_PAYMENT_URLS before publishing offer CTAs", offer_catalog)
 
 
 if __name__ == "__main__":

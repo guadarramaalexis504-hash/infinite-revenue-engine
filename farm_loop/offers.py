@@ -38,7 +38,36 @@ class OfferDraft:
         }
 
 
-def generate_offers(opportunity: RevenueOpportunity) -> list[OfferDraft]:
+def parse_offer_payment_urls(value: str | None) -> dict[str, str]:
+    if not value:
+        return {}
+    payment_urls: dict[str, str] = {}
+    for raw_item in value.replace("\n", ",").split(","):
+        item = raw_item.strip()
+        if not item:
+            continue
+        if "=" not in item:
+            raise ValueError("Offer payment URLs must use key=url pairs")
+        key, url = item.split("=", 1)
+        key = key.strip()
+        url = url.strip()
+        if not key or not url:
+            raise ValueError("Offer payment URL keys and values must be non-empty")
+        payment_urls[key] = url
+    return payment_urls
+
+
+def resolve_offer_payment_url(offer_type: str, channel: str, payment_urls: dict[str, str] | None) -> str:
+    if not payment_urls:
+        return ""
+    return payment_urls.get(offer_type) or payment_urls.get(channel) or payment_urls.get("*", "")
+
+
+def generate_offers(
+    opportunity: RevenueOpportunity,
+    *,
+    payment_urls: dict[str, str] | None = None,
+) -> list[OfferDraft]:
     channel = opportunity.channel
     if channel == "microtool_seo":
         return [
@@ -49,6 +78,7 @@ def generate_offers(opportunity: RevenueOpportunity) -> list[OfferDraft]:
                 description="Optional support for this useful tool on an owned channel. No third-party spam or automated posting.",
                 price_usd=5,
                 cta_label="Support this tool",
+                payment_url=resolve_offer_payment_url("support", channel, payment_urls),
             ),
             _offer(
                 opportunity,
@@ -57,6 +87,7 @@ def generate_offers(opportunity: RevenueOpportunity) -> list[OfferDraft]:
                 description="Fixed-scope help applying this tool's findings to a real project after manual review.",
                 price_usd=49,
                 cta_label="Get setup help",
+                payment_url=resolve_offer_payment_url("setup_service", channel, payment_urls),
             ),
         ]
     if channel == "paid_setup_kit":
@@ -68,6 +99,7 @@ def generate_offers(opportunity: RevenueOpportunity) -> list[OfferDraft]:
                 description="Done-for-you fixed-scope setup with clear deliverables, intake, and manual acceptance.",
                 price_usd=max(199, min(299, round(opportunity.payout_estimate_usd))),
                 cta_label="Book fixed setup",
+                payment_url=resolve_offer_payment_url("fixed_scope_service", channel, payment_urls),
             )
         ]
     if channel == "digital_product":
@@ -79,6 +111,7 @@ def generate_offers(opportunity: RevenueOpportunity) -> list[OfferDraft]:
                 description="Downloadable template or starter kit sold from an owned store after manual review.",
                 price_usd=29,
                 cta_label="Get the template",
+                payment_url=resolve_offer_payment_url("digital_product", channel, payment_urls),
             )
         ]
     if channel == "github_issue_helper":
@@ -90,6 +123,7 @@ def generate_offers(opportunity: RevenueOpportunity) -> list[OfferDraft]:
                 description="Owned sponsorship CTA for useful open-source help. Do not add payment links to third-party issues.",
                 price_usd=5,
                 cta_label="Sponsor this work",
+                payment_url=resolve_offer_payment_url("sponsorship", channel, payment_urls),
             )
         ]
     return [
@@ -100,6 +134,7 @@ def generate_offers(opportunity: RevenueOpportunity) -> list[OfferDraft]:
             description="Optional support CTA for an owned or explicitly permitted channel.",
             price_usd=5,
             cta_label="Support this work",
+            payment_url=resolve_offer_payment_url("support", channel, payment_urls),
         )
     ]
 
@@ -128,6 +163,7 @@ def _offer(
     description: str,
     price_usd: float,
     cta_label: str,
+    payment_url: str = "",
 ) -> OfferDraft:
     return OfferDraft(
         source=opportunity.source,
@@ -138,6 +174,7 @@ def _offer(
         description=description,
         price_usd=float(price_usd),
         cta_label=cta_label,
+        payment_url=payment_url,
     )
 
 
@@ -152,6 +189,7 @@ def _to_markdown(offers: list[OfferDraft]) -> str:
                 f"- Channel: {offer.channel}",
                 f"- External ID: {offer.external_id}",
                 f"- Price: ${offer.price_usd:.2f}",
+                f"- Payment URL: {offer.payment_url or 'not configured'}",
                 f"- CTA: {offer.cta_label}",
                 f"- Status: {offer.status}",
                 f"- Description: {offer.description}",

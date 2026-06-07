@@ -129,6 +129,20 @@ class CLITests(unittest.TestCase):
 
         self.assertEqual(args.offer_output_dir, "out/offers")
 
+    def test_parse_args_supports_offer_payment_urls(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--offer-payment-urls",
+                "fixed_scope_service=https://buy.stripe.com/setup,digital_product=https://gumroad.com/l/template",
+            ]
+        )
+
+        self.assertEqual(
+            args.offer_payment_urls,
+            "fixed_scope_service=https://buy.stripe.com/setup,digital_product=https://gumroad.com/l/template",
+        )
+
     def test_parse_args_supports_roadmap_output_dir(self):
         args = parse_args(
             [

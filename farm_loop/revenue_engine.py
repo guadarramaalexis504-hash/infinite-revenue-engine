@@ -48,6 +48,7 @@ def run_revenue_portfolio_once(
     offer_exporter: Any | None = None,
     roadmap_exporter: Any | None = None,
     activation_report: dict | None = None,
+    offer_payment_urls: dict[str, str] | None = None,
 ) -> RevenuePortfolioSummary:
     if phase == "summarize":
         dashboard_snapshots_created = 0
@@ -175,7 +176,7 @@ def run_revenue_portfolio_once(
                 }
             )
 
-        offers = generate_offers(opportunity)
+        offers = generate_offers(opportunity, payment_urls=offer_payment_urls)
         offer_drafts.extend(offers)
         if supabase and not dry_run:
             for offer in offers:

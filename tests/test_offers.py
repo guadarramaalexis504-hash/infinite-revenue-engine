@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from farm_loop.offers import OfferCatalogExporter, generate_offers
+from farm_loop.offers import OfferCatalogExporter, generate_offers, parse_offer_payment_urls
 from farm_loop.revenue_scoring import RevenueOpportunity, score_opportunity
 
 
@@ -47,17 +47,57 @@ class OfferTests(unittest.TestCase):
 
     def test_offer_payload_matches_supabase_shape(self):
         opp = opportunity("microtool_seo", external_id="tool-1")
-        offer = generate_offers(opp)[0]
+        offer = generate_offers(
+            opp,
+            payment_urls={"support": "https://buymeacoffee.com/example", "setup_service": "https://buy.stripe.com/setup"},
+        )[0]
 
         payload = offer.to_payload(opportunity_id="opp-row-1")
 
         self.assertEqual(payload["opportunity_id"], "opp-row-1")
         self.assertEqual(payload["channel"], "microtool_seo")
+        self.assertEqual(payload["payment_url"], "https://buymeacoffee.com/example")
         self.assertEqual(payload["status"], "draft")
         self.assertEqual(payload["payload"]["external_id"], "tool-1")
 
+    def test_parse_offer_payment_urls_accepts_offer_types_channels_and_default(self):
+        payment_urls = parse_offer_payment_urls(
+            "support=https://buymeacoffee.com/example,"
+            "fixed_scope_service=https://buy.stripe.com/setup,"
+            "digital_product=https://gumroad.com/l/template,"
+            "github_issue_helper=https://github.com/sponsors/example,"
+            "*=https://example.com/pay"
+        )
+
+        self.assertEqual(payment_urls["support"], "https://buymeacoffee.com/example")
+        self.assertEqual(payment_urls["fixed_scope_service"], "https://buy.stripe.com/setup")
+        self.assertEqual(payment_urls["digital_product"], "https://gumroad.com/l/template")
+        self.assertEqual(payment_urls["github_issue_helper"], "https://github.com/sponsors/example")
+        self.assertEqual(payment_urls["*"], "https://example.com/pay")
+
+    def test_generate_offers_applies_payment_url_by_offer_type_then_channel_default(self):
+        support, setup = generate_offers(
+            opportunity("microtool_seo"),
+            payment_urls={
+                "support": "https://buymeacoffee.com/example",
+                "microtool_seo": "https://stripe.example.com/microtool",
+                "*": "https://example.com/pay",
+            },
+        )
+        product = generate_offers(
+            opportunity("digital_product", "Template Pack"),
+            payment_urls={"*": "https://example.com/pay"},
+        )[0]
+
+        self.assertEqual(support.payment_url, "https://buymeacoffee.com/example")
+        self.assertEqual(setup.payment_url, "https://stripe.example.com/microtool")
+        self.assertEqual(product.payment_url, "https://example.com/pay")
+
     def test_offer_catalog_exporter_writes_json_and_markdown(self):
-        offers = generate_offers(opportunity("paid_setup_kit", "Webhook Setup Service"))
+        offers = generate_offers(
+            opportunity("paid_setup_kit", "Webhook Setup Service"),
+            payment_urls={"fixed_scope_service": "https://buy.stripe.com/webhook-setup"},
+        )
 
         with tempfile.TemporaryDirectory() as directory:
             written = OfferCatalogExporter(directory).export(offers)
@@ -67,8 +107,10 @@ class OfferTests(unittest.TestCase):
 
         self.assertEqual(sorted(path.name for path in written), ["OFFERS.md", "offers.json"])
         self.assertEqual(rows[0]["title"], "Webhook Setup Service")
+        self.assertEqual(rows[0]["payment_url"], "https://buy.stripe.com/webhook-setup")
         self.assertIn("# Offer Catalog", markdown)
         self.assertIn("Webhook Setup Service", markdown)
+        self.assertIn("https://buy.stripe.com/webhook-setup", markdown)
 
 
 if __name__ == "__main__":

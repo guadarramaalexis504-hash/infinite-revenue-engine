@@ -20,6 +20,7 @@ class StaticSiteExporter:
         intake_url: str = "",
         tools_path: str = "",
         site_base_url: str = "",
+        offer_payment_urls: dict[str, str] | None = None,
     ) -> None:
         self.output_dir = Path(output_dir)
         self.tip_url = tip_url
@@ -27,6 +28,7 @@ class StaticSiteExporter:
         self.intake_url = intake_url
         self.tools_path = tools_path
         self.site_base_url = site_base_url.rstrip("/")
+        self.offer_payment_urls = offer_payment_urls or {}
 
     def export_portfolio(self, opportunities_with_assets: list[tuple[RevenueOpportunity, list[AssetDraft]]]) -> list[str]:
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -144,7 +146,7 @@ class StaticSiteExporter:
         cards = "\n".join(
             self._catalog_offer_card(opportunity, offer)
             for opportunity in opportunities
-            for offer in generate_offers(opportunity)
+            for offer in generate_offers(opportunity, payment_urls=self.offer_payment_urls)
         )
         return self._page(
             "Offer Catalog",
@@ -250,7 +252,10 @@ class StaticSiteExporter:
         return f'<p class="notice">Useful? <a href="{escape(url)}">Support this work</a>.</p>'
 
     def _offer_section(self, opportunity: RevenueOpportunity) -> str:
-        cards = "\n".join(self._offer_card(opportunity, offer) for offer in generate_offers(opportunity))
+        cards = "\n".join(
+            self._offer_card(opportunity, offer)
+            for offer in generate_offers(opportunity, payment_urls=self.offer_payment_urls)
+        )
         return f"""
         <section class="offer-list" aria-label="Ways to work with this">
           <h2>Ways to work with this</h2>
@@ -271,13 +276,24 @@ class StaticSiteExporter:
         """
 
     def _offer_action(self, opportunity: RevenueOpportunity, offer: OfferDraft) -> str:
+        if offer.payment_url:
+            if self.click_redirect_url:
+                url = build_click_redirect_url(
+                    self.click_redirect_url,
+                    opportunity,
+                    target_url=offer.payment_url,
+                    content=offer.offer_type,
+                )
+            else:
+                url = build_tracking_url(offer.payment_url, opportunity, content=offer.offer_type)
+            return f'<a href="{escape(url)}">{escape(offer.cta_label)}</a>'
         if self.intake_url and offer.offer_type in {"fixed_scope_service", "setup_service"}:
             url = build_tracking_url(self.intake_url, opportunity, content=f"{offer.offer_type}_intake")
             return f'<a href="{escape(url)}">{escape(offer.cta_label)}</a>'
         if self.tip_url:
             url = build_tracking_url(self.tip_url, opportunity, content=offer.offer_type)
             return f'<a href="{escape(url)}">{escape(offer.cta_label)}</a>'
-        return "Configure TIP_URL before publishing offer CTAs."
+        return "Configure TIP_URL or OFFER_PAYMENT_URLS before publishing offer CTAs."
 
     def _tools_link(self, *, prefix: str) -> str:
         if not self.tools_path:

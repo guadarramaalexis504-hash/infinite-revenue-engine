@@ -38,6 +38,7 @@ class Settings:
     site_base_url: str | None = None
     click_redirect_url: str | None = None
     service_intake_url: str | None = None
+    offer_payment_urls: str = ""
     launch_queue_output_dir: str | None = None
     microtool_output_dir: str | None = None
     offer_output_dir: str | None = None
@@ -69,6 +70,7 @@ class Settings:
             site_base_url=os.getenv("SITE_BASE_URL"),
             click_redirect_url=os.getenv("CLICK_REDIRECT_URL"),
             service_intake_url=os.getenv("SERVICE_INTAKE_URL"),
+            offer_payment_urls=os.getenv("OFFER_PAYMENT_URLS", ""),
             launch_queue_output_dir=os.getenv("LAUNCH_QUEUE_OUTPUT_DIR"),
             microtool_output_dir=os.getenv("MICROTOOL_OUTPUT_DIR"),
             offer_output_dir=os.getenv("OFFER_OUTPUT_DIR"),

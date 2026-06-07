@@ -18,6 +18,7 @@ Current operating target:
 - Revenue bundle: `BUNDLE_OUTPUT_DIR=out/revenue-bundle`.
 - Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
 - Optional service intake: `SERVICE_INTAKE_URL=https://your-form-or-checkout.example`.
+- Optional checkout mapping: `OFFER_PAYMENT_URLS=fixed_scope_service=https://buy.stripe.com/setup,digital_product=https://gumroad.com/l/template`.
 - Live-readiness check: `.\scripts\doctor.ps1`.
 - Milestones: `$15`, `$200`, `$1,000`, `$20,000`.
 - Default behavior: keep running after milestones because `STOP_AFTER_TARGET=false`.
@@ -96,6 +97,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 ```
 
 The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
+
+Attach real payment links to generated offers:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --offer-payment-urls "fixed_scope_service=https://buy.stripe.com/setup,digital_product=https://gumroad.com/l/template" --site-output-dir out/site --offer-output-dir out/offers
+```
+
+`OFFER_PAYMENT_URLS` accepts comma-separated `offer_type=url`, `channel=url`, or `*=url` entries. The exporter stores matching URLs in `offers.json` and uses them for owned offer CTAs. If `CLICK_REDIRECT_URL` is configured, those CTAs route through `/click` first so checkout traffic is measurable.
 
 Record a confirmed conversion:
 
@@ -331,6 +340,7 @@ Revenue should be counted only from confirmed `tip_events` and `conversion_event
 - GitHub remote and authenticated `gh` or repository UI access so workflows can be dispatched.
 - If no remote exists locally, use `.\scripts\configure-github.ps1 -Repo owner/repo -RunWorkflow`.
 - Payment path: Buy Me a Coffee, Stripe, Gumroad, Lemon Squeezy, or GitHub Sponsors.
+- Offer payment URL mapping: `OFFER_PAYMENT_URLS`.
 - Optional conversion webhook token: `CONVERSION_WEBHOOK_TOKEN`.
 - Optional click redirect allowlist: `CLICK_ALLOWED_HOSTS`.
 - Service intake URL: `SERVICE_INTAKE_URL`.

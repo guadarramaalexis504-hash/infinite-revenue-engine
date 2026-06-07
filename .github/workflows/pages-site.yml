@@ -24,6 +24,7 @@ jobs:
       CLICK_REDIRECT_URL: ${{ secrets.CLICK_REDIRECT_URL }}
       SERVICE_INTAKE_URL: ${{ secrets.SERVICE_INTAKE_URL }}
       SITE_BASE_URL: ${{ secrets.SITE_BASE_URL }}
+      OFFER_PAYMENT_URLS: ${{ secrets.OFFER_PAYMENT_URLS }}
       KEYWORD_CSV_PATH: "data/revenue_keywords.csv"
       IDEA_CATALOG_PATH: "data/revenue_ideas.json"
     steps:
@@ -39,7 +40,7 @@ jobs:
         run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
 
       - name: Generate owned static site
-        run: python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 12 --site-output-dir out/site --microtool-output-dir out/site/tools --click-redirect-url "${CLICK_REDIRECT_URL}" --intake-url "${SERVICE_INTAKE_URL}" --site-base-url "${SITE_BASE_URL}"
+        run: python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 12 --site-output-dir out/site --microtool-output-dir out/site/tools --click-redirect-url "${CLICK_REDIRECT_URL}" --intake-url "${SERVICE_INTAKE_URL}" --site-base-url "${SITE_BASE_URL}" --offer-payment-urls "${OFFER_PAYMENT_URLS}"
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

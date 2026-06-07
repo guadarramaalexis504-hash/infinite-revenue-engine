@@ -180,6 +180,7 @@ Optional environment variables:
 - `CLICK_ALLOWED_HOSTS`, comma-separated final redirect host allowlist, default `buymeacoffee.com,www.buymeacoffee.com`
 - `CONVERSION_WEBHOOK_TOKEN`, optional shared token for your owned conversion webhook endpoint
 - `SERVICE_INTAKE_URL`, optional setup/service intake form URL used by service CTAs
+- `OFFER_PAYMENT_URLS`, optional comma-separated checkout links such as `fixed_scope_service=https://buy.stripe.com/...,digital_product=https://gumroad.com/l/...`
 - `LAUNCH_QUEUE_OUTPUT_DIR`, optional launch queue export path such as `out/launch-queue`
 - `MICROTOOL_OUTPUT_DIR`, optional interactive microtool export path such as `out/microtools`
 - `OFFER_OUTPUT_DIR`, optional offer catalog export path such as `out/offers`
@@ -204,6 +205,17 @@ Endpoints:
 - `POST /webhooks/conversion/<provider>`: validates `X-Revenue-Webhook-Token`, records `conversion_events`, and attributes revenue to an offer/source when provider metadata includes it.
 
 Deploy this app only on a server-side HTTPS host with `SUPABASE_URL`, `SUPABASE_KEY`, `BUYMEACOFFEE_WEBHOOK_TOKEN`, `CONVERSION_WEBHOOK_TOKEN`, and `CLICK_ALLOWED_HOSTS` configured. Do not expose the Supabase server-side key in browser JavaScript.
+
+## Offer Payment Links
+
+Use `OFFER_PAYMENT_URLS` to route each generated offer type to a real checkout while keeping attribution:
+
+```powershell
+$env:OFFER_PAYMENT_URLS="support=https://www.buymeacoffee.com/your-handle,fixed_scope_service=https://buy.stripe.com/setup,digital_product=https://gumroad.com/l/template,sponsorship=https://github.com/sponsors/your-handle"
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --site-output-dir out/site --offer-output-dir out/offers
+```
+
+Supported keys are offer types such as `support`, `setup_service`, `fixed_scope_service`, `digital_product`, and `sponsorship`; channel keys such as `microtool_seo` also work, and `*` is a default fallback. When `CLICK_REDIRECT_URL` is set, generated offer CTAs route through `/click` before the checkout so `click_events` can be recorded.
 
 ## Click Redirect Handler
 
