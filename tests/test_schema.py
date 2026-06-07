@@ -40,6 +40,20 @@ class SchemaTests(unittest.TestCase):
 
         self.assertIn("opportunity_id uuid references public.opportunities(id)", schema)
 
+    def test_schema_indexes_revenue_engine_foreign_keys(self):
+        schema = Path("supabase/schema.sql").read_text(encoding="utf-8")
+
+        for index in [
+            "assets_opportunity_id_idx",
+            "offers_opportunity_id_idx",
+            "offers_asset_id_idx",
+            "click_events_offer_id_idx",
+            "conversion_events_offer_id_idx",
+            "experiments_opportunity_id_idx",
+            "launch_tasks_opportunity_id_idx",
+        ]:
+            self.assertIn(f"create index if not exists {index}", schema)
+
 
 if __name__ == "__main__":
     unittest.main()

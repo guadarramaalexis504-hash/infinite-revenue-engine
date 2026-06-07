@@ -176,11 +176,32 @@ create index if not exists opportunities_expected_value_idx
 create index if not exists assets_status_channel_idx
     on public.assets(status, channel);
 
+create index if not exists assets_opportunity_id_idx
+    on public.assets(opportunity_id);
+
+create index if not exists offers_opportunity_id_idx
+    on public.offers(opportunity_id);
+
+create index if not exists offers_asset_id_idx
+    on public.offers(asset_id);
+
+create index if not exists click_events_offer_id_idx
+    on public.click_events(offer_id);
+
 create index if not exists conversion_events_source_created_at_idx
     on public.conversion_events(source, created_at desc);
 
+create index if not exists conversion_events_offer_id_idx
+    on public.conversion_events(offer_id);
+
+create index if not exists experiments_opportunity_id_idx
+    on public.experiments(opportunity_id);
+
 create index if not exists launch_tasks_status_priority_idx
     on public.launch_tasks(status, priority, expected_value_usd desc);
+
+create index if not exists launch_tasks_opportunity_id_idx
+    on public.launch_tasks(opportunity_id);
 
 create index if not exists portfolio_snapshots_created_at_idx
     on public.portfolio_snapshots(created_at desc);
