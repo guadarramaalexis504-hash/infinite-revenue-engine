@@ -74,13 +74,21 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The activation manifest writes `activation_manifest.json`, `ACTIVATE_NOW.md`, `RUNBOOK.md`, and `CLAUDE_HANDOFF.md`. It links each selected opportunity to local review files, owned pages, checkout setup, tracking deploy docs, offer keys, dry-run conversion commands, and safe handoff instructions for another coding agent.
 
+Generate an offer-level revenue forecast:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --revenue-forecast-output-dir out/revenue-forecast
+```
+
+The revenue forecast writes `revenue_forecast.json` and `REVENUE_FORECAST.md` with the number of conversions each generated offer needs to reach `$15`, `$200`, `$1,000`, and `$20,000`. It is a planning artifact, not an income guarantee.
+
 Generate the full local revenue bundle in one command:
 
 ```powershell
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, digital product packs, service packages, niche reports, affiliate article drafts, sponsor repo kits, the opportunity roadmap, activation manifest, and the launch queue using one standard folder tree.
+The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, digital product packs, service packages, niche reports, affiliate article drafts, sponsor repo kits, the opportunity roadmap, activation manifest, revenue forecast, and the launch queue using one standard folder tree.
 
 Record a confirmed sale from any payment path:
 
@@ -207,6 +215,7 @@ Optional environment variables:
 - `SPONSOR_URLS`, optional comma-separated tag=url, github=url, sponsorship=url, or *=url sponsor links
 - `ROADMAP_OUTPUT_DIR`, optional ranked opportunity roadmap path such as `out/roadmap`
 - `ACTIVATION_MANIFEST_OUTPUT_DIR`, optional launch activation manifest path such as `out/activation`
+- `REVENUE_FORECAST_OUTPUT_DIR`, optional offer-level milestone forecast path such as `out/revenue-forecast`
 - `BUNDLE_OUTPUT_DIR`, optional all-in-one local revenue bundle path such as `out/revenue-bundle`
 
 `scripts/configure-github.ps1` sets the required secrets and also sets optional activation secrets such as `CLICK_REDIRECT_URL`, `CONVERSION_WEBHOOK_TOKEN`, `SERVICE_INTAKE_URL`, `SITE_BASE_URL`, `OFFER_PAYMENT_URLS`, `CONVERSION_WEBHOOK_BASE_URL`, `TRACKING_PUBLIC_BASE_URL`, `LEAD_CAPTURE_URL`, `AFFILIATE_URLS`, and `SPONSOR_URLS` when present and not placeholders. The GitHub Actions workflow uses GitHub's built-in `github.token` for issue discovery rate limits.

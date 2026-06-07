@@ -236,6 +236,15 @@ class FakeActivationManifestExporter:
         return ["activation_manifest.json", "ACTIVATE_NOW.md", "RUNBOOK.md", "CLAUDE_HANDOFF.md"]
 
 
+class FakeRevenueForecastExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, *, offers, milestones):
+        self.exports.append({"offers": offers, "milestones": milestones})
+        return ["revenue_forecast.json", "REVENUE_FORECAST.md"]
+
+
 class RevenuePortfolioTests(unittest.TestCase):
     def test_run_revenue_portfolio_once_scores_generates_assets_and_continues_past_milestones(self):
         supabase = FakeSupabase()
@@ -520,6 +529,23 @@ class RevenuePortfolioTests(unittest.TestCase):
         )
         self.assertEqual(activation_exporter.exports[0]["offers"][0].offer_key, "manual_keywords:kw-portfolio:support")
         self.assertEqual(activation_exporter.exports[0]["activation_report"]["next_actions"], ["Run gh auth login"])
+
+    def test_run_revenue_portfolio_once_can_export_revenue_forecast(self):
+        forecast_exporter = FakeRevenueForecastExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            dry_run=True,
+            max_opportunities=3,
+            milestones=[15, 200, 1000, 20000],
+            revenue_forecast_exporter=forecast_exporter,
+        )
+
+        self.assertEqual(summary.revenue_forecast_exported, 2)
+        self.assertEqual(len(forecast_exporter.exports), 1)
+        self.assertEqual(forecast_exporter.exports[0]["milestones"], [15, 200, 1000, 20000])
+        self.assertEqual(len(forecast_exporter.exports[0]["offers"]), 2)
 
     def test_summarize_phase_persists_dashboard_snapshot(self):
         supabase = FakeSupabase()

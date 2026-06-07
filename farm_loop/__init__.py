@@ -21,6 +21,7 @@ __all__ = [
     "opportunity_roadmap",
     "revenue_dashboard",
     "revenue_engine",
+    "revenue_forecast",
     "revenue_scoring",
     "scoring",
     "service_package_exporter",

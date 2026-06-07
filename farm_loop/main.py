@@ -29,6 +29,7 @@ from .service_package_exporter import ServicePackageExporter
 from .sources_stackexchange import StackExchangeClient
 from .supabase_client import SupabaseClient
 from .revenue_engine import run_revenue_portfolio_once
+from .revenue_forecast import RevenueForecastExporter
 from .sources_github import GitHubIssuesClient
 from .sources_idea_catalog import IdeaCatalogSource
 from .sources_keywords import KeywordCSVSource
@@ -451,6 +452,17 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     )
     if activation_manifest_exporter and not activation_report:
         activation_report = collect_activation_report()
+    revenue_forecast_output_dir = (
+        args.revenue_forecast_output_dir
+        or cli_bundle_paths.get("revenue_forecast_output_dir")
+        or settings.revenue_forecast_output_dir
+        or env_bundle_paths.get("revenue_forecast_output_dir")
+    )
+    revenue_forecast_exporter = (
+        RevenueForecastExporter(revenue_forecast_output_dir)
+        if revenue_forecast_output_dir
+        else None
+    )
     summary = run_revenue_portfolio_once(
         sources=sources,
         supabase=supabase,
@@ -473,6 +485,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         sponsor_repo_exporter=sponsor_repo_exporter,
         roadmap_exporter=roadmap_exporter,
         activation_manifest_exporter=activation_manifest_exporter,
+        revenue_forecast_exporter=revenue_forecast_exporter,
         activation_report=activation_report,
         offer_payment_urls=offer_payment_urls,
     )
@@ -553,6 +566,7 @@ def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
         "sponsor_repo_output_dir": (base_path / "sponsor-repos").as_posix(),
         "roadmap_output_dir": (base_path / "roadmap").as_posix(),
         "activation_manifest_output_dir": (base_path / "activation").as_posix(),
+        "revenue_forecast_output_dir": (base_path / "revenue-forecast").as_posix(),
         "launch_queue_output_dir": (base_path / "launch-queue").as_posix(),
     }
 
@@ -694,6 +708,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--activation-manifest-output-dir",
         default=None,
         help="Write an activation manifest with exact artifact paths and validation commands.",
+    )
+    parser.add_argument(
+        "--revenue-forecast-output-dir",
+        default=None,
+        help="Write offer-level unit targets for each revenue milestone.",
     )
     parser.add_argument(
         "--bundle-output-dir",

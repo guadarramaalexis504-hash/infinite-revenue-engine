@@ -24,6 +24,7 @@ Current operating target:
 - Sponsor repo kits: `SPONSOR_REPO_OUTPUT_DIR=out/sponsor-repos`.
 - Opportunity roadmap: `ROADMAP_OUTPUT_DIR=out/roadmap`.
 - Activation manifest: `ACTIVATION_MANIFEST_OUTPUT_DIR=out/activation`.
+- Revenue forecast: `REVENUE_FORECAST_OUTPUT_DIR=out/revenue-forecast`.
 - Revenue bundle: `BUNDLE_OUTPUT_DIR=out/revenue-bundle`.
 - Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
 - Optional service intake: `SERVICE_INTAKE_URL=https://your-form-or-checkout.example`.
@@ -180,13 +181,21 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The activation manifest writes `activation_manifest.json`, `ACTIVATE_NOW.md`, `RUNBOOK.md`, and `CLAUDE_HANDOFF.md`. It turns the selected portfolio into exact local file paths, offer keys, checkout/payment readiness, blocker list, dry-run conversion commands, and safe agent handoff instructions so each item has a concrete publish-and-measure path.
 
+Generate an offer-level revenue forecast:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --revenue-forecast-output-dir out/revenue-forecast
+```
+
+The revenue forecast writes `revenue_forecast.json` and `REVENUE_FORECAST.md`. It shows how many conversions each generated offer needs to reach `$15`, `$200`, `$1,000`, and `$20,000`, so the system prioritizes higher-leverage paid setup, product, and sponsorship offers instead of relying only on low-ticket support.
+
 Generate the full revenue bundle:
 
 ```powershell
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, digital product packs, service packages, niche reports, affiliate article drafts, sponsor repo kits, opportunity roadmap, activation manifest, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
+The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, digital product packs, service packages, niche reports, affiliate article drafts, sponsor repo kits, opportunity roadmap, activation manifest, revenue forecast, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
 
 Attach real payment links to generated offers:
 

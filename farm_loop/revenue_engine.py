@@ -37,6 +37,7 @@ class RevenuePortfolioSummary:
     sponsor_repos_exported: int = 0
     roadmap_exported: int = 0
     activation_manifest_exported: int = 0
+    revenue_forecast_exported: int = 0
     dashboard_snapshots_created: int = 0
     prune_decisions_created: int = 0
     experiments_updated: int = 0
@@ -65,6 +66,7 @@ def run_revenue_portfolio_once(
     sponsor_repo_exporter: Any | None = None,
     roadmap_exporter: Any | None = None,
     activation_manifest_exporter: Any | None = None,
+    revenue_forecast_exporter: Any | None = None,
     activation_report: dict | None = None,
     offer_payment_urls: dict[str, str] | None = None,
 ) -> RevenuePortfolioSummary:
@@ -274,6 +276,15 @@ def run_revenue_portfolio_once(
             )
         )
 
+    revenue_forecast_exported = 0
+    if revenue_forecast_exporter:
+        revenue_forecast_exported = len(
+            revenue_forecast_exporter.export(
+                offers=offer_drafts,
+                milestones=milestones or DEFAULT_MILESTONES,
+            )
+        )
+
     if supabase and not dry_run:
         supabase.insert_event(
             None,
@@ -299,6 +310,7 @@ def run_revenue_portfolio_once(
                 "sponsor_repos_exported": sponsor_repos_exported,
                 "roadmap_exported": roadmap_exported,
                 "activation_manifest_exported": activation_manifest_exported,
+                "revenue_forecast_exported": revenue_forecast_exported,
                 "milestones": milestones or DEFAULT_MILESTONES,
                 "phase": phase,
             },
@@ -326,6 +338,7 @@ def run_revenue_portfolio_once(
         sponsor_repos_exported=sponsor_repos_exported,
         roadmap_exported=roadmap_exported,
         activation_manifest_exported=activation_manifest_exported,
+        revenue_forecast_exported=revenue_forecast_exported,
     )
 
 

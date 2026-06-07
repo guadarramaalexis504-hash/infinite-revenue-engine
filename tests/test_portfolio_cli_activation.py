@@ -75,6 +75,7 @@ class PortfolioCLIActivationTests(unittest.TestCase):
             sponsor_repo_output_dir="env/sponsor-repos",
             roadmap_output_dir="env/roadmap",
             activation_manifest_output_dir="env/activation",
+            revenue_forecast_output_dir="env/revenue-forecast",
         )
         args = parse_args(
             [
@@ -118,6 +119,7 @@ class PortfolioCLIActivationTests(unittest.TestCase):
         self.assertEqual(kwargs["sponsor_repo_exporter"].output_dir, Path("out/revenue-bundle/sponsor-repos"))
         self.assertEqual(kwargs["roadmap_exporter"].output_dir, Path("out/revenue-bundle/roadmap"))
         self.assertEqual(kwargs["activation_manifest_exporter"].output_dir, Path("out/revenue-bundle/activation"))
+        self.assertEqual(kwargs["revenue_forecast_exporter"].output_dir, Path("out/revenue-bundle/revenue-forecast"))
         self.assertEqual(kwargs["launch_queue_exporter"].output_dir, Path("out/revenue-bundle/launch-queue"))
         self.assertEqual(kwargs["activation_report"], report)
 
