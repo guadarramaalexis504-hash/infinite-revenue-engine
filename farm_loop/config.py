@@ -58,6 +58,7 @@ class Settings:
     roadmap_output_dir: str | None = None
     activation_manifest_output_dir: str | None = None
     revenue_forecast_output_dir: str | None = None
+    offer_ladder_output_dir: str | None = None
     bundle_output_dir: str | None = None
 
     @classmethod
@@ -105,6 +106,7 @@ class Settings:
             roadmap_output_dir=os.getenv("ROADMAP_OUTPUT_DIR"),
             activation_manifest_output_dir=os.getenv("ACTIVATION_MANIFEST_OUTPUT_DIR"),
             revenue_forecast_output_dir=os.getenv("REVENUE_FORECAST_OUTPUT_DIR"),
+            offer_ladder_output_dir=os.getenv("OFFER_LADDER_OUTPUT_DIR"),
             bundle_output_dir=os.getenv("BUNDLE_OUTPUT_DIR"),
         )
 

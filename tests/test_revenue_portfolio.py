@@ -245,6 +245,15 @@ class FakeRevenueForecastExporter:
         return ["revenue_forecast.json", "REVENUE_FORECAST.md"]
 
 
+class FakeOfferLadderExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, *, offers, milestones):
+        self.exports.append({"offers": offers, "milestones": milestones})
+        return ["offer_ladder.json", "OFFER_LADDER.md"]
+
+
 class RevenuePortfolioTests(unittest.TestCase):
     def test_run_revenue_portfolio_once_scores_generates_assets_and_continues_past_milestones(self):
         supabase = FakeSupabase()
@@ -546,6 +555,23 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(len(forecast_exporter.exports), 1)
         self.assertEqual(forecast_exporter.exports[0]["milestones"], [15, 200, 1000, 20000])
         self.assertEqual(len(forecast_exporter.exports[0]["offers"]), 2)
+
+    def test_run_revenue_portfolio_once_can_export_offer_ladder(self):
+        ladder_exporter = FakeOfferLadderExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            dry_run=True,
+            max_opportunities=3,
+            milestones=[15, 200, 1000, 20000],
+            offer_ladder_exporter=ladder_exporter,
+        )
+
+        self.assertEqual(summary.offer_ladder_exported, 2)
+        self.assertEqual(len(ladder_exporter.exports), 1)
+        self.assertEqual(ladder_exporter.exports[0]["milestones"], [15, 200, 1000, 20000])
+        self.assertEqual(len(ladder_exporter.exports[0]["offers"]), 2)
 
     def test_summarize_phase_persists_dashboard_snapshot(self):
         supabase = FakeSupabase()

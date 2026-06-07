@@ -288,6 +288,20 @@ class CLITests(unittest.TestCase):
 
         self.assertEqual(args.revenue_forecast_output_dir, "out/revenue-forecast")
 
+    def test_parse_args_supports_offer_ladder_output_dir(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--portfolio-phase",
+                "generate",
+                "--dry-run",
+                "--offer-ladder-output-dir",
+                "out/offer-ladder",
+            ]
+        )
+
+        self.assertEqual(args.offer_ladder_output_dir, "out/offer-ladder")
+
     def test_parse_args_supports_bundle_output_dir(self):
         args = parse_args(
             [
@@ -320,6 +334,7 @@ class CLITests(unittest.TestCase):
         self.assertEqual(paths["roadmap_output_dir"], "out/revenue-bundle/roadmap")
         self.assertEqual(paths["activation_manifest_output_dir"], "out/revenue-bundle/activation")
         self.assertEqual(paths["revenue_forecast_output_dir"], "out/revenue-bundle/revenue-forecast")
+        self.assertEqual(paths["offer_ladder_output_dir"], "out/revenue-bundle/offer-ladder")
         self.assertEqual(paths["launch_queue_output_dir"], "out/revenue-bundle/launch-queue")
 
     def test_parse_args_supports_manual_conversion_recording(self):

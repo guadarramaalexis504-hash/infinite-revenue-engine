@@ -22,6 +22,7 @@ from .launch_queue import LaunchQueueExporter
 from .lead_magnet_exporter import LeadMagnetExporter
 from .microtool_exporter import MicrotoolExporter
 from .niche_report_exporter import NicheReportExporter
+from .offer_ladder import OfferLadderExporter
 from .offers import OfferCatalogExporter, parse_offer_payment_urls
 from .opportunity_roadmap import OpportunityRoadmapExporter
 from .scoring import rank_questions, to_opportunity_payload
@@ -463,6 +464,17 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         if revenue_forecast_output_dir
         else None
     )
+    offer_ladder_output_dir = (
+        args.offer_ladder_output_dir
+        or cli_bundle_paths.get("offer_ladder_output_dir")
+        or settings.offer_ladder_output_dir
+        or env_bundle_paths.get("offer_ladder_output_dir")
+    )
+    offer_ladder_exporter = (
+        OfferLadderExporter(offer_ladder_output_dir)
+        if offer_ladder_output_dir
+        else None
+    )
     summary = run_revenue_portfolio_once(
         sources=sources,
         supabase=supabase,
@@ -486,6 +498,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         roadmap_exporter=roadmap_exporter,
         activation_manifest_exporter=activation_manifest_exporter,
         revenue_forecast_exporter=revenue_forecast_exporter,
+        offer_ladder_exporter=offer_ladder_exporter,
         activation_report=activation_report,
         offer_payment_urls=offer_payment_urls,
     )
@@ -567,6 +580,7 @@ def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
         "roadmap_output_dir": (base_path / "roadmap").as_posix(),
         "activation_manifest_output_dir": (base_path / "activation").as_posix(),
         "revenue_forecast_output_dir": (base_path / "revenue-forecast").as_posix(),
+        "offer_ladder_output_dir": (base_path / "offer-ladder").as_posix(),
         "launch_queue_output_dir": (base_path / "launch-queue").as_posix(),
     }
 
@@ -713,6 +727,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--revenue-forecast-output-dir",
         default=None,
         help="Write offer-level unit targets for each revenue milestone.",
+    )
+    parser.add_argument(
+        "--offer-ladder-output-dir",
+        default=None,
+        help="Write higher-ticket offer ladder paths for each revenue milestone.",
     )
     parser.add_argument(
         "--bundle-output-dir",
