@@ -169,6 +169,15 @@ class FakeDigitalProductExporter:
         return ["digital_products.json", "DIGITAL_PRODUCTS.md", "README.md", "STORE_LISTING.md"]
 
 
+class FakeServicePackageExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, opportunities):
+        self.exports.append(opportunities)
+        return ["service_packages.json", "SERVICE_PACKAGES.md", "PROPOSAL.md", "SCOPE.md"]
+
+
 class FakeAffiliateArticleExporter:
     def __init__(self):
         self.exports = []
@@ -387,6 +396,21 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(summary.digital_products_exported, 4)
         self.assertEqual(len(product_exporter.exports), 1)
         self.assertEqual(product_exporter.exports[0][0].external_id, "kw-portfolio")
+
+    def test_run_revenue_portfolio_once_can_export_service_packages(self):
+        service_exporter = FakeServicePackageExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            service_package_exporter=service_exporter,
+        )
+
+        self.assertEqual(summary.service_packages_exported, 4)
+        self.assertEqual(len(service_exporter.exports), 1)
+        self.assertEqual(service_exporter.exports[0][0].external_id, "kw-portfolio")
 
     def test_run_revenue_portfolio_once_can_export_affiliate_articles(self):
         article_exporter = FakeAffiliateArticleExporter()

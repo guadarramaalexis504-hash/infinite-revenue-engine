@@ -196,6 +196,17 @@ class CLITests(unittest.TestCase):
 
         self.assertEqual(args.digital_product_output_dir, "out/digital-products")
 
+    def test_parse_args_supports_service_package_output_dir(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--service-package-output-dir",
+                "out/service-packages",
+            ]
+        )
+
+        self.assertEqual(args.service_package_output_dir, "out/service-packages")
+
     def test_parse_args_supports_affiliate_article_output_dir_and_urls(self):
         args = parse_args(
             [
@@ -263,6 +274,7 @@ class CLITests(unittest.TestCase):
         self.assertEqual(paths["tracking_deploy_output_dir"], "out/revenue-bundle/tracking-deploy")
         self.assertEqual(paths["lead_magnet_output_dir"], "out/revenue-bundle/lead-magnets")
         self.assertEqual(paths["digital_product_output_dir"], "out/revenue-bundle/digital-products")
+        self.assertEqual(paths["service_package_output_dir"], "out/revenue-bundle/service-packages")
         self.assertEqual(paths["affiliate_article_output_dir"], "out/revenue-bundle/affiliate-articles")
         self.assertEqual(paths["sponsor_repo_output_dir"], "out/revenue-bundle/sponsor-repos")
         self.assertEqual(paths["roadmap_output_dir"], "out/revenue-bundle/roadmap")

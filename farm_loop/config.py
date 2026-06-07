@@ -49,6 +49,7 @@ class Settings:
     lead_magnet_output_dir: str | None = None
     lead_capture_url: str | None = None
     digital_product_output_dir: str | None = None
+    service_package_output_dir: str | None = None
     affiliate_article_output_dir: str | None = None
     affiliate_urls: str = ""
     sponsor_repo_output_dir: str | None = None
@@ -92,6 +93,7 @@ class Settings:
             lead_magnet_output_dir=os.getenv("LEAD_MAGNET_OUTPUT_DIR"),
             lead_capture_url=os.getenv("LEAD_CAPTURE_URL"),
             digital_product_output_dir=os.getenv("DIGITAL_PRODUCT_OUTPUT_DIR"),
+            service_package_output_dir=os.getenv("SERVICE_PACKAGE_OUTPUT_DIR"),
             affiliate_article_output_dir=os.getenv("AFFILIATE_ARTICLE_OUTPUT_DIR"),
             affiliate_urls=os.getenv("AFFILIATE_URLS", ""),
             sponsor_repo_output_dir=os.getenv("SPONSOR_REPO_OUTPUT_DIR"),

@@ -23,6 +23,7 @@ from .microtool_exporter import MicrotoolExporter
 from .offers import OfferCatalogExporter, parse_offer_payment_urls
 from .opportunity_roadmap import OpportunityRoadmapExporter
 from .scoring import rank_questions, to_opportunity_payload
+from .service_package_exporter import ServicePackageExporter
 from .sources_stackexchange import StackExchangeClient
 from .supabase_client import SupabaseClient
 from .revenue_engine import run_revenue_portfolio_once
@@ -343,6 +344,22 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         if digital_product_output_dir
         else None
     )
+    service_package_output_dir = (
+        args.service_package_output_dir
+        or cli_bundle_paths.get("service_package_output_dir")
+        or settings.service_package_output_dir
+        or env_bundle_paths.get("service_package_output_dir")
+    )
+    service_package_exporter = (
+        ServicePackageExporter(
+            service_package_output_dir,
+            payment_urls=offer_payment_urls,
+            intake_url=intake_url,
+            click_redirect_url=click_redirect_url,
+        )
+        if service_package_output_dir
+        else None
+    )
     affiliate_article_output_dir = (
         args.affiliate_article_output_dir
         or cli_bundle_paths.get("affiliate_article_output_dir")
@@ -400,6 +417,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         tracking_deploy_exporter=tracking_deploy_exporter,
         lead_magnet_exporter=lead_magnet_exporter,
         digital_product_exporter=digital_product_exporter,
+        service_package_exporter=service_package_exporter,
         affiliate_article_exporter=affiliate_article_exporter,
         sponsor_repo_exporter=sponsor_repo_exporter,
         roadmap_exporter=roadmap_exporter,
@@ -477,6 +495,7 @@ def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
         "tracking_deploy_output_dir": (base_path / "tracking-deploy").as_posix(),
         "lead_magnet_output_dir": (base_path / "lead-magnets").as_posix(),
         "digital_product_output_dir": (base_path / "digital-products").as_posix(),
+        "service_package_output_dir": (base_path / "service-packages").as_posix(),
         "affiliate_article_output_dir": (base_path / "affiliate-articles").as_posix(),
         "sponsor_repo_output_dir": (base_path / "sponsor-repos").as_posix(),
         "roadmap_output_dir": (base_path / "roadmap").as_posix(),
@@ -581,6 +600,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--digital-product-output-dir",
         default=None,
         help="Write product packs, store listings, and launch checklists for digital product opportunities.",
+    )
+    parser.add_argument(
+        "--service-package-output-dir",
+        default=None,
+        help="Write fixed-scope service packages, proposals, scopes, delivery checklists, and handoff docs.",
     )
     parser.add_argument(
         "--affiliate-article-output-dir",

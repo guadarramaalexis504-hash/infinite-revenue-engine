@@ -21,6 +21,7 @@ __all__ = [
     "revenue_engine",
     "revenue_scoring",
     "scoring",
+    "service_package_exporter",
     "sources_github",
     "sources_idea_catalog",
     "sources_keywords",

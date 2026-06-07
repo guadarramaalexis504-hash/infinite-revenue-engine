@@ -31,6 +31,7 @@ class RevenuePortfolioSummary:
     tracking_deploy_exported: int = 0
     lead_magnets_exported: int = 0
     digital_products_exported: int = 0
+    service_packages_exported: int = 0
     affiliate_articles_exported: int = 0
     sponsor_repos_exported: int = 0
     roadmap_exported: int = 0
@@ -56,6 +57,7 @@ def run_revenue_portfolio_once(
     tracking_deploy_exporter: Any | None = None,
     lead_magnet_exporter: Any | None = None,
     digital_product_exporter: Any | None = None,
+    service_package_exporter: Any | None = None,
     affiliate_article_exporter: Any | None = None,
     sponsor_repo_exporter: Any | None = None,
     roadmap_exporter: Any | None = None,
@@ -231,6 +233,10 @@ def run_revenue_portfolio_once(
     if digital_product_exporter:
         digital_products_exported = len(digital_product_exporter.export(selected))
 
+    service_packages_exported = 0
+    if service_package_exporter:
+        service_packages_exported = len(service_package_exporter.export(selected))
+
     affiliate_articles_exported = 0
     if affiliate_article_exporter:
         affiliate_articles_exported = len(affiliate_article_exporter.export(selected))
@@ -269,6 +275,7 @@ def run_revenue_portfolio_once(
                 "tracking_deploy_exported": tracking_deploy_exported,
                 "lead_magnets_exported": lead_magnets_exported,
                 "digital_products_exported": digital_products_exported,
+                "service_packages_exported": service_packages_exported,
                 "affiliate_articles_exported": affiliate_articles_exported,
                 "sponsor_repos_exported": sponsor_repos_exported,
                 "roadmap_exported": roadmap_exported,
@@ -293,6 +300,7 @@ def run_revenue_portfolio_once(
         tracking_deploy_exported=tracking_deploy_exported,
         lead_magnets_exported=lead_magnets_exported,
         digital_products_exported=digital_products_exported,
+        service_packages_exported=service_packages_exported,
         affiliate_articles_exported=affiliate_articles_exported,
         sponsor_repos_exported=sponsor_repos_exported,
         roadmap_exported=roadmap_exported,

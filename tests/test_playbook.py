@@ -69,6 +69,8 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "LEAD_CAPTURE_URL",
             "--digital-product-output-dir",
             "DIGITAL_PRODUCTS.md",
+            "--service-package-output-dir",
+            "SERVICE_PACKAGES.md",
             "--affiliate-article-output-dir",
             "AFFILIATE_ARTICLES.md",
             "AFFILIATE_URLS",

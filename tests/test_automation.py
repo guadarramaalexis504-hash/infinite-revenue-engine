@@ -210,6 +210,7 @@ EMPTY=
         self.assertIn("LEAD_MAGNET_OUTPUT_DIR=out/lead-magnets", env_example)
         self.assertIn("LEAD_CAPTURE_URL=", env_example)
         self.assertIn("DIGITAL_PRODUCT_OUTPUT_DIR=out/digital-products", env_example)
+        self.assertIn("SERVICE_PACKAGE_OUTPUT_DIR=out/service-packages", env_example)
         self.assertIn("AFFILIATE_ARTICLE_OUTPUT_DIR=out/affiliate-articles", env_example)
         self.assertIn("AFFILIATE_URLS=", env_example)
         self.assertIn("SPONSOR_REPO_OUTPUT_DIR=out/sponsor-repos", env_example)

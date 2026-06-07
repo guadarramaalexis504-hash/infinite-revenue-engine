@@ -18,6 +18,7 @@ Current operating target:
 - Tracking deploy bundle: `TRACKING_DEPLOY_OUTPUT_DIR=out/tracking-deploy`.
 - Lead magnets: `LEAD_MAGNET_OUTPUT_DIR=out/lead-magnets`.
 - Digital products: `DIGITAL_PRODUCT_OUTPUT_DIR=out/digital-products`.
+- Service packages: `SERVICE_PACKAGE_OUTPUT_DIR=out/service-packages`.
 - Affiliate articles: `AFFILIATE_ARTICLE_OUTPUT_DIR=out/affiliate-articles`.
 - Sponsor repo kits: `SPONSOR_REPO_OUTPUT_DIR=out/sponsor-repos`.
 - Opportunity roadmap: `ROADMAP_OUTPUT_DIR=out/roadmap`.
@@ -123,6 +124,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 This writes `digital_products.json`, `DIGITAL_PRODUCTS.md`, and one folder per selected digital product with `README.md`, `STORE_LISTING.md`, `LAUNCH_CHECKLIST.md`, `product.json`, and an owned landing page. Set checkout metadata with `offer_key` before publishing the product.
 
+Generate fixed-scope service packages:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 20 --service-package-output-dir out/service-packages --offer-payment-urls "fixed_scope_service=https://buy.stripe.com/setup" --intake-url https://forms.example.com/setup
+```
+
+This writes `service_packages.json`, `SERVICE_PACKAGES.md`, and one folder per selected paid setup kit with `PROPOSAL.md`, `SCOPE.md`, `DELIVERY_CHECKLIST.md`, `HANDOFF.md`, `service.json`, and an owned landing page. Use it to quote and deliver bounded setup work without silently expanding scope.
+
 Generate disclosed affiliate article drafts:
 
 ```powershell
@@ -153,7 +162,7 @@ Generate the full revenue bundle:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, digital product packs, affiliate article drafts, sponsor repo kits, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
+The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, digital product packs, service packages, affiliate article drafts, sponsor repo kits, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
 
 Attach real payment links to generated offers:
 
@@ -286,6 +295,14 @@ Suggested pricing:
 - basic fixed setup: 49 to 99 USD
 - full setup: 149 to 299 USD
 - urgent/debug setup: 299+ USD
+
+Service package outputs:
+
+- fixed-scope proposal
+- scope and out-of-scope boundary
+- delivery checklist
+- client handoff template
+- checkout and intake links with tracking
 
 ### Digital Products
 
