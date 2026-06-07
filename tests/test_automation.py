@@ -204,6 +204,7 @@ EMPTY=
         self.assertIn("OFFER_OUTPUT_DIR=out/offers", env_example)
         self.assertIn("ROADMAP_OUTPUT_DIR=out/roadmap", env_example)
         self.assertIn("BUNDLE_OUTPUT_DIR=out/revenue-bundle", env_example)
+        self.assertIn("CLICK_ALLOWED_HOSTS=buymeacoffee.com,www.buymeacoffee.com", env_example)
         self.assertIn("CONVERSION_WEBHOOK_TOKEN=", env_example)
         self.assertIn("SERVICE_INTAKE_URL=", env_example)
         self.assertIn("SITE_BASE_URL=", env_example)

@@ -7,6 +7,7 @@ __all__ = [
     "click_handler",
     "config",
     "drafts",
+    "http_app",
     "launch_queue",
     "main",
     "microtool_exporter",

@@ -177,6 +177,7 @@ Optional environment variables:
 - `SITE_OUTPUT_DIR`, optional owned static site export path such as `out/site`
 - `SITE_BASE_URL`, optional public site URL used in `sitemap.xml` and `robots.txt`
 - `CLICK_REDIRECT_URL`, optional owned click redirect endpoint such as `https://your-domain.example/click`
+- `CLICK_ALLOWED_HOSTS`, comma-separated final redirect host allowlist, default `buymeacoffee.com,www.buymeacoffee.com`
 - `CONVERSION_WEBHOOK_TOKEN`, optional shared token for your owned conversion webhook endpoint
 - `SERVICE_INTAKE_URL`, optional setup/service intake form URL used by service CTAs
 - `LAUNCH_QUEUE_OUTPUT_DIR`, optional launch queue export path such as `out/launch-queue`
@@ -186,6 +187,23 @@ Optional environment variables:
 - `BUNDLE_OUTPUT_DIR`, optional all-in-one local revenue bundle path such as `out/revenue-bundle`
 
 `scripts/configure-github.ps1` sets the required secrets and also sets optional secrets such as `CLICK_REDIRECT_URL`, `CONVERSION_WEBHOOK_TOKEN`, `SERVICE_INTAKE_URL`, and `SITE_BASE_URL` when present and not placeholders. The GitHub Actions workflow uses GitHub's built-in `github.token` for issue discovery rate limits.
+
+## Tracking HTTP App
+
+Run the built-in tracking HTTP app locally:
+
+```powershell
+python -m farm_loop.http_app --host 127.0.0.1 --port 8080
+```
+
+Endpoints:
+
+- `GET /health`: returns `{"status":"ok"}`.
+- `GET /click`: records a `click_events` row, inserts a `click_recorded` event, then redirects to the validated `target` URL.
+- `POST /webhooks/buymeacoffee`: validates `X-BuyMeACoffee-Token`, records `tip_events`, and updates revenue progress.
+- `POST /webhooks/conversion/<provider>`: validates `X-Revenue-Webhook-Token`, records `conversion_events`, and attributes revenue to an offer/source when provider metadata includes it.
+
+Deploy this app only on a server-side HTTPS host with `SUPABASE_URL`, `SUPABASE_KEY`, `BUYMEACOFFEE_WEBHOOK_TOKEN`, `CONVERSION_WEBHOOK_TOKEN`, and `CLICK_ALLOWED_HOSTS` configured. Do not expose the Supabase server-side key in browser JavaScript.
 
 ## Click Redirect Handler
 

@@ -21,6 +21,9 @@ class Settings:
     openai_api_key: str | None
     stackexchange_key: str | None
     tip_url: str
+    buymeacoffee_webhook_token: str | None = None
+    conversion_webhook_token: str | None = None
+    click_allowed_hosts: str = "buymeacoffee.com,www.buymeacoffee.com"
     github_token: str | None = None
     tags: str = DEFAULT_TAGS
     target_usd: float = 15.0
@@ -50,6 +53,9 @@ class Settings:
             stackexchange_key=os.getenv("STACKEXCHANGE_KEY"),
             github_token=os.getenv("GITHUB_TOKEN"),
             tip_url=os.getenv("TIP_URL", ""),
+            buymeacoffee_webhook_token=os.getenv("BUYMEACOFFEE_WEBHOOK_TOKEN"),
+            conversion_webhook_token=os.getenv("CONVERSION_WEBHOOK_TOKEN"),
+            click_allowed_hosts=os.getenv("CLICK_ALLOWED_HOSTS", "buymeacoffee.com,www.buymeacoffee.com"),
             tags=os.getenv("STACKEXCHANGE_TAGS", DEFAULT_TAGS),
             target_usd=float(os.getenv("TARGET_USD", "15")),
             revenue_milestones=_parse_milestones(os.getenv("REVENUE_MILESTONES", "15,200,1000,20000")),

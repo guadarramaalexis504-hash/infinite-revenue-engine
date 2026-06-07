@@ -123,6 +123,14 @@ Attribution:
 - service offers use `SERVICE_INTAKE_URL` first and add UTM attribution such as `utm_content=fixed_scope_service_intake`
 - confirmed payment events can be recorded through `--record-conversion` or a custom webhook calling `handle_conversion_webhook`
 
+tracking HTTP app:
+
+```powershell
+python -m farm_loop.http_app --host 127.0.0.1 --port 8080
+```
+
+The app exposes `/health`, `/click`, `/webhooks/buymeacoffee`, and `/webhooks/conversion/<provider>`. Use it behind HTTPS on a server-side host so generated pages can send visitors through `/click` and payment providers can confirm revenue through `/webhooks/conversion`. Configure `CLICK_ALLOWED_HOSTS`, `BUYMEACOFFEE_WEBHOOK_TOKEN`, and `CONVERSION_WEBHOOK_TOKEN` before using it live.
+
 Local continuous review loop:
 
 ```powershell
@@ -324,6 +332,7 @@ Revenue should be counted only from confirmed `tip_events` and `conversion_event
 - If no remote exists locally, use `.\scripts\configure-github.ps1 -Repo owner/repo -RunWorkflow`.
 - Payment path: Buy Me a Coffee, Stripe, Gumroad, Lemon Squeezy, or GitHub Sponsors.
 - Optional conversion webhook token: `CONVERSION_WEBHOOK_TOKEN`.
+- Optional click redirect allowlist: `CLICK_ALLOWED_HOSTS`.
 - Service intake URL: `SERVICE_INTAKE_URL`.
 - Owned publishing surface: repo, website, landing pages, newsletter, or store.
 - Manual review process for assets before public release.
