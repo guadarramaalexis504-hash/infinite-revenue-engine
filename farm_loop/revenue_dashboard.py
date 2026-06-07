@@ -18,6 +18,19 @@ def _payload(row: dict) -> dict:
 
 def _offer_id(row: dict) -> str | None:
     value = row.get("offer_id")
+    if value:
+        return str(value)
+    payload = _payload(row)
+    value = payload.get("offer_key")
+    return str(value) if value else None
+
+
+def _catalog_offer_id(row: dict) -> str | None:
+    value = row.get("id")
+    if value:
+        return str(value)
+    payload = _payload(row)
+    value = payload.get("offer_key")
     return str(value) if value else None
 
 
@@ -30,7 +43,11 @@ def _best_offer(conversions: list[dict], offers: list[dict]) -> dict[str, Any] |
     if not offer_totals:
         return None
     best_id, revenue = offer_totals.most_common(1)[0]
-    titles = {str(offer.get("id")): str(offer.get("title") or offer.get("id")) for offer in offers if offer.get("id")}
+    titles = {
+        offer_id: str(offer.get("title") or offer_id)
+        for offer in offers
+        if (offer_id := _catalog_offer_id(offer))
+    }
     return {"id": best_id, "title": titles.get(best_id, best_id), "revenue_usd": round(revenue, 2)}
 
 

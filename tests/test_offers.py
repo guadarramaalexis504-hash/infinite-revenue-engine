@@ -54,10 +54,12 @@ class OfferTests(unittest.TestCase):
 
         payload = offer.to_payload(opportunity_id="opp-row-1")
 
+        self.assertEqual(offer.offer_key, "idea_catalog:tool-1:support")
         self.assertEqual(payload["opportunity_id"], "opp-row-1")
         self.assertEqual(payload["channel"], "microtool_seo")
         self.assertEqual(payload["payment_url"], "https://buymeacoffee.com/example")
         self.assertEqual(payload["status"], "draft")
+        self.assertEqual(payload["payload"]["offer_key"], "idea_catalog:tool-1:support")
         self.assertEqual(payload["payload"]["external_id"], "tool-1")
 
     def test_parse_offer_payment_urls_accepts_offer_types_channels_and_default(self):
@@ -107,9 +109,11 @@ class OfferTests(unittest.TestCase):
 
         self.assertEqual(sorted(path.name for path in written), ["OFFERS.md", "offers.json"])
         self.assertEqual(rows[0]["title"], "Webhook Setup Service")
+        self.assertEqual(rows[0]["offer_key"], "idea_catalog:opp-1:fixed_scope_service")
         self.assertEqual(rows[0]["payment_url"], "https://buy.stripe.com/webhook-setup")
         self.assertIn("# Offer Catalog", markdown)
         self.assertIn("Webhook Setup Service", markdown)
+        self.assertIn("idea_catalog:opp-1:fixed_scope_service", markdown)
         self.assertIn("https://buy.stripe.com/webhook-setup", markdown)
 
 

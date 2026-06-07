@@ -196,6 +196,8 @@ class CLITests(unittest.TestCase):
                 "digital_product",
                 "--conversion-offer-id",
                 "offer-product",
+                "--conversion-offer-key",
+                "idea_catalog:offer-product:digital_product",
                 "--conversion-payload-json",
                 '{"product":"Template pack"}',
             ]
@@ -207,6 +209,7 @@ class CLITests(unittest.TestCase):
         self.assertEqual(args.conversion_amount_usd, 29)
         self.assertEqual(args.conversion_source, "digital_product")
         self.assertEqual(args.conversion_offer_id, "offer-product")
+        self.assertEqual(args.conversion_offer_key, "idea_catalog:offer-product:digital_product")
 
     def test_tools_path_for_site_returns_relative_tools_url_inside_site_output(self):
         self.assertEqual(tools_path_for_site("out/site", "out/site/tools"), "tools/")

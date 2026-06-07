@@ -80,7 +80,7 @@ Record a confirmed sale from any payment path:
 python -m farm_loop.main --record-conversion --conversion-provider gumroad --conversion-external-id sale-123 --conversion-amount-usd 29 --conversion-source digital_product --conversion-offer-id offer-id
 ```
 
-Use `--dry-run` first to verify the payload without writing to Supabase. Conversion external ids are stored as `<provider>:<id>` so Stripe, Gumroad, Lemon Squeezy, manual invoices, and other providers can share `conversion_events` safely.
+Use `--dry-run` first to verify the payload without writing to Supabase. Conversion external ids are stored as `<provider>:<id>` so Stripe, Gumroad, Lemon Squeezy, manual invoices, and other providers can share `conversion_events` safely. If you do not know the Supabase offer UUID, pass `--conversion-offer-key source:external_id:offer_type` so dashboards and pruning can still attribute the sale.
 
 Generate interactive microtools for supported opportunities:
 
@@ -92,7 +92,7 @@ The first supported interactive microtools are a Supabase RLS policy checker and
 
 The GitHub Pages workflow writes those microtools under `out/site/tools` so they are included in the deployed Pages artifact with the owned static site.
 
-Support links on generated pages include attribution parameters such as `utm_campaign=<external_id>` plus `ire_source` and `ire_external_id`, so future analytics or webhook handlers can tie clicks/conversions back to a specific opportunity.
+Support links on generated pages include attribution parameters such as `utm_campaign=<external_id>` plus `ire_source`, `ire_external_id`, and offer CTAs include `ire_offer_key`, so future analytics or webhook handlers can tie clicks/conversions back to a specific opportunity and offer.
 
 If `CLICK_REDIRECT_URL` is set, support links point to your owned click redirect endpoint first, so clicks can be saved to Supabase `click_events` before sending the visitor to the final support/payment URL.
 
@@ -217,6 +217,8 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 Supported keys are offer types such as `support`, `setup_service`, `fixed_scope_service`, `digital_product`, and `sponsorship`; channel keys such as `microtool_seo` also work, and `*` is a default fallback. When `CLICK_REDIRECT_URL` is set, generated offer CTAs route through `/click` before the checkout so `click_events` can be recorded.
 
+Every generated offer also has a stable `offer_key` in the form `source:external_id:offer_type`. The site appends it to checkout URLs as `ire_offer_key`, stores it in `click_events.payload.offer_key`, and accepts it back from conversion webhooks through provider metadata such as `offer_key` or `ire_offer_key`. Use this when Stripe, Gumroad, or another provider cannot send the internal Supabase `offers.id`.
+
 ## Click Redirect Handler
 
 Host a small HTTPS endpoint and call the reusable handler with a server-side Supabase key:
@@ -252,7 +254,7 @@ handle_conversion_webhook(
 )
 ```
 
-The handler accepts `X-Revenue-Webhook-Token`, extracts USD amount, provider/event id, optional `offer_id`, and attribution source metadata, then inserts `conversion_events`.
+The handler accepts `X-Revenue-Webhook-Token`, extracts USD amount, provider/event id, optional `offer_id`, stable `offer_key`, and attribution source metadata, then inserts `conversion_events`.
 
 ## Supabase Setup
 

@@ -29,6 +29,7 @@ class TrackingTests(unittest.TestCase):
             "https://buymeacoffee.com/example?existing=1",
             self.opportunity,
             content="support_cta",
+            offer_key="idea_catalog:offer-webhook-setup-service:support",
         )
 
         self.assertIn("existing=1", url)
@@ -38,12 +39,14 @@ class TrackingTests(unittest.TestCase):
         self.assertIn("utm_content=support_cta", url)
         self.assertIn("ire_source=idea_catalog", url)
         self.assertIn("ire_external_id=offer-webhook-setup-service", url)
+        self.assertIn("ire_offer_key=idea_catalog%3Aoffer-webhook-setup-service%3Asupport", url)
 
     def test_build_click_event_payload_matches_supabase_click_events_shape(self):
         payload = build_click_event_payload(
             self.opportunity,
             target_url="https://buymeacoffee.com/example",
             content="support_cta",
+            offer_key="idea_catalog:offer-webhook-setup-service:support",
         )
 
         self.assertEqual(payload["source"], "revenue_site")
@@ -53,6 +56,7 @@ class TrackingTests(unittest.TestCase):
         self.assertEqual(payload["payload"]["channel"], "paid_setup_kit")
         self.assertEqual(payload["payload"]["target_url"], "https://buymeacoffee.com/example")
         self.assertEqual(payload["payload"]["content"], "support_cta")
+        self.assertEqual(payload["payload"]["offer_key"], "idea_catalog:offer-webhook-setup-service:support")
 
     def test_build_click_redirect_url_wraps_tracked_target_for_owned_endpoint(self):
         url = build_click_redirect_url(
@@ -60,6 +64,7 @@ class TrackingTests(unittest.TestCase):
             self.opportunity,
             target_url="https://buymeacoffee.com/example",
             content="support_cta",
+            offer_key="idea_catalog:offer-webhook-setup-service:support",
         )
         query = parse_qs(urlsplit(url).query)
 
@@ -69,8 +74,10 @@ class TrackingTests(unittest.TestCase):
         self.assertEqual(query["opportunity_external_id"], ["offer-webhook-setup-service"])
         self.assertEqual(query["channel"], ["paid_setup_kit"])
         self.assertEqual(query["content"], ["support_cta"])
+        self.assertEqual(query["offer_key"], ["idea_catalog:offer-webhook-setup-service:support"])
         self.assertIn("utm_campaign=offer-webhook-setup-service", query["target"][0])
         self.assertIn("ire_external_id=offer-webhook-setup-service", query["target"][0])
+        self.assertIn("ire_offer_key=idea_catalog%3Aoffer-webhook-setup-service%3Asupport", query["target"][0])
 
 
 if __name__ == "__main__":

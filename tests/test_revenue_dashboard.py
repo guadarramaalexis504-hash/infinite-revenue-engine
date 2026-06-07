@@ -60,6 +60,37 @@ class RevenueDashboardTests(unittest.TestCase):
         self.assertEqual(snapshot["remaining_to_next_milestone_usd"], 15)
         self.assertIn("Publish one owned asset", snapshot["recommended_next_actions"][0])
 
+    def test_dashboard_can_rank_best_offer_by_stable_offer_key(self):
+        snapshot = build_dashboard_snapshot(
+            conversions=[
+                {
+                    "source": "paid_setup_kit",
+                    "amount_usd": 199,
+                    "payload": {"offer_key": "idea_catalog:setup-kit:fixed_scope_service"},
+                }
+            ],
+            tips=[],
+            assets=[],
+            milestones=[15, 200, 1000, 20000],
+            clicks=[],
+            offers=[
+                {
+                    "title": "Webhook setup",
+                    "payload": {"offer_key": "idea_catalog:setup-kit:fixed_scope_service"},
+                }
+            ],
+            experiments=[],
+        )
+
+        self.assertEqual(
+            snapshot["best_offer"],
+            {
+                "id": "idea_catalog:setup-kit:fixed_scope_service",
+                "title": "Webhook setup",
+                "revenue_usd": 199.0,
+            },
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

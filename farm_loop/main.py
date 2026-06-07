@@ -315,6 +315,7 @@ def run_record_conversion(args: argparse.Namespace) -> int:
         amount_usd=args.conversion_amount_usd,
         source=args.conversion_source,
         offer_id=args.conversion_offer_id,
+        offer_key=args.conversion_offer_key,
         payload=payload_json,
     )
     if args.dry_run:
@@ -452,6 +453,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--conversion-amount-usd", type=float, default=0.0, help="Confirmed conversion amount in USD.")
     parser.add_argument("--conversion-source", default="manual", help="Revenue source/channel attribution.")
     parser.add_argument("--conversion-offer-id", default=None, help="Optional Supabase offers.id attribution.")
+    parser.add_argument("--conversion-offer-key", default=None, help="Optional deterministic offer key attribution.")
     parser.add_argument("--conversion-payload-json", default="{}", help="Optional JSON payload to store with the conversion.")
     return parser.parse_args(argv)
 

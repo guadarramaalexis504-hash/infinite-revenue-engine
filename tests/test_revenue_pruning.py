@@ -70,6 +70,54 @@ class RevenuePruningTests(unittest.TestCase):
 
         self.assertEqual(plan, [])
 
+    def test_prune_plan_uses_offer_key_when_provider_does_not_return_offer_id(self):
+        plan = build_prune_plan(
+            experiments=[
+                {
+                    "id": "exp-won",
+                    "opportunity_id": "opp-won",
+                    "name": "setup:won",
+                    "status": "running",
+                    "created_at": "2026-05-01T00:00:00+00:00",
+                },
+                {
+                    "id": "exp-clicks",
+                    "opportunity_id": "opp-clicks",
+                    "name": "setup:clicks",
+                    "status": "running",
+                    "created_at": "2026-05-01T00:00:00+00:00",
+                },
+            ],
+            offers=[
+                {
+                    "opportunity_id": "opp-won",
+                    "payload": {"offer_key": "idea_catalog:won:fixed_scope_service"},
+                },
+                {
+                    "opportunity_id": "opp-clicks",
+                    "payload": {"offer_key": "idea_catalog:clicks:fixed_scope_service"},
+                },
+            ],
+            clicks=[
+                {"payload": {"offer_key": "idea_catalog:clicks:fixed_scope_service"}},
+                {"payload": {"offer_key": "idea_catalog:clicks:fixed_scope_service"}},
+                {"payload": {"offer_key": "idea_catalog:clicks:fixed_scope_service"}},
+            ],
+            conversions=[
+                {
+                    "amount_usd": 199,
+                    "payload": {"offer_key": "idea_catalog:won:fixed_scope_service"},
+                }
+            ],
+            now=datetime(2026, 6, 6, tzinfo=timezone.utc),
+            click_threshold=3,
+        )
+
+        actions = {decision.experiment_id: decision.action for decision in plan}
+
+        self.assertEqual(actions["exp-won"], "mark_won")
+        self.assertEqual(actions["exp-clicks"], "revise_offer")
+
 
 if __name__ == "__main__":
     unittest.main()

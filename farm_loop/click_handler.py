@@ -18,6 +18,7 @@ def handle_click_redirect(
     if host not in {item.lower() for item in allowed_target_hosts}:
         raise PermissionError(f"Click redirect target host is not allowed: {host}")
 
+    offer_key = query.get("offer_key") or None
     click_payload = {
         "offer_id": None,
         "source": "revenue_site",
@@ -29,6 +30,8 @@ def handle_click_redirect(
             "content": query.get("content", "support_cta"),
         },
     }
+    if offer_key:
+        click_payload["payload"]["offer_key"] = offer_key
     rows = supabase.insert_click_event(click_payload)
     if hasattr(supabase, "insert_event"):
         supabase.insert_event(
@@ -38,6 +41,7 @@ def handle_click_redirect(
                 "source": click_payload["source"],
                 "opportunity_external_id": click_payload["payload"]["opportunity_external_id"],
                 "channel": click_payload["payload"]["channel"],
+                "offer_key": offer_key,
             },
         )
     return {"status": "redirect", "location": target_url, "click_event": rows}

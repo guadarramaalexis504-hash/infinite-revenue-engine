@@ -58,7 +58,11 @@ class WebhookHandlerTests(unittest.TestCase):
                 "object": {
                     "amount_total": 9900,
                     "currency": "usd",
-                    "metadata": {"offer_id": "offer-1", "source": "paid_setup_kit"},
+                    "metadata": {
+                        "offer_id": "offer-1",
+                        "offer_key": "idea_catalog:offer-webhook:fixed_scope_service",
+                        "source": "paid_setup_kit",
+                    },
                 }
             },
         }
@@ -74,6 +78,10 @@ class WebhookHandlerTests(unittest.TestCase):
         self.assertEqual(result["status"], "recorded")
         self.assertEqual(supabase.conversion_events[0]["external_id"], "stripe:evt_123")
         self.assertEqual(supabase.conversion_events[0]["amount_usd"], 99.0)
+        self.assertEqual(
+            supabase.conversion_events[0]["payload"]["offer_key"],
+            "idea_catalog:offer-webhook:fixed_scope_service",
+        )
         self.assertEqual(supabase.events[-1][1], "conversion_recorded")
 
     def test_handle_conversion_webhook_rejects_invalid_token(self):

@@ -27,6 +27,7 @@ class ClickHandlerTests(unittest.TestCase):
                 "opportunity_external_id": "offer-webhook",
                 "channel": "paid_setup_kit",
                 "content": "support_cta",
+                "offer_key": "idea_catalog:offer-webhook:support_cta",
             },
             supabase=supabase,
             allowed_target_hosts={"buymeacoffee.com"},
@@ -36,7 +37,9 @@ class ClickHandlerTests(unittest.TestCase):
         self.assertEqual(result["location"], "https://buymeacoffee.com/example?utm_campaign=offer-webhook")
         self.assertEqual(supabase.clicks[0]["source"], "revenue_site")
         self.assertEqual(supabase.clicks[0]["payload"]["opportunity_external_id"], "offer-webhook")
+        self.assertEqual(supabase.clicks[0]["payload"]["offer_key"], "idea_catalog:offer-webhook:support_cta")
         self.assertEqual(supabase.events[0][1], "click_recorded")
+        self.assertEqual(supabase.events[0][2]["offer_key"], "idea_catalog:offer-webhook:support_cta")
 
     def test_handle_click_redirect_rejects_disallowed_target_host(self):
         with self.assertRaises(PermissionError):

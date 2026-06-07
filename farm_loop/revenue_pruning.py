@@ -88,7 +88,7 @@ def _offer_ids_by_opportunity(offers: list[dict]) -> dict[str, list[str]]:
     grouped: dict[str, list[str]] = defaultdict(list)
     for offer in offers:
         opportunity_id = offer.get("opportunity_id")
-        offer_id = offer.get("id")
+        offer_id = _catalog_offer_id(offer)
         if opportunity_id and offer_id:
             grouped[str(opportunity_id)].append(str(offer_id))
     return grouped
@@ -119,6 +119,18 @@ def _offer_id(row: dict) -> str | None:
     payload = row.get("payload") or {}
     if isinstance(payload, dict) and payload.get("offer_id"):
         return str(payload["offer_id"])
+    if isinstance(payload, dict) and payload.get("offer_key"):
+        return str(payload["offer_key"])
+    return None
+
+
+def _catalog_offer_id(row: dict) -> str | None:
+    value = row.get("id")
+    if value:
+        return str(value)
+    payload = row.get("payload") or {}
+    if isinstance(payload, dict) and payload.get("offer_key"):
+        return str(payload["offer_key"])
     return None
 
 

@@ -15,6 +15,7 @@ class ConversionTests(unittest.TestCase):
                     "currency": "usd",
                     "metadata": {
                         "offer_id": "offer-1",
+                        "offer_key": "idea_catalog:setup-kit:fixed_scope_service",
                         "source": "paid_setup_kit",
                         "ire_external_id": "setup-kit",
                     },
@@ -30,6 +31,7 @@ class ConversionTests(unittest.TestCase):
         self.assertEqual(parsed["amount_usd"], 49.0)
         self.assertEqual(parsed["payload"]["provider"], "stripe")
         self.assertEqual(parsed["payload"]["provider_external_id"], "evt_123")
+        self.assertEqual(parsed["payload"]["offer_key"], "idea_catalog:setup-kit:fixed_scope_service")
 
     def test_parse_conversion_rejects_non_usd_payloads(self):
         payload = {
@@ -55,6 +57,7 @@ class ConversionTests(unittest.TestCase):
             amount_usd=29,
             source="digital_product",
             offer_id="offer-product",
+            offer_key="idea_catalog:offer-product:digital_product",
             payload={"product": "Template pack"},
         )
 
@@ -63,6 +66,7 @@ class ConversionTests(unittest.TestCase):
         self.assertEqual(parsed["external_id"], "gumroad:sale-123")
         self.assertEqual(parsed["amount_usd"], 29.0)
         self.assertEqual(parsed["payload"]["provider"], "gumroad")
+        self.assertEqual(parsed["payload"]["offer_key"], "idea_catalog:offer-product:digital_product")
 
     def test_build_manual_conversion_payload_rejects_missing_external_id(self):
         with self.assertRaisesRegex(ValueError, "external_id is required"):

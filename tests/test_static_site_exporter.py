@@ -145,6 +145,8 @@ class StaticSiteExporterTests(unittest.TestCase):
         self.assertIn("https://revenue.example/click?", page)
         self.assertIn("target=https%3A%2F%2Fbuy.stripe.com%2Fwebhook-setup", page)
         self.assertIn("utm_content%3Dfixed_scope_service", page)
+        self.assertIn("ire_offer_key%3Didea_catalog%253Aoffer-webhook-setup-service%253Afixed_scope_service", page)
+        self.assertIn("offer_key=idea_catalog%3Aoffer-webhook-setup-service%3Afixed_scope_service", page)
         self.assertIn("target=https%3A%2F%2Fbuy.stripe.com%2Fwebhook-setup", offer_catalog)
         self.assertNotIn("fixed_scope_service_intake", page)
 

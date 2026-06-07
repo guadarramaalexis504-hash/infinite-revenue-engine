@@ -20,8 +20,15 @@ def parse_confirmed_conversion_event(payload: dict[str, Any], *, provider: str) 
     amount_usd = _amount_usd(payload, obj)
     source = _first_string(metadata.get("source"), metadata.get("channel"), payload.get("source"), provider_name)
     offer_id = _first_string(metadata.get("offer_id"), obj.get("offer_id"), payload.get("offer_id")) or None
+    offer_key = _first_string(
+        metadata.get("offer_key"),
+        metadata.get("ire_offer_key"),
+        obj.get("offer_key"),
+        payload.get("offer_key"),
+        payload.get("ire_offer_key"),
+    )
 
-    return {
+    conversion_payload = {
         "offer_id": offer_id,
         "source": source,
         "external_id": _provider_external_id(provider_name, provider_external_id),
@@ -32,6 +39,9 @@ def parse_confirmed_conversion_event(payload: dict[str, Any], *, provider: str) 
             "raw": payload,
         },
     }
+    if offer_key:
+        conversion_payload["payload"]["offer_key"] = offer_key
+    return conversion_payload
 
 
 def build_manual_conversion_payload(
@@ -41,6 +51,7 @@ def build_manual_conversion_payload(
     amount_usd: float,
     source: str,
     offer_id: str | None = None,
+    offer_key: str | None = None,
     payload: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     provider_name = _clean(provider, default="manual")
@@ -51,7 +62,7 @@ def build_manual_conversion_payload(
     if amount < 0:
         raise ValueError("amount_usd must be greater than or equal to 0")
     raw_payload = payload or {}
-    return {
+    conversion_payload = {
         "offer_id": offer_id or None,
         "source": _clean(source, default=provider_name),
         "external_id": _provider_external_id(provider_name, provider_external_id),
@@ -62,6 +73,10 @@ def build_manual_conversion_payload(
             "raw": raw_payload,
         },
     }
+    clean_offer_key = str(offer_key or "").strip()
+    if clean_offer_key:
+        conversion_payload["payload"]["offer_key"] = clean_offer_key
+    return conversion_payload
 
 
 def _amount_usd(payload: dict[str, Any], obj: dict[str, Any]) -> float:

@@ -283,9 +283,10 @@ class StaticSiteExporter:
                     opportunity,
                     target_url=offer.payment_url,
                     content=offer.offer_type,
+                    offer_key=offer.offer_key,
                 )
             else:
-                url = build_tracking_url(offer.payment_url, opportunity, content=offer.offer_type)
+                url = build_tracking_url(offer.payment_url, opportunity, content=offer.offer_type, offer_key=offer.offer_key)
             return f'<a href="{escape(url)}">{escape(offer.cta_label)}</a>'
         if self.intake_url and offer.offer_type in {"fixed_scope_service", "setup_service"}:
             url = build_tracking_url(self.intake_url, opportunity, content=f"{offer.offer_type}_intake")

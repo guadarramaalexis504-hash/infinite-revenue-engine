@@ -58,6 +58,8 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "SERVICE_INTAKE_URL",
             "OFFER_PAYMENT_URLS",
             "--offer-payment-urls",
+            "offer_key",
+            "--conversion-offer-key",
             "intake/index.html",
             "SITE_BASE_URL",
             "sitemap.xml",

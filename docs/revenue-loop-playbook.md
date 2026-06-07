@@ -106,6 +106,8 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 `OFFER_PAYMENT_URLS` accepts comma-separated `offer_type=url`, `channel=url`, or `*=url` entries. The exporter stores matching URLs in `offers.json` and uses them for owned offer CTAs. If `CLICK_REDIRECT_URL` is configured, those CTAs route through `/click` first so checkout traffic is measurable.
 
+Each generated offer includes an `offer_key` like `idea_catalog:offer-webhook-setup-service:fixed_scope_service`. Use that key as checkout metadata (`offer_key` or `ire_offer_key`) when the payment provider cannot return Supabase `offers.id`. The dashboard and pruning loop can attribute clicks and confirmed revenue by either `offer_id` or `offer_key`.
+
 Record a confirmed conversion:
 
 ```powershell
@@ -113,6 +115,12 @@ python -m farm_loop.main --record-conversion --conversion-provider stripe --conv
 ```
 
 This writes to `conversion_events` in live mode and supports dry-run validation first. Use it for confirmed Stripe, Gumroad, Lemon Squeezy, manual invoice, affiliate, or sponsorship revenue when a provider-specific integration is not wired yet.
+
+If you only have the stable offer key:
+
+```powershell
+python -m farm_loop.main --record-conversion --dry-run --conversion-provider manual --conversion-external-id invoice-123 --conversion-amount-usd 199 --conversion-source paid_setup_kit --conversion-offer-key idea_catalog:offer-webhook-setup-service:fixed_scope_service
+```
 
 Generate interactive microtools:
 

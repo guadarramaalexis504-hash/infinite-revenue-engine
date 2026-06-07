@@ -13,6 +13,7 @@ class OfferDraft:
     external_id: str
     channel: str
     offer_type: str
+    offer_key: str
     title: str
     description: str
     price_usd: float
@@ -32,6 +33,7 @@ class OfferDraft:
                 "source": self.source,
                 "external_id": self.external_id,
                 "offer_type": self.offer_type,
+                "offer_key": self.offer_key,
                 "description": self.description,
                 "cta_label": self.cta_label,
             },
@@ -61,6 +63,10 @@ def resolve_offer_payment_url(offer_type: str, channel: str, payment_urls: dict[
     if not payment_urls:
         return ""
     return payment_urls.get(offer_type) or payment_urls.get(channel) or payment_urls.get("*", "")
+
+
+def build_offer_key(opportunity: RevenueOpportunity, offer_type: str) -> str:
+    return f"{opportunity.source}:{opportunity.external_id}:{offer_type}"
 
 
 def generate_offers(
@@ -170,6 +176,7 @@ def _offer(
         external_id=opportunity.external_id,
         channel=opportunity.channel,
         offer_type=offer_type,
+        offer_key=build_offer_key(opportunity, offer_type),
         title=title,
         description=description,
         price_usd=float(price_usd),
@@ -186,6 +193,7 @@ def _to_markdown(offers: list[OfferDraft]) -> str:
                 f"## {offer.title}",
                 "",
                 f"- Type: {offer.offer_type}",
+                f"- Offer Key: {offer.offer_key}",
                 f"- Channel: {offer.channel}",
                 f"- External ID: {offer.external_id}",
                 f"- Price: ${offer.price_usd:.2f}",
