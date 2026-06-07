@@ -120,6 +120,18 @@ def generate_offers(
                 payment_url=resolve_offer_payment_url("digital_product", channel, payment_urls),
             )
         ]
+    if channel == "niche_report":
+        return [
+            _offer(
+                opportunity,
+                offer_type="paid_report",
+                title=opportunity.title,
+                description="Paid mini-report sold from an owned store after manual source and claim review.",
+                price_usd=19,
+                cta_label="Get the report",
+                payment_url=resolve_offer_payment_url("paid_report", channel, payment_urls),
+            )
+        ]
     if channel in {"github_issue_helper", "open_source_sponsorship"}:
         return [
             _offer(

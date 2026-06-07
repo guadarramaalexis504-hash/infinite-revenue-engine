@@ -178,6 +178,15 @@ class FakeServicePackageExporter:
         return ["service_packages.json", "SERVICE_PACKAGES.md", "PROPOSAL.md", "SCOPE.md"]
 
 
+class FakeNicheReportExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, opportunities):
+        self.exports.append(opportunities)
+        return ["niche_reports.json", "NICHE_REPORTS.md", "REPORT.md", "STORE_LISTING.md"]
+
+
 class FakeAffiliateArticleExporter:
     def __init__(self):
         self.exports = []
@@ -411,6 +420,21 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(summary.service_packages_exported, 4)
         self.assertEqual(len(service_exporter.exports), 1)
         self.assertEqual(service_exporter.exports[0][0].external_id, "kw-portfolio")
+
+    def test_run_revenue_portfolio_once_can_export_niche_reports(self):
+        niche_exporter = FakeNicheReportExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            niche_report_exporter=niche_exporter,
+        )
+
+        self.assertEqual(summary.niche_reports_exported, 4)
+        self.assertEqual(len(niche_exporter.exports), 1)
+        self.assertEqual(niche_exporter.exports[0][0].external_id, "kw-portfolio")
 
     def test_run_revenue_portfolio_once_can_export_affiliate_articles(self):
         article_exporter = FakeAffiliateArticleExporter()

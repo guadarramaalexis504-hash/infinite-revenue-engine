@@ -70,6 +70,7 @@ class PortfolioCLIActivationTests(unittest.TestCase):
             lead_magnet_output_dir="env/lead-magnets",
             digital_product_output_dir="env/digital-products",
             service_package_output_dir="env/service-packages",
+            niche_report_output_dir="env/niche-reports",
             affiliate_article_output_dir="env/affiliate-articles",
             sponsor_repo_output_dir="env/sponsor-repos",
             roadmap_output_dir="env/roadmap",
@@ -111,6 +112,7 @@ class PortfolioCLIActivationTests(unittest.TestCase):
         self.assertEqual(kwargs["lead_magnet_exporter"].output_dir, Path("out/revenue-bundle/lead-magnets"))
         self.assertEqual(kwargs["digital_product_exporter"].output_dir, Path("out/revenue-bundle/digital-products"))
         self.assertEqual(kwargs["service_package_exporter"].output_dir, Path("out/revenue-bundle/service-packages"))
+        self.assertEqual(kwargs["niche_report_exporter"].output_dir, Path("out/revenue-bundle/niche-reports"))
         self.assertEqual(kwargs["affiliate_article_exporter"].output_dir, Path("out/revenue-bundle/affiliate-articles"))
         self.assertEqual(kwargs["sponsor_repo_exporter"].output_dir, Path("out/revenue-bundle/sponsor-repos"))
         self.assertEqual(kwargs["roadmap_exporter"].output_dir, Path("out/revenue-bundle/roadmap"))

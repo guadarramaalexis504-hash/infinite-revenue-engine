@@ -72,7 +72,7 @@ Generate the full local revenue bundle in one command:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, digital product packs, service packages, affiliate article drafts, sponsor repo kits, the opportunity roadmap, and the launch queue using one standard folder tree.
+The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, digital product packs, service packages, niche reports, affiliate article drafts, sponsor repo kits, the opportunity roadmap, and the launch queue using one standard folder tree.
 
 Record a confirmed sale from any payment path:
 
@@ -192,6 +192,7 @@ Optional environment variables:
 - `LEAD_CAPTURE_URL`, optional owned opt-in form or newsletter URL used by lead magnet CTAs
 - `DIGITAL_PRODUCT_OUTPUT_DIR`, optional digital product pack export path such as `out/digital-products`
 - `SERVICE_PACKAGE_OUTPUT_DIR`, optional fixed-scope service package export path such as `out/service-packages`
+- `NICHE_REPORT_OUTPUT_DIR`, optional paid niche report export path such as `out/niche-reports`
 - `AFFILIATE_ARTICLE_OUTPUT_DIR`, optional affiliate article export path such as `out/affiliate-articles`
 - `AFFILIATE_URLS`, optional comma-separated tag=url or *=url affiliate links
 - `SPONSOR_REPO_OUTPUT_DIR`, optional GitHub Sponsors repo kit export path such as `out/sponsor-repos`
@@ -270,6 +271,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 ```
 
 This writes `service_packages.json`, `SERVICE_PACKAGES.md`, and one folder per selected paid setup kit with `PROPOSAL.md`, `SCOPE.md`, `DELIVERY_CHECKLIST.md`, `HANDOFF.md`, `service.json`, and an owned landing page. Use this to sell bounded setup work without silently expanding scope.
+
+Generate paid niche report drafts:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 20 --niche-report-output-dir out/niche-reports --offer-payment-urls "paid_report=https://gumroad.com/l/report"
+```
+
+This writes `niche_reports.json`, `NICHE_REPORTS.md`, and one folder per selected niche report with `REPORT.md`, `STORE_LISTING.md`, `VALIDATION_PLAN.md`, and an owned landing page. Publish only after manually verifying keywords, competitors, claims, and sources.
 
 Generate disclosed affiliate article drafts:
 

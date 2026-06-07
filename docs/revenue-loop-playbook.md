@@ -19,6 +19,7 @@ Current operating target:
 - Lead magnets: `LEAD_MAGNET_OUTPUT_DIR=out/lead-magnets`.
 - Digital products: `DIGITAL_PRODUCT_OUTPUT_DIR=out/digital-products`.
 - Service packages: `SERVICE_PACKAGE_OUTPUT_DIR=out/service-packages`.
+- Niche reports: `NICHE_REPORT_OUTPUT_DIR=out/niche-reports`.
 - Affiliate articles: `AFFILIATE_ARTICLE_OUTPUT_DIR=out/affiliate-articles`.
 - Sponsor repo kits: `SPONSOR_REPO_OUTPUT_DIR=out/sponsor-repos`.
 - Opportunity roadmap: `ROADMAP_OUTPUT_DIR=out/roadmap`.
@@ -132,6 +133,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 This writes `service_packages.json`, `SERVICE_PACKAGES.md`, and one folder per selected paid setup kit with `PROPOSAL.md`, `SCOPE.md`, `DELIVERY_CHECKLIST.md`, `HANDOFF.md`, `service.json`, and an owned landing page. Use it to quote and deliver bounded setup work without silently expanding scope.
 
+Generate paid niche report drafts:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 20 --niche-report-output-dir out/niche-reports --offer-payment-urls "paid_report=https://gumroad.com/l/report"
+```
+
+This writes `niche_reports.json`, `NICHE_REPORTS.md`, and one folder per selected niche report with `REPORT.md`, `STORE_LISTING.md`, `VALIDATION_PLAN.md`, and an owned landing page. Publish only after manually verifying keywords, competitors, claims, and sources.
+
 Generate disclosed affiliate article drafts:
 
 ```powershell
@@ -162,7 +171,7 @@ Generate the full revenue bundle:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, digital product packs, service packages, affiliate article drafts, sponsor repo kits, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
+The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, digital product packs, service packages, niche reports, affiliate article drafts, sponsor repo kits, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
 
 Attach real payment links to generated offers:
 
@@ -385,6 +394,14 @@ Reports can become paid PDFs, mini-sites, or lead magnets:
 - AI spreadsheet templates
 - small-business automation stacks
 - webhook/payment integration starter niches
+
+Niche report outputs:
+
+- paid mini-report draft
+- store listing
+- validation plan
+- owned landing page
+- checkout tracking through `paid_report`
 
 ## Scoring And Thresholds
 

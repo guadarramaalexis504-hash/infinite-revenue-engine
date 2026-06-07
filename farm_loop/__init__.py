@@ -15,6 +15,7 @@ __all__ = [
     "lead_magnet_exporter",
     "main",
     "microtool_exporter",
+    "niche_report_exporter",
     "offers",
     "opportunity_roadmap",
     "revenue_dashboard",

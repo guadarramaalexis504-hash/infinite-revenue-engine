@@ -32,6 +32,7 @@ class RevenuePortfolioSummary:
     lead_magnets_exported: int = 0
     digital_products_exported: int = 0
     service_packages_exported: int = 0
+    niche_reports_exported: int = 0
     affiliate_articles_exported: int = 0
     sponsor_repos_exported: int = 0
     roadmap_exported: int = 0
@@ -58,6 +59,7 @@ def run_revenue_portfolio_once(
     lead_magnet_exporter: Any | None = None,
     digital_product_exporter: Any | None = None,
     service_package_exporter: Any | None = None,
+    niche_report_exporter: Any | None = None,
     affiliate_article_exporter: Any | None = None,
     sponsor_repo_exporter: Any | None = None,
     roadmap_exporter: Any | None = None,
@@ -237,6 +239,10 @@ def run_revenue_portfolio_once(
     if service_package_exporter:
         service_packages_exported = len(service_package_exporter.export(selected))
 
+    niche_reports_exported = 0
+    if niche_report_exporter:
+        niche_reports_exported = len(niche_report_exporter.export(selected))
+
     affiliate_articles_exported = 0
     if affiliate_article_exporter:
         affiliate_articles_exported = len(affiliate_article_exporter.export(selected))
@@ -276,6 +282,7 @@ def run_revenue_portfolio_once(
                 "lead_magnets_exported": lead_magnets_exported,
                 "digital_products_exported": digital_products_exported,
                 "service_packages_exported": service_packages_exported,
+                "niche_reports_exported": niche_reports_exported,
                 "affiliate_articles_exported": affiliate_articles_exported,
                 "sponsor_repos_exported": sponsor_repos_exported,
                 "roadmap_exported": roadmap_exported,
@@ -301,6 +308,7 @@ def run_revenue_portfolio_once(
         lead_magnets_exported=lead_magnets_exported,
         digital_products_exported=digital_products_exported,
         service_packages_exported=service_packages_exported,
+        niche_reports_exported=niche_reports_exported,
         affiliate_articles_exported=affiliate_articles_exported,
         sponsor_repos_exported=sponsor_repos_exported,
         roadmap_exported=roadmap_exported,

@@ -71,6 +71,8 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "DIGITAL_PRODUCTS.md",
             "--service-package-output-dir",
             "SERVICE_PACKAGES.md",
+            "--niche-report-output-dir",
+            "NICHE_REPORTS.md",
             "--affiliate-article-output-dir",
             "AFFILIATE_ARTICLES.md",
             "AFFILIATE_URLS",

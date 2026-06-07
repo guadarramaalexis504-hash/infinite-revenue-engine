@@ -20,6 +20,7 @@ from .drafts import DraftGenerator
 from .launch_queue import LaunchQueueExporter
 from .lead_magnet_exporter import LeadMagnetExporter
 from .microtool_exporter import MicrotoolExporter
+from .niche_report_exporter import NicheReportExporter
 from .offers import OfferCatalogExporter, parse_offer_payment_urls
 from .opportunity_roadmap import OpportunityRoadmapExporter
 from .scoring import rank_questions, to_opportunity_payload
@@ -360,6 +361,21 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         if service_package_output_dir
         else None
     )
+    niche_report_output_dir = (
+        args.niche_report_output_dir
+        or cli_bundle_paths.get("niche_report_output_dir")
+        or settings.niche_report_output_dir
+        or env_bundle_paths.get("niche_report_output_dir")
+    )
+    niche_report_exporter = (
+        NicheReportExporter(
+            niche_report_output_dir,
+            payment_urls=offer_payment_urls,
+            click_redirect_url=click_redirect_url,
+        )
+        if niche_report_output_dir
+        else None
+    )
     affiliate_article_output_dir = (
         args.affiliate_article_output_dir
         or cli_bundle_paths.get("affiliate_article_output_dir")
@@ -418,6 +434,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         lead_magnet_exporter=lead_magnet_exporter,
         digital_product_exporter=digital_product_exporter,
         service_package_exporter=service_package_exporter,
+        niche_report_exporter=niche_report_exporter,
         affiliate_article_exporter=affiliate_article_exporter,
         sponsor_repo_exporter=sponsor_repo_exporter,
         roadmap_exporter=roadmap_exporter,
@@ -496,6 +513,7 @@ def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
         "lead_magnet_output_dir": (base_path / "lead-magnets").as_posix(),
         "digital_product_output_dir": (base_path / "digital-products").as_posix(),
         "service_package_output_dir": (base_path / "service-packages").as_posix(),
+        "niche_report_output_dir": (base_path / "niche-reports").as_posix(),
         "affiliate_article_output_dir": (base_path / "affiliate-articles").as_posix(),
         "sponsor_repo_output_dir": (base_path / "sponsor-repos").as_posix(),
         "roadmap_output_dir": (base_path / "roadmap").as_posix(),
@@ -605,6 +623,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--service-package-output-dir",
         default=None,
         help="Write fixed-scope service packages, proposals, scopes, delivery checklists, and handoff docs.",
+    )
+    parser.add_argument(
+        "--niche-report-output-dir",
+        default=None,
+        help="Write paid niche report drafts, validation plans, store listings, and landing pages.",
     )
     parser.add_argument(
         "--affiliate-article-output-dir",

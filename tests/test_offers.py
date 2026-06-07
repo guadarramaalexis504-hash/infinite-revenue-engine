@@ -55,6 +55,16 @@ class OfferTests(unittest.TestCase):
         self.assertEqual(sponsor.payment_url, "https://github.com/sponsors/example")
         self.assertIn("Sponsor", sponsor.title)
 
+    def test_generate_offers_creates_paid_report_for_niche_report(self):
+        report = generate_offers(
+            opportunity("niche_report", "Local AI Tools Niche Report"),
+            payment_urls={"paid_report": "https://gumroad.com/l/report"},
+        )[0]
+
+        self.assertEqual(report.offer_type, "paid_report")
+        self.assertEqual(report.price_usd, 19)
+        self.assertEqual(report.payment_url, "https://gumroad.com/l/report")
+
     def test_offer_payload_matches_supabase_shape(self):
         opp = opportunity("microtool_seo", external_id="tool-1")
         offer = generate_offers(
