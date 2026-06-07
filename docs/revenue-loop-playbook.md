@@ -17,6 +17,7 @@ Current operating target:
 - Checkout setup: `CHECKOUT_SETUP_OUTPUT_DIR=out/checkout-setup`.
 - Tracking deploy bundle: `TRACKING_DEPLOY_OUTPUT_DIR=out/tracking-deploy`.
 - Lead magnets: `LEAD_MAGNET_OUTPUT_DIR=out/lead-magnets`.
+- Digital products: `DIGITAL_PRODUCT_OUTPUT_DIR=out/digital-products`.
 - Opportunity roadmap: `ROADMAP_OUTPUT_DIR=out/roadmap`.
 - Revenue bundle: `BUNDLE_OUTPUT_DIR=out/revenue-bundle`.
 - Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
@@ -110,6 +111,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 This writes `lead_magnets.json`, `LEAD_MAGNETS.md`, an index page, and one landing/checklist pair per selected lead magnet opportunity. Use these only on owned channels with explicit opt-in and a clear next paid offer.
 
+Generate digital product packs:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 20 --digital-product-output-dir out/digital-products --offer-payment-urls "digital_product=https://gumroad.com/l/template"
+```
+
+This writes `digital_products.json`, `DIGITAL_PRODUCTS.md`, and one folder per selected digital product with `README.md`, `STORE_LISTING.md`, `LAUNCH_CHECKLIST.md`, `product.json`, and an owned landing page. Set checkout metadata with `offer_key` before publishing the product.
+
 Generate an opportunity roadmap:
 
 ```powershell
@@ -124,7 +133,7 @@ Generate the full revenue bundle:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
+The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, digital product packs, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
 
 Attach real payment links to generated offers:
 

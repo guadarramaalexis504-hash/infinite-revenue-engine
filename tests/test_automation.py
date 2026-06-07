@@ -209,6 +209,7 @@ EMPTY=
         self.assertIn("TRACKING_PUBLIC_BASE_URL=", env_example)
         self.assertIn("LEAD_MAGNET_OUTPUT_DIR=out/lead-magnets", env_example)
         self.assertIn("LEAD_CAPTURE_URL=", env_example)
+        self.assertIn("DIGITAL_PRODUCT_OUTPUT_DIR=out/digital-products", env_example)
         self.assertIn("ROADMAP_OUTPUT_DIR=out/roadmap", env_example)
         self.assertIn("BUNDLE_OUTPUT_DIR=out/revenue-bundle", env_example)
         self.assertIn("CLICK_ALLOWED_HOSTS=buymeacoffee.com,www.buymeacoffee.com", env_example)

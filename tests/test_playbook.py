@@ -67,6 +67,8 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "--lead-magnet-output-dir",
             "LEAD_MAGNETS.md",
             "LEAD_CAPTURE_URL",
+            "--digital-product-output-dir",
+            "DIGITAL_PRODUCTS.md",
             "intake/index.html",
             "SITE_BASE_URL",
             "sitemap.xml",

@@ -14,6 +14,7 @@ from .automation import collect_activation_report
 from .checkout_setup import CheckoutSetupExporter
 from .config import Settings
 from .conversions import build_manual_conversion_payload
+from .digital_product_exporter import DigitalProductExporter
 from .drafts import DraftGenerator
 from .launch_queue import LaunchQueueExporter
 from .lead_magnet_exporter import LeadMagnetExporter
@@ -325,6 +326,21 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         if lead_magnet_output_dir
         else None
     )
+    digital_product_output_dir = (
+        args.digital_product_output_dir
+        or cli_bundle_paths.get("digital_product_output_dir")
+        or settings.digital_product_output_dir
+        or env_bundle_paths.get("digital_product_output_dir")
+    )
+    digital_product_exporter = (
+        DigitalProductExporter(
+            digital_product_output_dir,
+            payment_urls=offer_payment_urls,
+            click_redirect_url=click_redirect_url,
+        )
+        if digital_product_output_dir
+        else None
+    )
     roadmap_output_dir = (
         args.roadmap_output_dir
         or cli_bundle_paths.get("roadmap_output_dir")
@@ -349,6 +365,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         checkout_setup_exporter=checkout_setup_exporter,
         tracking_deploy_exporter=tracking_deploy_exporter,
         lead_magnet_exporter=lead_magnet_exporter,
+        digital_product_exporter=digital_product_exporter,
         roadmap_exporter=roadmap_exporter,
         activation_report=activation_report,
         offer_payment_urls=offer_payment_urls,
@@ -423,6 +440,7 @@ def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
         "checkout_setup_output_dir": (base_path / "checkout-setup").as_posix(),
         "tracking_deploy_output_dir": (base_path / "tracking-deploy").as_posix(),
         "lead_magnet_output_dir": (base_path / "lead-magnets").as_posix(),
+        "digital_product_output_dir": (base_path / "digital-products").as_posix(),
         "roadmap_output_dir": (base_path / "roadmap").as_posix(),
         "launch_queue_output_dir": (base_path / "launch-queue").as_posix(),
     }
@@ -520,6 +538,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--lead-capture-url",
         default=None,
         help="Owned opt-in form or newsletter URL used by generated lead magnet CTAs.",
+    )
+    parser.add_argument(
+        "--digital-product-output-dir",
+        default=None,
+        help="Write product packs, store listings, and launch checklists for digital product opportunities.",
     )
     parser.add_argument(
         "--roadmap-output-dir",

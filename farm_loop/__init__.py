@@ -7,6 +7,7 @@ __all__ = [
     "click_handler",
     "checkout_setup",
     "config",
+    "digital_product_exporter",
     "drafts",
     "http_app",
     "launch_queue",

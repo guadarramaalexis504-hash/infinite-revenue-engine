@@ -185,6 +185,17 @@ class CLITests(unittest.TestCase):
         self.assertEqual(args.lead_magnet_output_dir, "out/lead-magnets")
         self.assertEqual(args.lead_capture_url, "https://forms.example.com/signup")
 
+    def test_parse_args_supports_digital_product_output_dir(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--digital-product-output-dir",
+                "out/digital-products",
+            ]
+        )
+
+        self.assertEqual(args.digital_product_output_dir, "out/digital-products")
+
     def test_parse_args_supports_roadmap_output_dir(self):
         args = parse_args(
             [
@@ -223,6 +234,7 @@ class CLITests(unittest.TestCase):
         self.assertEqual(paths["checkout_setup_output_dir"], "out/revenue-bundle/checkout-setup")
         self.assertEqual(paths["tracking_deploy_output_dir"], "out/revenue-bundle/tracking-deploy")
         self.assertEqual(paths["lead_magnet_output_dir"], "out/revenue-bundle/lead-magnets")
+        self.assertEqual(paths["digital_product_output_dir"], "out/revenue-bundle/digital-products")
         self.assertEqual(paths["roadmap_output_dir"], "out/revenue-bundle/roadmap")
         self.assertEqual(paths["launch_queue_output_dir"], "out/revenue-bundle/launch-queue")
 

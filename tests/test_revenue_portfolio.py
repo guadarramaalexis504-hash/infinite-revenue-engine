@@ -160,6 +160,15 @@ class FakeLeadMagnetExporter:
         return ["lead_magnets.json", "LEAD_MAGNETS.md", "index.html", "checklist.md"]
 
 
+class FakeDigitalProductExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, opportunities):
+        self.exports.append(opportunities)
+        return ["digital_products.json", "DIGITAL_PRODUCTS.md", "README.md", "STORE_LISTING.md"]
+
+
 class FakeRoadmapExporter:
     def __init__(self):
         self.exports = []
@@ -345,6 +354,21 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(summary.lead_magnets_exported, 4)
         self.assertEqual(len(lead_exporter.exports), 1)
         self.assertEqual(lead_exporter.exports[0][0].external_id, "kw-portfolio")
+
+    def test_run_revenue_portfolio_once_can_export_digital_products(self):
+        product_exporter = FakeDigitalProductExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            digital_product_exporter=product_exporter,
+        )
+
+        self.assertEqual(summary.digital_products_exported, 4)
+        self.assertEqual(len(product_exporter.exports), 1)
+        self.assertEqual(product_exporter.exports[0][0].external_id, "kw-portfolio")
 
     def test_run_revenue_portfolio_once_can_export_opportunity_roadmap(self):
         roadmap_exporter = FakeRoadmapExporter()
