@@ -120,7 +120,7 @@ def generate_offers(
                 payment_url=resolve_offer_payment_url("digital_product", channel, payment_urls),
             )
         ]
-    if channel == "github_issue_helper":
+    if channel in {"github_issue_helper", "open_source_sponsorship"}:
         return [
             _offer(
                 opportunity,

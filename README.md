@@ -72,7 +72,7 @@ Generate the full local revenue bundle in one command:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, digital product packs, affiliate article drafts, the opportunity roadmap, and the launch queue using one standard folder tree.
+The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, digital product packs, affiliate article drafts, sponsor repo kits, the opportunity roadmap, and the launch queue using one standard folder tree.
 
 Record a confirmed sale from any payment path:
 
@@ -193,6 +193,8 @@ Optional environment variables:
 - `DIGITAL_PRODUCT_OUTPUT_DIR`, optional digital product pack export path such as `out/digital-products`
 - `AFFILIATE_ARTICLE_OUTPUT_DIR`, optional affiliate article export path such as `out/affiliate-articles`
 - `AFFILIATE_URLS`, optional comma-separated tag=url or *=url affiliate links
+- `SPONSOR_REPO_OUTPUT_DIR`, optional GitHub Sponsors repo kit export path such as `out/sponsor-repos`
+- `SPONSOR_URLS`, optional comma-separated tag=url, github=url, sponsorship=url, or *=url sponsor links
 - `ROADMAP_OUTPUT_DIR`, optional ranked opportunity roadmap path such as `out/roadmap`
 - `BUNDLE_OUTPUT_DIR`, optional all-in-one local revenue bundle path such as `out/revenue-bundle`
 
@@ -268,6 +270,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 This writes `affiliate_articles.json`, `AFFILIATE_ARTICLES.md`, an index page, and one `ARTICLE.md`/`DISCLOSURE.md`/landing page set per selected affiliate article opportunity. Publish only on owned channels with visible disclosure and verified claims.
 
+Generate GitHub Sponsors repo kits:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 20 --sponsor-repo-output-dir out/sponsor-repos --sponsor-urls "github=https://github.com/sponsors/your-handle"
+```
+
+This writes `sponsor_repos.json`, `SPONSOR_REPOS.md`, an index page, and one owned repo kit per selected open-source sponsorship opportunity with `README.md`, `.github/FUNDING.yml`, `.github/ISSUE_TEMPLATE/support.yml`, `CONTRIBUTING.md`, `ROADMAP.md`, `examples/usage.md`, and an owned landing page. Publish only in your own GitHub repos after manual review.
+
 ## Click Redirect Handler
 
 Host a small HTTPS endpoint and call the reusable handler with a server-side Supabase key:
@@ -315,7 +325,7 @@ Run `supabase/schema.sql` in the Supabase SQL editor. The schema defines:
 - `events`: structured logs for each run.
 - `tip_events`: confirmed Buy Me a Coffee events, deduplicated by `(provider, external_id)`.
 - `revenue_milestones`: milestone definitions such as 15, 200, 1000, and 20000.
-- `channels`: allowed revenue lanes such as microtools, GitHub issue helper, digital products, affiliates, and paid setup kits.
+- `channels`: allowed revenue lanes such as microtools, GitHub issue helper, digital products, affiliates, open-source sponsorship, and paid setup kits.
 - `assets`: reviewable generated assets: microtool specs, article outlines, patch plans, product listings, landing copy, support offers.
 - `offers`, `click_events`, `conversion_events`, `experiments`: monetization and learning loop tracking.
 - `launch_tasks`: prioritized manual launch tasks for review, publishing, monetization, and measurement.

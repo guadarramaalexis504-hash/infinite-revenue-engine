@@ -51,6 +51,8 @@ class Settings:
     digital_product_output_dir: str | None = None
     affiliate_article_output_dir: str | None = None
     affiliate_urls: str = ""
+    sponsor_repo_output_dir: str | None = None
+    sponsor_urls: str = ""
     roadmap_output_dir: str | None = None
     bundle_output_dir: str | None = None
 
@@ -92,6 +94,8 @@ class Settings:
             digital_product_output_dir=os.getenv("DIGITAL_PRODUCT_OUTPUT_DIR"),
             affiliate_article_output_dir=os.getenv("AFFILIATE_ARTICLE_OUTPUT_DIR"),
             affiliate_urls=os.getenv("AFFILIATE_URLS", ""),
+            sponsor_repo_output_dir=os.getenv("SPONSOR_REPO_OUTPUT_DIR"),
+            sponsor_urls=os.getenv("SPONSOR_URLS", ""),
             roadmap_output_dir=os.getenv("ROADMAP_OUTPUT_DIR"),
             bundle_output_dir=os.getenv("BUNDLE_OUTPUT_DIR"),
         )

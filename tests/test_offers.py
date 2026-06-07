@@ -45,6 +45,16 @@ class OfferTests(unittest.TestCase):
         self.assertEqual(product.offer_type, "digital_product")
         self.assertLess(product.price_usd, setup.price_usd)
 
+    def test_generate_offers_creates_sponsorship_for_open_source_repo(self):
+        sponsor = generate_offers(
+            opportunity("open_source_sponsorship", "GitHub Sponsors README Kit"),
+            payment_urls={"sponsorship": "https://github.com/sponsors/example"},
+        )[0]
+
+        self.assertEqual(sponsor.offer_type, "sponsorship")
+        self.assertEqual(sponsor.payment_url, "https://github.com/sponsors/example")
+        self.assertIn("Sponsor", sponsor.title)
+
     def test_offer_payload_matches_supabase_shape(self):
         opp = opportunity("microtool_seo", external_id="tool-1")
         offer = generate_offers(

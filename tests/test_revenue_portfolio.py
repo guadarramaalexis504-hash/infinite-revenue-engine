@@ -178,6 +178,15 @@ class FakeAffiliateArticleExporter:
         return ["affiliate_articles.json", "AFFILIATE_ARTICLES.md", "index.html", "ARTICLE.md"]
 
 
+class FakeSponsorRepoExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, opportunities):
+        self.exports.append(opportunities)
+        return ["sponsor_repos.json", "SPONSOR_REPOS.md", "README.md", "FUNDING.yml"]
+
+
 class FakeRoadmapExporter:
     def __init__(self):
         self.exports = []
@@ -393,6 +402,21 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(summary.affiliate_articles_exported, 4)
         self.assertEqual(len(article_exporter.exports), 1)
         self.assertEqual(article_exporter.exports[0][0].external_id, "kw-portfolio")
+
+    def test_run_revenue_portfolio_once_can_export_sponsor_repo_kits(self):
+        sponsor_exporter = FakeSponsorRepoExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            sponsor_repo_exporter=sponsor_exporter,
+        )
+
+        self.assertEqual(summary.sponsor_repos_exported, 4)
+        self.assertEqual(len(sponsor_exporter.exports), 1)
+        self.assertEqual(sponsor_exporter.exports[0][0].external_id, "kw-portfolio")
 
     def test_run_revenue_portfolio_once_can_export_opportunity_roadmap(self):
         roadmap_exporter = FakeRoadmapExporter()

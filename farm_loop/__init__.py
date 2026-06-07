@@ -25,6 +25,7 @@ __all__ = [
     "sources_idea_catalog",
     "sources_keywords",
     "sources_stackexchange",
+    "sponsor_repo_exporter",
     "static_site_exporter",
     "supabase_client",
     "tracking",

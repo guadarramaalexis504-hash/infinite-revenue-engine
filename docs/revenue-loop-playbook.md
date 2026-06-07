@@ -19,6 +19,7 @@ Current operating target:
 - Lead magnets: `LEAD_MAGNET_OUTPUT_DIR=out/lead-magnets`.
 - Digital products: `DIGITAL_PRODUCT_OUTPUT_DIR=out/digital-products`.
 - Affiliate articles: `AFFILIATE_ARTICLE_OUTPUT_DIR=out/affiliate-articles`.
+- Sponsor repo kits: `SPONSOR_REPO_OUTPUT_DIR=out/sponsor-repos`.
 - Opportunity roadmap: `ROADMAP_OUTPUT_DIR=out/roadmap`.
 - Revenue bundle: `BUNDLE_OUTPUT_DIR=out/revenue-bundle`.
 - Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
@@ -26,6 +27,7 @@ Current operating target:
 - Optional lead capture: `LEAD_CAPTURE_URL=https://your-form-or-newsletter.example`.
 - Optional checkout mapping: `OFFER_PAYMENT_URLS=fixed_scope_service=https://buy.stripe.com/setup,digital_product=https://gumroad.com/l/template`.
 - Optional affiliate mapping: `AFFILIATE_URLS=fastapi=https://affiliate.example/fastapi,*=https://affiliate.example/default`.
+- Optional sponsor mapping: `SPONSOR_URLS=github=https://github.com/sponsors/your-handle`.
 - Live-readiness check: `.\scripts\doctor.ps1`.
 - Milestones: `$15`, `$200`, `$1,000`, `$20,000`.
 - Default behavior: keep running after milestones because `STOP_AFTER_TARGET=false`.
@@ -129,6 +131,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 This writes `affiliate_articles.json`, `AFFILIATE_ARTICLES.md`, an index page, and one `ARTICLE.md`/`DISCLOSURE.md`/landing page set per selected affiliate article opportunity. Publish only on owned channels with visible disclosure, verified claims, and allowed affiliate programs.
 
+Generate GitHub Sponsors repo kits:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 20 --sponsor-repo-output-dir out/sponsor-repos --sponsor-urls "github=https://github.com/sponsors/your-handle"
+```
+
+This writes `sponsor_repos.json`, `SPONSOR_REPOS.md`, an index page, and one owned repo kit per selected open-source sponsorship opportunity with `README.md`, `.github/FUNDING.yml`, `.github/ISSUE_TEMPLATE/support.yml`, `CONTRIBUTING.md`, `ROADMAP.md`, `examples/usage.md`, and an owned landing page. Publish only in your own GitHub repos after manual review and never use this to mass-post payment links.
+
 Generate an opportunity roadmap:
 
 ```powershell
@@ -143,7 +153,7 @@ Generate the full revenue bundle:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, digital product packs, affiliate article drafts, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
+The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, digital product packs, affiliate article drafts, sponsor repo kits, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
 
 Attach real payment links to generated offers:
 
@@ -304,6 +314,18 @@ Use GitHub as a discovery source and create drafts:
 
 Do not spam maintainers. Only submit PRs manually when they are genuinely useful.
 
+### Open-Source Sponsorship
+
+Use owned GitHub repositories only:
+
+- sponsor-ready README and funding files
+- issue templates for paid support requests
+- example folders that prove the repo is useful
+- roadmap with sponsor tiers and maintenance promises
+- links from the owned site to GitHub Sponsors or another permitted support page
+
+Do not add sponsor CTAs to third-party issues. Revenue is counted only after confirmed sponsorship, support, or conversion events are recorded.
+
 ### Affiliate and Content
 
 Use owned sites only:
@@ -396,6 +418,7 @@ Revenue should be counted only from confirmed `tip_events` and `conversion_event
 - If no remote exists locally, use `.\scripts\configure-github.ps1 -Repo owner/repo -RunWorkflow`.
 - Payment path: Buy Me a Coffee, Stripe, Gumroad, Lemon Squeezy, or GitHub Sponsors.
 - Offer payment URL mapping: `OFFER_PAYMENT_URLS`.
+- Sponsor URL mapping: `SPONSOR_URLS`.
 - Optional conversion webhook token: `CONVERSION_WEBHOOK_TOKEN`.
 - Optional click redirect allowlist: `CLICK_ALLOWED_HOSTS`.
 - Service intake URL: `SERVICE_INTAKE_URL`.

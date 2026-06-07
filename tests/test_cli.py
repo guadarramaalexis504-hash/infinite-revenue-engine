@@ -210,6 +210,20 @@ class CLITests(unittest.TestCase):
         self.assertEqual(args.affiliate_article_output_dir, "out/affiliate-articles")
         self.assertEqual(args.affiliate_urls, "fastapi=https://affiliate.example/fastapi")
 
+    def test_parse_args_supports_sponsor_repo_output_dir_and_urls(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--sponsor-repo-output-dir",
+                "out/sponsor-repos",
+                "--sponsor-urls",
+                "github=https://github.com/sponsors/example",
+            ]
+        )
+
+        self.assertEqual(args.sponsor_repo_output_dir, "out/sponsor-repos")
+        self.assertEqual(args.sponsor_urls, "github=https://github.com/sponsors/example")
+
     def test_parse_args_supports_roadmap_output_dir(self):
         args = parse_args(
             [
@@ -250,6 +264,7 @@ class CLITests(unittest.TestCase):
         self.assertEqual(paths["lead_magnet_output_dir"], "out/revenue-bundle/lead-magnets")
         self.assertEqual(paths["digital_product_output_dir"], "out/revenue-bundle/digital-products")
         self.assertEqual(paths["affiliate_article_output_dir"], "out/revenue-bundle/affiliate-articles")
+        self.assertEqual(paths["sponsor_repo_output_dir"], "out/revenue-bundle/sponsor-repos")
         self.assertEqual(paths["roadmap_output_dir"], "out/revenue-bundle/roadmap")
         self.assertEqual(paths["launch_queue_output_dir"], "out/revenue-bundle/launch-queue")
 

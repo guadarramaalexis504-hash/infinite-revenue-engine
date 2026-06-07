@@ -29,6 +29,7 @@ from .revenue_engine import run_revenue_portfolio_once
 from .sources_github import GitHubIssuesClient
 from .sources_idea_catalog import IdeaCatalogSource
 from .sources_keywords import KeywordCSVSource
+from .sponsor_repo_exporter import SponsorRepoExporter
 from .static_site_exporter import StaticSiteExporter
 from .tracking_deploy import TrackingDeployExporter
 
@@ -358,6 +359,22 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         if affiliate_article_output_dir
         else None
     )
+    sponsor_repo_output_dir = (
+        args.sponsor_repo_output_dir
+        or cli_bundle_paths.get("sponsor_repo_output_dir")
+        or settings.sponsor_repo_output_dir
+        or env_bundle_paths.get("sponsor_repo_output_dir")
+    )
+    sponsor_urls = parse_offer_payment_urls(args.sponsor_urls or settings.sponsor_urls)
+    sponsor_repo_exporter = (
+        SponsorRepoExporter(
+            sponsor_repo_output_dir,
+            sponsor_urls=sponsor_urls,
+            click_redirect_url=click_redirect_url,
+        )
+        if sponsor_repo_output_dir
+        else None
+    )
     roadmap_output_dir = (
         args.roadmap_output_dir
         or cli_bundle_paths.get("roadmap_output_dir")
@@ -384,6 +401,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         lead_magnet_exporter=lead_magnet_exporter,
         digital_product_exporter=digital_product_exporter,
         affiliate_article_exporter=affiliate_article_exporter,
+        sponsor_repo_exporter=sponsor_repo_exporter,
         roadmap_exporter=roadmap_exporter,
         activation_report=activation_report,
         offer_payment_urls=offer_payment_urls,
@@ -460,6 +478,7 @@ def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
         "lead_magnet_output_dir": (base_path / "lead-magnets").as_posix(),
         "digital_product_output_dir": (base_path / "digital-products").as_posix(),
         "affiliate_article_output_dir": (base_path / "affiliate-articles").as_posix(),
+        "sponsor_repo_output_dir": (base_path / "sponsor-repos").as_posix(),
         "roadmap_output_dir": (base_path / "roadmap").as_posix(),
         "launch_queue_output_dir": (base_path / "launch-queue").as_posix(),
     }
@@ -572,6 +591,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--affiliate-urls",
         default=None,
         help="Comma-separated tag=url or *=url affiliate links used in generated affiliate articles.",
+    )
+    parser.add_argument(
+        "--sponsor-repo-output-dir",
+        default=None,
+        help="Write GitHub Sponsors-ready open-source repo kits for owned repositories.",
+    )
+    parser.add_argument(
+        "--sponsor-urls",
+        default=None,
+        help="Comma-separated tag=url, github=url, sponsorship=url, or *=url sponsor links for repo kits.",
     )
     parser.add_argument(
         "--roadmap-output-dir",
