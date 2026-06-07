@@ -5,6 +5,7 @@ __all__ = [
     "automation",
     "assets",
     "click_handler",
+    "checkout_setup",
     "config",
     "drafts",
     "http_app",

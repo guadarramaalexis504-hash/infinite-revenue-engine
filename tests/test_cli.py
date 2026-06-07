@@ -143,6 +143,20 @@ class CLITests(unittest.TestCase):
             "fixed_scope_service=https://buy.stripe.com/setup,digital_product=https://gumroad.com/l/template",
         )
 
+    def test_parse_args_supports_checkout_setup_output_dir_and_webhook_base_url(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--checkout-setup-output-dir",
+                "out/checkout-setup",
+                "--conversion-webhook-base-url",
+                "https://revenue.example/webhooks/conversion",
+            ]
+        )
+
+        self.assertEqual(args.checkout_setup_output_dir, "out/checkout-setup")
+        self.assertEqual(args.conversion_webhook_base_url, "https://revenue.example/webhooks/conversion")
+
     def test_parse_args_supports_roadmap_output_dir(self):
         args = parse_args(
             [
@@ -178,6 +192,7 @@ class CLITests(unittest.TestCase):
         self.assertEqual(paths["site_output_dir"], "out/revenue-bundle/site")
         self.assertEqual(paths["microtool_output_dir"], "out/revenue-bundle/site/tools")
         self.assertEqual(paths["offer_output_dir"], "out/revenue-bundle/offers")
+        self.assertEqual(paths["checkout_setup_output_dir"], "out/revenue-bundle/checkout-setup")
         self.assertEqual(paths["roadmap_output_dir"], "out/revenue-bundle/roadmap")
         self.assertEqual(paths["launch_queue_output_dir"], "out/revenue-bundle/launch-queue")
 

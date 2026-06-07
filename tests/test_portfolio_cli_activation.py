@@ -65,6 +65,7 @@ class PortfolioCLIActivationTests(unittest.TestCase):
             launch_queue_output_dir="env/launch-queue",
             microtool_output_dir="env/microtools",
             offer_output_dir="env/offers",
+            checkout_setup_output_dir="env/checkout-setup",
             roadmap_output_dir="env/roadmap",
         )
         args = parse_args(
@@ -99,6 +100,7 @@ class PortfolioCLIActivationTests(unittest.TestCase):
         self.assertEqual(kwargs["site_exporter"].output_dir, Path("out/revenue-bundle/site"))
         self.assertEqual(kwargs["microtool_exporter"].output_dir, Path("out/revenue-bundle/site/tools"))
         self.assertEqual(kwargs["offer_exporter"].output_dir, Path("out/revenue-bundle/offers"))
+        self.assertEqual(kwargs["checkout_setup_exporter"].output_dir, Path("out/revenue-bundle/checkout-setup"))
         self.assertEqual(kwargs["roadmap_exporter"].output_dir, Path("out/revenue-bundle/roadmap"))
         self.assertEqual(kwargs["launch_queue_exporter"].output_dir, Path("out/revenue-bundle/launch-queue"))
         self.assertEqual(kwargs["activation_report"], report)

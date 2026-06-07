@@ -27,6 +27,7 @@ class RevenuePortfolioSummary:
     microtools_exported: int = 0
     offers_created: int = 0
     offers_exported: int = 0
+    checkout_setup_exported: int = 0
     roadmap_exported: int = 0
     dashboard_snapshots_created: int = 0
     prune_decisions_created: int = 0
@@ -46,6 +47,7 @@ def run_revenue_portfolio_once(
     launch_queue_exporter: Any | None = None,
     microtool_exporter: Any | None = None,
     offer_exporter: Any | None = None,
+    checkout_setup_exporter: Any | None = None,
     roadmap_exporter: Any | None = None,
     activation_report: dict | None = None,
     offer_payment_urls: dict[str, str] | None = None,
@@ -203,6 +205,10 @@ def run_revenue_portfolio_once(
     if offer_exporter:
         offers_exported = len(offer_exporter.export(offer_drafts))
 
+    checkout_setup_exported = 0
+    if checkout_setup_exporter:
+        checkout_setup_exported = len(checkout_setup_exporter.export(offer_drafts))
+
     roadmap_exported = 0
     if roadmap_exporter:
         roadmap_exported = len(
@@ -229,6 +235,7 @@ def run_revenue_portfolio_once(
                 "microtools_exported": microtools_exported,
                 "offers_created": len(offer_drafts),
                 "offers_exported": offers_exported,
+                "checkout_setup_exported": checkout_setup_exported,
                 "roadmap_exported": roadmap_exported,
                 "milestones": milestones or DEFAULT_MILESTONES,
                 "phase": phase,
@@ -247,6 +254,7 @@ def run_revenue_portfolio_once(
         microtools_exported=microtools_exported,
         offers_created=len(offer_drafts),
         offers_exported=offers_exported,
+        checkout_setup_exported=checkout_setup_exported,
         roadmap_exported=roadmap_exported,
     )
 

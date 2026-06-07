@@ -42,6 +42,8 @@ class Settings:
     launch_queue_output_dir: str | None = None
     microtool_output_dir: str | None = None
     offer_output_dir: str | None = None
+    checkout_setup_output_dir: str | None = None
+    conversion_webhook_base_url: str | None = None
     roadmap_output_dir: str | None = None
     bundle_output_dir: str | None = None
 
@@ -74,6 +76,8 @@ class Settings:
             launch_queue_output_dir=os.getenv("LAUNCH_QUEUE_OUTPUT_DIR"),
             microtool_output_dir=os.getenv("MICROTOOL_OUTPUT_DIR"),
             offer_output_dir=os.getenv("OFFER_OUTPUT_DIR"),
+            checkout_setup_output_dir=os.getenv("CHECKOUT_SETUP_OUTPUT_DIR"),
+            conversion_webhook_base_url=os.getenv("CONVERSION_WEBHOOK_BASE_URL"),
             roadmap_output_dir=os.getenv("ROADMAP_OUTPUT_DIR"),
             bundle_output_dir=os.getenv("BUNDLE_OUTPUT_DIR"),
         )

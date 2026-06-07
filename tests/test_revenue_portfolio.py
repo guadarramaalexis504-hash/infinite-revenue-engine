@@ -133,6 +133,15 @@ class FakeOfferExporter:
         return ["offers.json", "OFFERS.md"]
 
 
+class FakeCheckoutSetupExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, offers):
+        self.exports.append(offers)
+        return ["checkout_setup.json", "CHECKOUT_SETUP.md"]
+
+
 class FakeRoadmapExporter:
     def __init__(self):
         self.exports = []
@@ -273,6 +282,22 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(summary.offers_exported, 2)
         self.assertEqual(len(offer_exporter.exports), 1)
         self.assertEqual(offer_exporter.exports[0][0].external_id, "kw-portfolio")
+
+    def test_run_revenue_portfolio_once_can_export_checkout_setup(self):
+        checkout_exporter = FakeCheckoutSetupExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            checkout_setup_exporter=checkout_exporter,
+        )
+
+        self.assertEqual(summary.offers_created, 2)
+        self.assertEqual(summary.checkout_setup_exported, 2)
+        self.assertEqual(len(checkout_exporter.exports), 1)
+        self.assertEqual(checkout_exporter.exports[0][0].offer_key, "manual_keywords:kw-portfolio:support")
 
     def test_run_revenue_portfolio_once_can_export_opportunity_roadmap(self):
         roadmap_exporter = FakeRoadmapExporter()

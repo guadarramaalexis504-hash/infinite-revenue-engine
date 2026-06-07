@@ -14,6 +14,7 @@ Current operating target:
 - Launch queue: `LAUNCH_QUEUE_OUTPUT_DIR=out/launch-queue`.
 - Interactive microtools: `MICROTOOL_OUTPUT_DIR=out/microtools`.
 - Offer catalog: `OFFER_OUTPUT_DIR=out/offers`.
+- Checkout setup: `CHECKOUT_SETUP_OUTPUT_DIR=out/checkout-setup`.
 - Opportunity roadmap: `ROADMAP_OUTPUT_DIR=out/roadmap`.
 - Revenue bundle: `BUNDLE_OUTPUT_DIR=out/revenue-bundle`.
 - Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
@@ -82,6 +83,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The offer catalog writes `offers.json` and `OFFERS.md`. It turns selected opportunities into draft support offers, setup services, digital products, or sponsorship-style CTAs with prices. In live Supabase runs, these offers are inserted into `offers`.
 
+Generate checkout setup instructions:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --checkout-setup-output-dir out/checkout-setup --conversion-webhook-base-url https://your-domain.example/webhooks/conversion
+```
+
+This writes `checkout_setup.json` and `CHECKOUT_SETUP.md` with checkout metadata, stable `offer_key` values, provider webhook URLs, and manual conversion fallback commands.
+
 Generate an opportunity roadmap:
 
 ```powershell
@@ -96,7 +105,7 @@ Generate the full revenue bundle:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
+The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
 
 Attach real payment links to generated offers:
 

@@ -60,6 +60,8 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "--offer-payment-urls",
             "offer_key",
             "--conversion-offer-key",
+            "--checkout-setup-output-dir",
+            "CHECKOUT_SETUP.md",
             "intake/index.html",
             "SITE_BASE_URL",
             "sitemap.xml",

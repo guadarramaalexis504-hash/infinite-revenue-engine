@@ -11,6 +11,7 @@ from typing import Any
 
 from .asset_exporter import LocalAssetExporter
 from .automation import collect_activation_report
+from .checkout_setup import CheckoutSetupExporter
 from .config import Settings
 from .conversions import build_manual_conversion_payload
 from .drafts import DraftGenerator
@@ -278,6 +279,22 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         or env_bundle_paths.get("offer_output_dir")
     )
     offer_exporter = OfferCatalogExporter(offer_output_dir) if offer_output_dir else None
+    checkout_setup_output_dir = (
+        args.checkout_setup_output_dir
+        or cli_bundle_paths.get("checkout_setup_output_dir")
+        or settings.checkout_setup_output_dir
+        or env_bundle_paths.get("checkout_setup_output_dir")
+    )
+    conversion_webhook_base_url = args.conversion_webhook_base_url or settings.conversion_webhook_base_url or ""
+    checkout_setup_exporter = (
+        CheckoutSetupExporter(
+            checkout_setup_output_dir,
+            conversion_webhook_base_url=conversion_webhook_base_url,
+            click_redirect_url=click_redirect_url,
+        )
+        if checkout_setup_output_dir
+        else None
+    )
     roadmap_output_dir = (
         args.roadmap_output_dir
         or cli_bundle_paths.get("roadmap_output_dir")
@@ -299,6 +316,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         launch_queue_exporter=launch_queue_exporter,
         microtool_exporter=microtool_exporter,
         offer_exporter=offer_exporter,
+        checkout_setup_exporter=checkout_setup_exporter,
         roadmap_exporter=roadmap_exporter,
         activation_report=activation_report,
         offer_payment_urls=offer_payment_urls,
@@ -370,6 +388,7 @@ def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
         "site_output_dir": site_path.as_posix(),
         "microtool_output_dir": (site_path / "tools").as_posix(),
         "offer_output_dir": (base_path / "offers").as_posix(),
+        "checkout_setup_output_dir": (base_path / "checkout-setup").as_posix(),
         "roadmap_output_dir": (base_path / "roadmap").as_posix(),
         "launch_queue_output_dir": (base_path / "launch-queue").as_posix(),
     }
@@ -437,6 +456,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--offer-payment-urls",
         default=None,
         help="Comma-separated offer_type=url or channel=url checkout links used in generated offer CTAs.",
+    )
+    parser.add_argument(
+        "--checkout-setup-output-dir",
+        default=None,
+        help="Write checkout metadata and webhook setup instructions for generated offers.",
+    )
+    parser.add_argument(
+        "--conversion-webhook-base-url",
+        default=None,
+        help="Public base URL for conversion webhooks, e.g. https://host/webhooks/conversion.",
     )
     parser.add_argument(
         "--roadmap-output-dir",

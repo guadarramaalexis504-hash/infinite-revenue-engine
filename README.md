@@ -184,6 +184,8 @@ Optional environment variables:
 - `LAUNCH_QUEUE_OUTPUT_DIR`, optional launch queue export path such as `out/launch-queue`
 - `MICROTOOL_OUTPUT_DIR`, optional interactive microtool export path such as `out/microtools`
 - `OFFER_OUTPUT_DIR`, optional offer catalog export path such as `out/offers`
+- `CHECKOUT_SETUP_OUTPUT_DIR`, optional checkout setup export path such as `out/checkout-setup`
+- `CONVERSION_WEBHOOK_BASE_URL`, optional public webhook base such as `https://your-domain.example/webhooks/conversion`
 - `ROADMAP_OUTPUT_DIR`, optional ranked opportunity roadmap path such as `out/roadmap`
 - `BUNDLE_OUTPUT_DIR`, optional all-in-one local revenue bundle path such as `out/revenue-bundle`
 
@@ -218,6 +220,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 Supported keys are offer types such as `support`, `setup_service`, `fixed_scope_service`, `digital_product`, and `sponsorship`; channel keys such as `microtool_seo` also work, and `*` is a default fallback. When `CLICK_REDIRECT_URL` is set, generated offer CTAs route through `/click` before the checkout so `click_events` can be recorded.
 
 Every generated offer also has a stable `offer_key` in the form `source:external_id:offer_type`. The site appends it to checkout URLs as `ire_offer_key`, stores it in `click_events.payload.offer_key`, and accepts it back from conversion webhooks through provider metadata such as `offer_key` or `ire_offer_key`. Use this when Stripe, Gumroad, or another provider cannot send the internal Supabase `offers.id`.
+
+Export copy-paste checkout setup instructions:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --checkout-setup-output-dir out/checkout-setup --conversion-webhook-base-url https://your-domain.example/webhooks/conversion
+```
+
+This writes `checkout_setup.json` and `CHECKOUT_SETUP.md` with metadata keys, provider webhook URLs, and manual conversion fallback commands for each generated offer.
 
 ## Click Redirect Handler
 
