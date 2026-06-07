@@ -56,6 +56,7 @@ class Settings:
     sponsor_repo_output_dir: str | None = None
     sponsor_urls: str = ""
     roadmap_output_dir: str | None = None
+    activation_manifest_output_dir: str | None = None
     bundle_output_dir: str | None = None
 
     @classmethod
@@ -101,6 +102,7 @@ class Settings:
             sponsor_repo_output_dir=os.getenv("SPONSOR_REPO_OUTPUT_DIR"),
             sponsor_urls=os.getenv("SPONSOR_URLS", ""),
             roadmap_output_dir=os.getenv("ROADMAP_OUTPUT_DIR"),
+            activation_manifest_output_dir=os.getenv("ACTIVATION_MANIFEST_OUTPUT_DIR"),
             bundle_output_dir=os.getenv("BUNDLE_OUTPUT_DIR"),
         )
 

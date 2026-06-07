@@ -66,13 +66,21 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The opportunity roadmap writes `opportunity_roadmap.json` and `OPPORTUNITY_ROADMAP.md` with activation blockers, channel summary, milestone plan, and all ranked ideas so the engine keeps a long backlog toward 20000 USD.
 
+Generate an activation manifest with exact next files and commands:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --activation-manifest-output-dir out/activation
+```
+
+The activation manifest writes `activation_manifest.json`, `ACTIVATE_NOW.md`, and `RUNBOOK.md`. It links each selected opportunity to local review files, owned pages, checkout setup, tracking deploy docs, offer keys, and dry-run conversion commands.
+
 Generate the full local revenue bundle in one command:
 
 ```powershell
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, digital product packs, service packages, niche reports, affiliate article drafts, sponsor repo kits, the opportunity roadmap, and the launch queue using one standard folder tree.
+The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, digital product packs, service packages, niche reports, affiliate article drafts, sponsor repo kits, the opportunity roadmap, activation manifest, and the launch queue using one standard folder tree.
 
 Record a confirmed sale from any payment path:
 
@@ -198,6 +206,7 @@ Optional environment variables:
 - `SPONSOR_REPO_OUTPUT_DIR`, optional GitHub Sponsors repo kit export path such as `out/sponsor-repos`
 - `SPONSOR_URLS`, optional comma-separated tag=url, github=url, sponsorship=url, or *=url sponsor links
 - `ROADMAP_OUTPUT_DIR`, optional ranked opportunity roadmap path such as `out/roadmap`
+- `ACTIVATION_MANIFEST_OUTPUT_DIR`, optional launch activation manifest path such as `out/activation`
 - `BUNDLE_OUTPUT_DIR`, optional all-in-one local revenue bundle path such as `out/revenue-bundle`
 
 `scripts/configure-github.ps1` sets the required secrets and also sets optional secrets such as `CLICK_REDIRECT_URL`, `CONVERSION_WEBHOOK_TOKEN`, `SERVICE_INTAKE_URL`, and `SITE_BASE_URL` when present and not placeholders. The GitHub Actions workflow uses GitHub's built-in `github.token` for issue discovery rate limits.

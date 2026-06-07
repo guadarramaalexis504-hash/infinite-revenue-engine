@@ -23,6 +23,7 @@ Current operating target:
 - Affiliate articles: `AFFILIATE_ARTICLE_OUTPUT_DIR=out/affiliate-articles`.
 - Sponsor repo kits: `SPONSOR_REPO_OUTPUT_DIR=out/sponsor-repos`.
 - Opportunity roadmap: `ROADMAP_OUTPUT_DIR=out/roadmap`.
+- Activation manifest: `ACTIVATION_MANIFEST_OUTPUT_DIR=out/activation`.
 - Revenue bundle: `BUNDLE_OUTPUT_DIR=out/revenue-bundle`.
 - Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
 - Optional service intake: `SERVICE_INTAKE_URL=https://your-form-or-checkout.example`.
@@ -165,13 +166,21 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The opportunity roadmap writes `opportunity_roadmap.json` and `OPPORTUNITY_ROADMAP.md`. It keeps all ranked ideas, channel summaries, activation blockers, and a milestone plan for `$15`, `$200`, `$1,000`, and `$20,000`, so the backlog stays visible even when only the top few assets are generated in one run.
 
+Generate an activation manifest:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --activation-manifest-output-dir out/activation
+```
+
+The activation manifest writes `activation_manifest.json`, `ACTIVATE_NOW.md`, and `RUNBOOK.md`. It turns the selected portfolio into exact local file paths, offer keys, checkout/payment readiness, blocker list, and dry-run conversion commands so each item has a concrete publish-and-measure path.
+
 Generate the full revenue bundle:
 
 ```powershell
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, digital product packs, service packages, niche reports, affiliate article drafts, sponsor repo kits, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
+The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, digital product packs, service packages, niche reports, affiliate article drafts, sponsor repo kits, opportunity roadmap, activation manifest, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
 
 Attach real payment links to generated offers:
 

@@ -221,6 +221,21 @@ class FakeRoadmapExporter:
         return ["opportunity_roadmap.json", "OPPORTUNITY_ROADMAP.md"]
 
 
+class FakeActivationManifestExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, opportunities_with_assets, *, offers, activation_report):
+        self.exports.append(
+            {
+                "opportunities_with_assets": opportunities_with_assets,
+                "offers": offers,
+                "activation_report": activation_report,
+            }
+        )
+        return ["activation_manifest.json", "ACTIVATE_NOW.md", "RUNBOOK.md"]
+
+
 class RevenuePortfolioTests(unittest.TestCase):
     def test_run_revenue_portfolio_once_scores_generates_assets_and_continues_past_milestones(self):
         supabase = FakeSupabase()
@@ -484,6 +499,27 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(roadmap_exporter.exports[0]["discovered"][0].external_id, "kw-portfolio")
         self.assertEqual(roadmap_exporter.exports[0]["selected"][0].external_id, "kw-portfolio")
         self.assertEqual(roadmap_exporter.exports[0]["activation_report"]["ready"], False)
+
+    def test_run_revenue_portfolio_once_can_export_activation_manifest(self):
+        activation_exporter = FakeActivationManifestExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            activation_manifest_exporter=activation_exporter,
+            activation_report={"ready": False, "next_actions": ["Run gh auth login"]},
+        )
+
+        self.assertEqual(summary.activation_manifest_exported, 3)
+        self.assertEqual(len(activation_exporter.exports), 1)
+        self.assertEqual(
+            activation_exporter.exports[0]["opportunities_with_assets"][0][0].external_id,
+            "kw-portfolio",
+        )
+        self.assertEqual(activation_exporter.exports[0]["offers"][0].offer_key, "manual_keywords:kw-portfolio:support")
+        self.assertEqual(activation_exporter.exports[0]["activation_report"]["next_actions"], ["Run gh auth login"])
 
     def test_summarize_phase_persists_dashboard_snapshot(self):
         supabase = FakeSupabase()

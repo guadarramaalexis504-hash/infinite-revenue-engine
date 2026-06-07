@@ -9,6 +9,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
+from .activation_manifest import ActivationManifestExporter
 from .affiliate_article_exporter import AffiliateArticleExporter
 from .asset_exporter import LocalAssetExporter
 from .automation import collect_activation_report
@@ -417,6 +418,35 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     roadmap_exporter = OpportunityRoadmapExporter(roadmap_output_dir) if roadmap_output_dir else None
     if roadmap_exporter and not activation_report:
         activation_report = collect_activation_report()
+    activation_manifest_output_dir = (
+        args.activation_manifest_output_dir
+        or cli_bundle_paths.get("activation_manifest_output_dir")
+        or settings.activation_manifest_output_dir
+        or env_bundle_paths.get("activation_manifest_output_dir")
+    )
+    artifact_dirs = {
+        "asset_output_dir": asset_output_dir or "",
+        "site_output_dir": site_output_dir or "",
+        "microtool_output_dir": microtool_output_dir or "",
+        "offer_output_dir": offer_output_dir or "",
+        "checkout_setup_output_dir": checkout_setup_output_dir or "",
+        "tracking_deploy_output_dir": tracking_deploy_output_dir or "",
+        "lead_magnet_output_dir": lead_magnet_output_dir or "",
+        "digital_product_output_dir": digital_product_output_dir or "",
+        "service_package_output_dir": service_package_output_dir or "",
+        "niche_report_output_dir": niche_report_output_dir or "",
+        "affiliate_article_output_dir": affiliate_article_output_dir or "",
+        "sponsor_repo_output_dir": sponsor_repo_output_dir or "",
+        "roadmap_output_dir": roadmap_output_dir or "",
+        "launch_queue_output_dir": launch_queue_output_dir or "",
+    }
+    activation_manifest_exporter = (
+        ActivationManifestExporter(activation_manifest_output_dir, artifact_dirs=artifact_dirs)
+        if activation_manifest_output_dir
+        else None
+    )
+    if activation_manifest_exporter and not activation_report:
+        activation_report = collect_activation_report()
     summary = run_revenue_portfolio_once(
         sources=sources,
         supabase=supabase,
@@ -438,6 +468,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         affiliate_article_exporter=affiliate_article_exporter,
         sponsor_repo_exporter=sponsor_repo_exporter,
         roadmap_exporter=roadmap_exporter,
+        activation_manifest_exporter=activation_manifest_exporter,
         activation_report=activation_report,
         offer_payment_urls=offer_payment_urls,
     )
@@ -517,6 +548,7 @@ def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
         "affiliate_article_output_dir": (base_path / "affiliate-articles").as_posix(),
         "sponsor_repo_output_dir": (base_path / "sponsor-repos").as_posix(),
         "roadmap_output_dir": (base_path / "roadmap").as_posix(),
+        "activation_manifest_output_dir": (base_path / "activation").as_posix(),
         "launch_queue_output_dir": (base_path / "launch-queue").as_posix(),
     }
 
@@ -653,6 +685,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--roadmap-output-dir",
         default=None,
         help="Write a ranked opportunity roadmap for all discovered ideas.",
+    )
+    parser.add_argument(
+        "--activation-manifest-output-dir",
+        default=None,
+        help="Write an activation manifest with exact artifact paths and validation commands.",
     )
     parser.add_argument(
         "--bundle-output-dir",

@@ -1,6 +1,7 @@
 """Safe autonomous loop for finding reviewable technical-answer opportunities."""
 
 __all__ = [
+    "activation_manifest",
     "affiliate_article_exporter",
     "asset_exporter",
     "automation",
