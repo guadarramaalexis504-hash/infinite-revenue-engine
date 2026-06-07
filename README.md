@@ -98,13 +98,21 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The launch sprint writes `launch_sprint.json` and `30_DAY_LAUNCH_PLAN.md`. It answers what can run automatically, what still blocks real payments, which owned-channel assets should publish first, and how to keep scaling after `$15` toward `$20,000`.
 
+Generate an allowed traffic plan:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --traffic-plan-output-dir out/traffic-plan
+```
+
+The traffic plan writes `traffic_plan.json` and `TRAFFIC_PLAN.md`. It maps each selected opportunity to owned or explicitly allowed distribution surfaces, including owned SEO pages, owned repos, newsletter/lead magnets, store listings, and service pages. It does not create autoposting or mass outreach.
+
 Generate the full local revenue bundle in one command:
 
 ```powershell
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, digital product packs, service packages, niche reports, affiliate article drafts, sponsor repo kits, the opportunity roadmap, activation manifest, revenue forecast, offer ladder, launch queue, and 30-day launch sprint using one standard folder tree.
+The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, digital product packs, service packages, niche reports, affiliate article drafts, sponsor repo kits, the opportunity roadmap, activation manifest, revenue forecast, offer ladder, launch queue, 30-day launch sprint, and traffic plan using one standard folder tree.
 
 Record a confirmed sale from any payment path:
 
@@ -234,6 +242,7 @@ Optional environment variables:
 - `REVENUE_FORECAST_OUTPUT_DIR`, optional offer-level milestone forecast path such as `out/revenue-forecast`
 - `OFFER_LADDER_OUTPUT_DIR`, optional higher-ticket offer ladder path such as `out/offer-ladder`
 - `LAUNCH_SPRINT_OUTPUT_DIR`, optional 30-day activation and launch plan path such as `out/launch-sprint`
+- `TRAFFIC_PLAN_OUTPUT_DIR`, optional allowed traffic and distribution plan path such as `out/traffic-plan`
 - `BUNDLE_OUTPUT_DIR`, optional all-in-one local revenue bundle path such as `out/revenue-bundle`
 
 `scripts/configure-github.ps1` sets the required secrets and also sets optional activation secrets such as `CLICK_REDIRECT_URL`, `CONVERSION_WEBHOOK_TOKEN`, `SERVICE_INTAKE_URL`, `SITE_BASE_URL`, `OFFER_PAYMENT_URLS`, `CONVERSION_WEBHOOK_BASE_URL`, `TRACKING_PUBLIC_BASE_URL`, `LEAD_CAPTURE_URL`, `AFFILIATE_URLS`, and `SPONSOR_URLS` when present and not placeholders. The GitHub Actions workflow uses GitHub's built-in `github.token` for issue discovery rate limits.

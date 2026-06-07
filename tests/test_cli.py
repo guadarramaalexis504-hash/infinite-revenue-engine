@@ -316,6 +316,20 @@ class CLITests(unittest.TestCase):
 
         self.assertEqual(args.launch_sprint_output_dir, "out/launch-sprint")
 
+    def test_parse_args_supports_traffic_plan_output_dir(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--portfolio-phase",
+                "generate",
+                "--dry-run",
+                "--traffic-plan-output-dir",
+                "out/traffic-plan",
+            ]
+        )
+
+        self.assertEqual(args.traffic_plan_output_dir, "out/traffic-plan")
+
     def test_parse_args_supports_bundle_output_dir(self):
         args = parse_args(
             [
@@ -351,6 +365,7 @@ class CLITests(unittest.TestCase):
         self.assertEqual(paths["offer_ladder_output_dir"], "out/revenue-bundle/offer-ladder")
         self.assertEqual(paths["launch_queue_output_dir"], "out/revenue-bundle/launch-queue")
         self.assertEqual(paths["launch_sprint_output_dir"], "out/revenue-bundle/launch-sprint")
+        self.assertEqual(paths["traffic_plan_output_dir"], "out/revenue-bundle/traffic-plan")
 
     def test_parse_args_supports_manual_conversion_recording(self):
         args = parse_args(

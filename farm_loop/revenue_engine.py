@@ -40,6 +40,7 @@ class RevenuePortfolioSummary:
     revenue_forecast_exported: int = 0
     offer_ladder_exported: int = 0
     launch_sprint_exported: int = 0
+    traffic_plan_exported: int = 0
     dashboard_snapshots_created: int = 0
     prune_decisions_created: int = 0
     experiments_updated: int = 0
@@ -71,8 +72,12 @@ def run_revenue_portfolio_once(
     revenue_forecast_exporter: Any | None = None,
     offer_ladder_exporter: Any | None = None,
     launch_sprint_exporter: Any | None = None,
+    traffic_plan_exporter: Any | None = None,
     activation_report: dict | None = None,
     offer_payment_urls: dict[str, str] | None = None,
+    site_base_url: str = "",
+    click_redirect_url: str = "",
+    lead_capture_url: str = "",
 ) -> RevenuePortfolioSummary:
     if phase == "summarize":
         dashboard_snapshots_created = 0
@@ -309,6 +314,18 @@ def run_revenue_portfolio_once(
             )
         )
 
+    traffic_plan_exported = 0
+    if traffic_plan_exporter:
+        traffic_plan_exported = len(
+            traffic_plan_exporter.export(
+                opportunities=selected,
+                offers=offer_drafts,
+                site_base_url=site_base_url,
+                click_redirect_url=click_redirect_url,
+                lead_capture_url=lead_capture_url,
+            )
+        )
+
     if supabase and not dry_run:
         supabase.insert_event(
             None,
@@ -337,6 +354,7 @@ def run_revenue_portfolio_once(
                 "revenue_forecast_exported": revenue_forecast_exported,
                 "offer_ladder_exported": offer_ladder_exported,
                 "launch_sprint_exported": launch_sprint_exported,
+                "traffic_plan_exported": traffic_plan_exported,
                 "milestones": milestones or DEFAULT_MILESTONES,
                 "phase": phase,
             },
@@ -367,6 +385,7 @@ def run_revenue_portfolio_once(
         revenue_forecast_exported=revenue_forecast_exported,
         offer_ladder_exported=offer_ladder_exported,
         launch_sprint_exported=launch_sprint_exported,
+        traffic_plan_exported=traffic_plan_exported,
     )
 
 

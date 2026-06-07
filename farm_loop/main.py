@@ -38,6 +38,7 @@ from .sources_keywords import KeywordCSVSource
 from .sponsor_repo_exporter import SponsorRepoExporter
 from .static_site_exporter import StaticSiteExporter
 from .tracking_deploy import TrackingDeployExporter
+from .traffic_plan import TrafficPlanExporter
 
 
 LOGGER = logging.getLogger("farm_loop")
@@ -449,6 +450,13 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
             or env_bundle_paths.get("launch_sprint_output_dir")
             or ""
         ),
+        "traffic_plan_output_dir": (
+            args.traffic_plan_output_dir
+            or cli_bundle_paths.get("traffic_plan_output_dir")
+            or settings.traffic_plan_output_dir
+            or env_bundle_paths.get("traffic_plan_output_dir")
+            or ""
+        ),
     }
     activation_manifest_exporter = (
         ActivationManifestExporter(
@@ -496,6 +504,17 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
     )
     if launch_sprint_exporter and not activation_report:
         activation_report = collect_activation_report()
+    traffic_plan_output_dir = (
+        args.traffic_plan_output_dir
+        or cli_bundle_paths.get("traffic_plan_output_dir")
+        or settings.traffic_plan_output_dir
+        or env_bundle_paths.get("traffic_plan_output_dir")
+    )
+    traffic_plan_exporter = (
+        TrafficPlanExporter(traffic_plan_output_dir)
+        if traffic_plan_output_dir
+        else None
+    )
     summary = run_revenue_portfolio_once(
         sources=sources,
         supabase=supabase,
@@ -521,8 +540,12 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         revenue_forecast_exporter=revenue_forecast_exporter,
         offer_ladder_exporter=offer_ladder_exporter,
         launch_sprint_exporter=launch_sprint_exporter,
+        traffic_plan_exporter=traffic_plan_exporter,
         activation_report=activation_report,
         offer_payment_urls=offer_payment_urls,
+        site_base_url=site_base_url,
+        click_redirect_url=click_redirect_url,
+        lead_capture_url=lead_capture_url,
     )
     LOGGER.info("portfolio_summary %s", json.dumps(asdict(summary), sort_keys=True))
     return 0
@@ -605,6 +628,7 @@ def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
         "offer_ladder_output_dir": (base_path / "offer-ladder").as_posix(),
         "launch_queue_output_dir": (base_path / "launch-queue").as_posix(),
         "launch_sprint_output_dir": (base_path / "launch-sprint").as_posix(),
+        "traffic_plan_output_dir": (base_path / "traffic-plan").as_posix(),
     }
 
 
@@ -760,6 +784,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--launch-sprint-output-dir",
         default=None,
         help="Write a 30-day launch plan that turns generated assets into owned-channel revenue tests.",
+    )
+    parser.add_argument(
+        "--traffic-plan-output-dir",
+        default=None,
+        help="Write allowed traffic and distribution plans for generated revenue assets.",
     )
     parser.add_argument(
         "--bundle-output-dir",

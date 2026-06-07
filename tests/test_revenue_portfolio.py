@@ -270,6 +270,23 @@ class FakeLaunchSprintExporter:
         return ["launch_sprint.json", "30_DAY_LAUNCH_PLAN.md"]
 
 
+class FakeTrafficPlanExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, *, opportunities, offers, site_base_url, click_redirect_url, lead_capture_url):
+        self.exports.append(
+            {
+                "opportunities": opportunities,
+                "offers": offers,
+                "site_base_url": site_base_url,
+                "click_redirect_url": click_redirect_url,
+                "lead_capture_url": lead_capture_url,
+            }
+        )
+        return ["traffic_plan.json", "TRAFFIC_PLAN.md"]
+
+
 class RevenuePortfolioTests(unittest.TestCase):
     def test_run_revenue_portfolio_once_scores_generates_assets_and_continues_past_milestones(self):
         supabase = FakeSupabase()
@@ -607,6 +624,25 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(sprint_exporter.exports[0]["opportunities"][0].external_id, "kw-portfolio")
         self.assertEqual(sprint_exporter.exports[0]["milestones"], [15, 200, 1000, 20000])
         self.assertEqual(sprint_exporter.exports[0]["activation_report"]["ready"], False)
+
+    def test_run_revenue_portfolio_once_can_export_traffic_plan(self):
+        traffic_exporter = FakeTrafficPlanExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            dry_run=True,
+            max_opportunities=3,
+            traffic_plan_exporter=traffic_exporter,
+            site_base_url="https://revenue.example",
+            click_redirect_url="https://track.example/click",
+            lead_capture_url="https://forms.example/signup",
+        )
+
+        self.assertEqual(summary.traffic_plan_exported, 2)
+        self.assertEqual(len(traffic_exporter.exports), 1)
+        self.assertEqual(traffic_exporter.exports[0]["opportunities"][0].external_id, "kw-portfolio")
+        self.assertEqual(traffic_exporter.exports[0]["site_base_url"], "https://revenue.example")
 
     def test_summarize_phase_persists_dashboard_snapshot(self):
         supabase = FakeSupabase()
