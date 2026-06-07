@@ -60,10 +60,21 @@ EMPTY=
             ],
         )
 
-    def test_optional_github_secret_names_include_click_redirect(self):
+    def test_optional_github_secret_names_include_revenue_activation_values(self):
         self.assertEqual(
             optional_github_secret_names(),
-            ["CLICK_REDIRECT_URL", "CONVERSION_WEBHOOK_TOKEN", "SERVICE_INTAKE_URL", "SITE_BASE_URL", "OFFER_PAYMENT_URLS"],
+            [
+                "CLICK_REDIRECT_URL",
+                "CONVERSION_WEBHOOK_TOKEN",
+                "SERVICE_INTAKE_URL",
+                "SITE_BASE_URL",
+                "OFFER_PAYMENT_URLS",
+                "CONVERSION_WEBHOOK_BASE_URL",
+                "TRACKING_PUBLIC_BASE_URL",
+                "LEAD_CAPTURE_URL",
+                "AFFILIATE_URLS",
+                "SPONSOR_URLS",
+            ],
         )
 
     def test_placeholder_vars_detects_example_values(self):
@@ -104,6 +115,11 @@ EMPTY=
         self.assertIn('"SERVICE_INTAKE_URL"', script)
         self.assertIn('"SITE_BASE_URL"', script)
         self.assertIn('"OFFER_PAYMENT_URLS"', script)
+        self.assertIn('"CONVERSION_WEBHOOK_BASE_URL"', script)
+        self.assertIn('"TRACKING_PUBLIC_BASE_URL"', script)
+        self.assertIn('"LEAD_CAPTURE_URL"', script)
+        self.assertIn('"AFFILIATE_URLS"', script)
+        self.assertIn('"SPONSOR_URLS"', script)
         self.assertIn("gh auth status", script)
         self.assertIn("No git remote found", script)
 
@@ -174,6 +190,9 @@ EMPTY=
         workflow = Path(".github/workflows/farm-loop.yml").read_text(encoding="utf-8")
 
         self.assertIn('IDEA_CATALOG_PATH: "data/revenue_ideas.json"', workflow)
+        self.assertIn("OFFER_PAYMENT_URLS: ${{ secrets.OFFER_PAYMENT_URLS }}", workflow)
+        self.assertIn("AFFILIATE_URLS: ${{ secrets.AFFILIATE_URLS }}", workflow)
+        self.assertIn("SPONSOR_URLS: ${{ secrets.SPONSOR_URLS }}", workflow)
 
     def test_pages_workflow_deploys_owned_static_site_with_official_actions(self):
         workflow = Path(".github/workflows/pages-site.yml").read_text(encoding="utf-8")

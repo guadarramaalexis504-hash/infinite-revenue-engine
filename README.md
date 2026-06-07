@@ -209,7 +209,7 @@ Optional environment variables:
 - `ACTIVATION_MANIFEST_OUTPUT_DIR`, optional launch activation manifest path such as `out/activation`
 - `BUNDLE_OUTPUT_DIR`, optional all-in-one local revenue bundle path such as `out/revenue-bundle`
 
-`scripts/configure-github.ps1` sets the required secrets and also sets optional secrets such as `CLICK_REDIRECT_URL`, `CONVERSION_WEBHOOK_TOKEN`, `SERVICE_INTAKE_URL`, and `SITE_BASE_URL` when present and not placeholders. The GitHub Actions workflow uses GitHub's built-in `github.token` for issue discovery rate limits.
+`scripts/configure-github.ps1` sets the required secrets and also sets optional activation secrets such as `CLICK_REDIRECT_URL`, `CONVERSION_WEBHOOK_TOKEN`, `SERVICE_INTAKE_URL`, `SITE_BASE_URL`, `OFFER_PAYMENT_URLS`, `CONVERSION_WEBHOOK_BASE_URL`, `TRACKING_PUBLIC_BASE_URL`, `LEAD_CAPTURE_URL`, `AFFILIATE_URLS`, and `SPONSOR_URLS` when present and not placeholders. The GitHub Actions workflow uses GitHub's built-in `github.token` for issue discovery rate limits.
 
 ## Tracking HTTP App
 
