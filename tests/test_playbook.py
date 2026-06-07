@@ -62,6 +62,8 @@ class RevenueLoopPlaybookTests(unittest.TestCase):
             "--conversion-offer-key",
             "--checkout-setup-output-dir",
             "CHECKOUT_SETUP.md",
+            "--tracking-deploy-output-dir",
+            "DEPLOY_TRACKING_APP.md",
             "intake/index.html",
             "SITE_BASE_URL",
             "sitemap.xml",

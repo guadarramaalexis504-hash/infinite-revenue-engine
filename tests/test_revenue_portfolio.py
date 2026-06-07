@@ -142,6 +142,15 @@ class FakeCheckoutSetupExporter:
         return ["checkout_setup.json", "CHECKOUT_SETUP.md"]
 
 
+class FakeTrackingDeployExporter:
+    def __init__(self):
+        self.exports = 0
+
+    def export(self):
+        self.exports += 1
+        return ["Dockerfile", ".env.tracking.example", "tracking_deploy.json", "DEPLOY_TRACKING_APP.md"]
+
+
 class FakeRoadmapExporter:
     def __init__(self):
         self.exports = []
@@ -298,6 +307,20 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(summary.checkout_setup_exported, 2)
         self.assertEqual(len(checkout_exporter.exports), 1)
         self.assertEqual(checkout_exporter.exports[0][0].offer_key, "manual_keywords:kw-portfolio:support")
+
+    def test_run_revenue_portfolio_once_can_export_tracking_deploy_bundle(self):
+        tracking_exporter = FakeTrackingDeployExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            max_opportunities=3,
+            dry_run=True,
+            tracking_deploy_exporter=tracking_exporter,
+        )
+
+        self.assertEqual(summary.tracking_deploy_exported, 4)
+        self.assertEqual(tracking_exporter.exports, 1)
 
     def test_run_revenue_portfolio_once_can_export_opportunity_roadmap(self):
         roadmap_exporter = FakeRoadmapExporter()

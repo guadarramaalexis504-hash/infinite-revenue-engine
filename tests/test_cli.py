@@ -157,6 +157,20 @@ class CLITests(unittest.TestCase):
         self.assertEqual(args.checkout_setup_output_dir, "out/checkout-setup")
         self.assertEqual(args.conversion_webhook_base_url, "https://revenue.example/webhooks/conversion")
 
+    def test_parse_args_supports_tracking_deploy_output_dir_and_public_base_url(self):
+        args = parse_args(
+            [
+                "--portfolio-once",
+                "--tracking-deploy-output-dir",
+                "out/tracking-deploy",
+                "--tracking-public-base-url",
+                "https://revenue.example",
+            ]
+        )
+
+        self.assertEqual(args.tracking_deploy_output_dir, "out/tracking-deploy")
+        self.assertEqual(args.tracking_public_base_url, "https://revenue.example")
+
     def test_parse_args_supports_roadmap_output_dir(self):
         args = parse_args(
             [
@@ -193,6 +207,7 @@ class CLITests(unittest.TestCase):
         self.assertEqual(paths["microtool_output_dir"], "out/revenue-bundle/site/tools")
         self.assertEqual(paths["offer_output_dir"], "out/revenue-bundle/offers")
         self.assertEqual(paths["checkout_setup_output_dir"], "out/revenue-bundle/checkout-setup")
+        self.assertEqual(paths["tracking_deploy_output_dir"], "out/revenue-bundle/tracking-deploy")
         self.assertEqual(paths["roadmap_output_dir"], "out/revenue-bundle/roadmap")
         self.assertEqual(paths["launch_queue_output_dir"], "out/revenue-bundle/launch-queue")
 

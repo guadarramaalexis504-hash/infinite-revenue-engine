@@ -27,6 +27,7 @@ from .sources_github import GitHubIssuesClient
 from .sources_idea_catalog import IdeaCatalogSource
 from .sources_keywords import KeywordCSVSource
 from .static_site_exporter import StaticSiteExporter
+from .tracking_deploy import TrackingDeployExporter
 
 
 LOGGER = logging.getLogger("farm_loop")
@@ -295,6 +296,18 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         if checkout_setup_output_dir
         else None
     )
+    tracking_deploy_output_dir = (
+        args.tracking_deploy_output_dir
+        or cli_bundle_paths.get("tracking_deploy_output_dir")
+        or settings.tracking_deploy_output_dir
+        or env_bundle_paths.get("tracking_deploy_output_dir")
+    )
+    tracking_public_base_url = args.tracking_public_base_url or settings.tracking_public_base_url or ""
+    tracking_deploy_exporter = (
+        TrackingDeployExporter(tracking_deploy_output_dir, public_base_url=tracking_public_base_url)
+        if tracking_deploy_output_dir
+        else None
+    )
     roadmap_output_dir = (
         args.roadmap_output_dir
         or cli_bundle_paths.get("roadmap_output_dir")
@@ -317,6 +330,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         microtool_exporter=microtool_exporter,
         offer_exporter=offer_exporter,
         checkout_setup_exporter=checkout_setup_exporter,
+        tracking_deploy_exporter=tracking_deploy_exporter,
         roadmap_exporter=roadmap_exporter,
         activation_report=activation_report,
         offer_payment_urls=offer_payment_urls,
@@ -389,6 +403,7 @@ def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
         "microtool_output_dir": (site_path / "tools").as_posix(),
         "offer_output_dir": (base_path / "offers").as_posix(),
         "checkout_setup_output_dir": (base_path / "checkout-setup").as_posix(),
+        "tracking_deploy_output_dir": (base_path / "tracking-deploy").as_posix(),
         "roadmap_output_dir": (base_path / "roadmap").as_posix(),
         "launch_queue_output_dir": (base_path / "launch-queue").as_posix(),
     }
@@ -466,6 +481,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--conversion-webhook-base-url",
         default=None,
         help="Public base URL for conversion webhooks, e.g. https://host/webhooks/conversion.",
+    )
+    parser.add_argument(
+        "--tracking-deploy-output-dir",
+        default=None,
+        help="Write Docker-based deployment files for the server-side tracking/webhook app.",
+    )
+    parser.add_argument(
+        "--tracking-public-base-url",
+        default=None,
+        help="Public HTTPS base URL for the deployed tracking app, e.g. https://track.example.com.",
     )
     parser.add_argument(
         "--roadmap-output-dir",

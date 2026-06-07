@@ -44,6 +44,8 @@ class Settings:
     offer_output_dir: str | None = None
     checkout_setup_output_dir: str | None = None
     conversion_webhook_base_url: str | None = None
+    tracking_deploy_output_dir: str | None = None
+    tracking_public_base_url: str | None = None
     roadmap_output_dir: str | None = None
     bundle_output_dir: str | None = None
 
@@ -78,6 +80,8 @@ class Settings:
             offer_output_dir=os.getenv("OFFER_OUTPUT_DIR"),
             checkout_setup_output_dir=os.getenv("CHECKOUT_SETUP_OUTPUT_DIR"),
             conversion_webhook_base_url=os.getenv("CONVERSION_WEBHOOK_BASE_URL"),
+            tracking_deploy_output_dir=os.getenv("TRACKING_DEPLOY_OUTPUT_DIR"),
+            tracking_public_base_url=os.getenv("TRACKING_PUBLIC_BASE_URL"),
             roadmap_output_dir=os.getenv("ROADMAP_OUTPUT_DIR"),
             bundle_output_dir=os.getenv("BUNDLE_OUTPUT_DIR"),
         )

@@ -25,6 +25,7 @@ __all__ = [
     "static_site_exporter",
     "supabase_client",
     "tracking",
+    "tracking_deploy",
     "webhook_handler",
     "webhooks",
 ]

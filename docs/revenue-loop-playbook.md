@@ -15,6 +15,7 @@ Current operating target:
 - Interactive microtools: `MICROTOOL_OUTPUT_DIR=out/microtools`.
 - Offer catalog: `OFFER_OUTPUT_DIR=out/offers`.
 - Checkout setup: `CHECKOUT_SETUP_OUTPUT_DIR=out/checkout-setup`.
+- Tracking deploy bundle: `TRACKING_DEPLOY_OUTPUT_DIR=out/tracking-deploy`.
 - Opportunity roadmap: `ROADMAP_OUTPUT_DIR=out/roadmap`.
 - Revenue bundle: `BUNDLE_OUTPUT_DIR=out/revenue-bundle`.
 - Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
@@ -91,6 +92,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 This writes `checkout_setup.json` and `CHECKOUT_SETUP.md` with checkout metadata, stable `offer_key` values, provider webhook URLs, and manual conversion fallback commands.
 
+Generate a tracking app deploy bundle:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --tracking-deploy-output-dir out/tracking-deploy --tracking-public-base-url https://track.your-domain.example
+```
+
+This writes `Dockerfile`, `.env.tracking.example`, `tracking_deploy.json`, and `DEPLOY_TRACKING_APP.md` for the server-side click redirect and conversion webhook app. Deploy it behind HTTPS, then set `CLICK_REDIRECT_URL=https://track.your-domain.example/click` and `CONVERSION_WEBHOOK_BASE_URL=https://track.your-domain.example/webhooks/conversion`.
+
 Generate an opportunity roadmap:
 
 ```powershell
@@ -105,7 +114,7 @@ Generate the full revenue bundle:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
+The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
 
 Attach real payment links to generated offers:
 

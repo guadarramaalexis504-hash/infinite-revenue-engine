@@ -72,7 +72,7 @@ Generate the full local revenue bundle in one command:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, the opportunity roadmap, and the launch queue using one standard folder tree.
+The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, the opportunity roadmap, and the launch queue using one standard folder tree.
 
 Record a confirmed sale from any payment path:
 
@@ -186,6 +186,8 @@ Optional environment variables:
 - `OFFER_OUTPUT_DIR`, optional offer catalog export path such as `out/offers`
 - `CHECKOUT_SETUP_OUTPUT_DIR`, optional checkout setup export path such as `out/checkout-setup`
 - `CONVERSION_WEBHOOK_BASE_URL`, optional public webhook base such as `https://your-domain.example/webhooks/conversion`
+- `TRACKING_DEPLOY_OUTPUT_DIR`, optional server-side tracking app deploy bundle path such as `out/tracking-deploy`
+- `TRACKING_PUBLIC_BASE_URL`, optional public tracking app base URL such as `https://track.your-domain.example`
 - `ROADMAP_OUTPUT_DIR`, optional ranked opportunity roadmap path such as `out/roadmap`
 - `BUNDLE_OUTPUT_DIR`, optional all-in-one local revenue bundle path such as `out/revenue-bundle`
 
@@ -228,6 +230,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 ```
 
 This writes `checkout_setup.json` and `CHECKOUT_SETUP.md` with metadata keys, provider webhook URLs, and manual conversion fallback commands for each generated offer.
+
+Generate a deployable tracking app bundle:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --tracking-deploy-output-dir out/tracking-deploy --tracking-public-base-url https://track.your-domain.example
+```
+
+This writes `Dockerfile`, `.env.tracking.example`, `tracking_deploy.json`, and `DEPLOY_TRACKING_APP.md` for the server-side click and conversion webhook app. Host it behind HTTPS, then set `CLICK_REDIRECT_URL` and `CONVERSION_WEBHOOK_BASE_URL` to its public endpoints before regenerating the site/offers.
 
 ## Click Redirect Handler
 
