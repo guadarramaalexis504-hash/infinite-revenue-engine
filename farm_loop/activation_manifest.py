@@ -120,6 +120,7 @@ def _local_paths(opportunity: RevenueOpportunity, artifact_dirs: dict[str, str |
         "launch_queue": _join(artifact_dirs.get("launch_queue_output_dir"), "LAUNCH_QUEUE.md"),
         "launch_sprint": _join(artifact_dirs.get("launch_sprint_output_dir"), "30_DAY_LAUNCH_PLAN.md"),
         "traffic_plan": _join(artifact_dirs.get("traffic_plan_output_dir"), "TRAFFIC_PLAN.md"),
+        "all_ideas": _join(artifact_dirs.get("all_ideas_output_dir"), "ALL_REVENUE_IDEAS.md"),
         "roadmap": _join(artifact_dirs.get("roadmap_output_dir"), "OPPORTUNITY_ROADMAP.md"),
     }
     if opportunity.channel == "microtool_seo":

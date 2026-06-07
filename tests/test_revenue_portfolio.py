@@ -287,6 +287,21 @@ class FakeTrafficPlanExporter:
         return ["traffic_plan.json", "TRAFFIC_PLAN.md"]
 
 
+class FakeAllIdeasCatalogExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, *, ideas, selected_external_ids, milestones):
+        self.exports.append(
+            {
+                "ideas": ideas,
+                "selected_external_ids": selected_external_ids,
+                "milestones": milestones,
+            }
+        )
+        return ["all_revenue_ideas.json", "ALL_REVENUE_IDEAS.md"]
+
+
 class RevenuePortfolioTests(unittest.TestCase):
     def test_run_revenue_portfolio_once_scores_generates_assets_and_continues_past_milestones(self):
         supabase = FakeSupabase()
@@ -643,6 +658,24 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(len(traffic_exporter.exports), 1)
         self.assertEqual(traffic_exporter.exports[0]["opportunities"][0].external_id, "kw-portfolio")
         self.assertEqual(traffic_exporter.exports[0]["site_base_url"], "https://revenue.example")
+
+    def test_run_revenue_portfolio_once_can_export_all_ideas_catalog(self):
+        all_ideas_exporter = FakeAllIdeasCatalogExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            dry_run=True,
+            max_opportunities=3,
+            milestones=[15, 200, 1000, 20000],
+            all_ideas_exporter=all_ideas_exporter,
+        )
+
+        self.assertEqual(summary.all_ideas_exported, 2)
+        self.assertEqual(len(all_ideas_exporter.exports), 1)
+        self.assertEqual(all_ideas_exporter.exports[0]["ideas"][0].external_id, "kw-portfolio")
+        self.assertEqual(all_ideas_exporter.exports[0]["selected_external_ids"], {"kw-portfolio"})
+        self.assertEqual(all_ideas_exporter.exports[0]["milestones"], [15, 200, 1000, 20000])
 
     def test_summarize_phase_persists_dashboard_snapshot(self):
         supabase = FakeSupabase()

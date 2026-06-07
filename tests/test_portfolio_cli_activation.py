@@ -79,6 +79,7 @@ class PortfolioCLIActivationTests(unittest.TestCase):
             offer_ladder_output_dir="env/offer-ladder",
             launch_sprint_output_dir="env/launch-sprint",
             traffic_plan_output_dir="env/traffic-plan",
+            all_ideas_output_dir="env/all-ideas",
         )
         args = parse_args(
             [
@@ -127,6 +128,7 @@ class PortfolioCLIActivationTests(unittest.TestCase):
         self.assertEqual(kwargs["launch_queue_exporter"].output_dir, Path("out/revenue-bundle/launch-queue"))
         self.assertEqual(kwargs["launch_sprint_exporter"].output_dir, Path("out/revenue-bundle/launch-sprint"))
         self.assertEqual(kwargs["traffic_plan_exporter"].output_dir, Path("out/revenue-bundle/traffic-plan"))
+        self.assertEqual(kwargs["all_ideas_exporter"].output_dir, Path("out/revenue-bundle/all-ideas"))
         self.assertEqual(kwargs["activation_report"], report)
 
 

@@ -61,6 +61,7 @@ class Settings:
     offer_ladder_output_dir: str | None = None
     launch_sprint_output_dir: str | None = None
     traffic_plan_output_dir: str | None = None
+    all_ideas_output_dir: str | None = None
     bundle_output_dir: str | None = None
 
     @classmethod
@@ -111,6 +112,7 @@ class Settings:
             offer_ladder_output_dir=os.getenv("OFFER_LADDER_OUTPUT_DIR"),
             launch_sprint_output_dir=os.getenv("LAUNCH_SPRINT_OUTPUT_DIR"),
             traffic_plan_output_dir=os.getenv("TRAFFIC_PLAN_OUTPUT_DIR"),
+            all_ideas_output_dir=os.getenv("ALL_IDEAS_OUTPUT_DIR"),
             bundle_output_dir=os.getenv("BUNDLE_OUTPUT_DIR"),
         )
 

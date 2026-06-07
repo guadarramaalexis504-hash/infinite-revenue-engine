@@ -41,6 +41,7 @@ class RevenuePortfolioSummary:
     offer_ladder_exported: int = 0
     launch_sprint_exported: int = 0
     traffic_plan_exported: int = 0
+    all_ideas_exported: int = 0
     dashboard_snapshots_created: int = 0
     prune_decisions_created: int = 0
     experiments_updated: int = 0
@@ -73,6 +74,7 @@ def run_revenue_portfolio_once(
     offer_ladder_exporter: Any | None = None,
     launch_sprint_exporter: Any | None = None,
     traffic_plan_exporter: Any | None = None,
+    all_ideas_exporter: Any | None = None,
     activation_report: dict | None = None,
     offer_payment_urls: dict[str, str] | None = None,
     site_base_url: str = "",
@@ -326,6 +328,16 @@ def run_revenue_portfolio_once(
             )
         )
 
+    all_ideas_exported = 0
+    if all_ideas_exporter:
+        all_ideas_exported = len(
+            all_ideas_exporter.export(
+                ideas=discovered,
+                selected_external_ids={opportunity.external_id for opportunity in selected},
+                milestones=milestones or DEFAULT_MILESTONES,
+            )
+        )
+
     if supabase and not dry_run:
         supabase.insert_event(
             None,
@@ -355,6 +367,7 @@ def run_revenue_portfolio_once(
                 "offer_ladder_exported": offer_ladder_exported,
                 "launch_sprint_exported": launch_sprint_exported,
                 "traffic_plan_exported": traffic_plan_exported,
+                "all_ideas_exported": all_ideas_exported,
                 "milestones": milestones or DEFAULT_MILESTONES,
                 "phase": phase,
             },
@@ -386,6 +399,7 @@ def run_revenue_portfolio_once(
         offer_ladder_exported=offer_ladder_exported,
         launch_sprint_exported=launch_sprint_exported,
         traffic_plan_exported=traffic_plan_exported,
+        all_ideas_exported=all_ideas_exported,
     )
 
 

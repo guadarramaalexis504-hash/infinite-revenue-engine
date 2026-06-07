@@ -11,6 +11,7 @@ from typing import Any
 
 from .activation_manifest import ActivationManifestExporter
 from .affiliate_article_exporter import AffiliateArticleExporter
+from .all_ideas_catalog import AllIdeasCatalogExporter
 from .asset_exporter import LocalAssetExporter
 from .automation import collect_activation_report
 from .checkout_setup import CheckoutSetupExporter
@@ -457,6 +458,13 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
             or env_bundle_paths.get("traffic_plan_output_dir")
             or ""
         ),
+        "all_ideas_output_dir": (
+            args.all_ideas_output_dir
+            or cli_bundle_paths.get("all_ideas_output_dir")
+            or settings.all_ideas_output_dir
+            or env_bundle_paths.get("all_ideas_output_dir")
+            or ""
+        ),
     }
     activation_manifest_exporter = (
         ActivationManifestExporter(
@@ -515,6 +523,17 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         if traffic_plan_output_dir
         else None
     )
+    all_ideas_output_dir = (
+        args.all_ideas_output_dir
+        or cli_bundle_paths.get("all_ideas_output_dir")
+        or settings.all_ideas_output_dir
+        or env_bundle_paths.get("all_ideas_output_dir")
+    )
+    all_ideas_exporter = (
+        AllIdeasCatalogExporter(all_ideas_output_dir)
+        if all_ideas_output_dir
+        else None
+    )
     summary = run_revenue_portfolio_once(
         sources=sources,
         supabase=supabase,
@@ -541,6 +560,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         offer_ladder_exporter=offer_ladder_exporter,
         launch_sprint_exporter=launch_sprint_exporter,
         traffic_plan_exporter=traffic_plan_exporter,
+        all_ideas_exporter=all_ideas_exporter,
         activation_report=activation_report,
         offer_payment_urls=offer_payment_urls,
         site_base_url=site_base_url,
@@ -629,6 +649,7 @@ def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
         "launch_queue_output_dir": (base_path / "launch-queue").as_posix(),
         "launch_sprint_output_dir": (base_path / "launch-sprint").as_posix(),
         "traffic_plan_output_dir": (base_path / "traffic-plan").as_posix(),
+        "all_ideas_output_dir": (base_path / "all-ideas").as_posix(),
     }
 
 
@@ -789,6 +810,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--traffic-plan-output-dir",
         default=None,
         help="Write allowed traffic and distribution plans for generated revenue assets.",
+    )
+    parser.add_argument(
+        "--all-ideas-output-dir",
+        default=None,
+        help="Write a complete ranked catalog of all discovered revenue ideas.",
     )
     parser.add_argument(
         "--bundle-output-dir",
