@@ -39,6 +39,7 @@ class RevenuePortfolioSummary:
     activation_manifest_exported: int = 0
     revenue_forecast_exported: int = 0
     offer_ladder_exported: int = 0
+    launch_sprint_exported: int = 0
     dashboard_snapshots_created: int = 0
     prune_decisions_created: int = 0
     experiments_updated: int = 0
@@ -69,6 +70,7 @@ def run_revenue_portfolio_once(
     activation_manifest_exporter: Any | None = None,
     revenue_forecast_exporter: Any | None = None,
     offer_ladder_exporter: Any | None = None,
+    launch_sprint_exporter: Any | None = None,
     activation_report: dict | None = None,
     offer_payment_urls: dict[str, str] | None = None,
 ) -> RevenuePortfolioSummary:
@@ -296,6 +298,17 @@ def run_revenue_portfolio_once(
             )
         )
 
+    launch_sprint_exported = 0
+    if launch_sprint_exporter:
+        launch_sprint_exported = len(
+            launch_sprint_exporter.export(
+                opportunities=selected,
+                offers=offer_drafts,
+                milestones=milestones or DEFAULT_MILESTONES,
+                activation_report=activation_report,
+            )
+        )
+
     if supabase and not dry_run:
         supabase.insert_event(
             None,
@@ -323,6 +336,7 @@ def run_revenue_portfolio_once(
                 "activation_manifest_exported": activation_manifest_exported,
                 "revenue_forecast_exported": revenue_forecast_exported,
                 "offer_ladder_exported": offer_ladder_exported,
+                "launch_sprint_exported": launch_sprint_exported,
                 "milestones": milestones or DEFAULT_MILESTONES,
                 "phase": phase,
             },
@@ -352,6 +366,7 @@ def run_revenue_portfolio_once(
         activation_manifest_exported=activation_manifest_exported,
         revenue_forecast_exported=revenue_forecast_exported,
         offer_ladder_exported=offer_ladder_exported,
+        launch_sprint_exported=launch_sprint_exported,
     )
 
 

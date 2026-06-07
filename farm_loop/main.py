@@ -19,6 +19,7 @@ from .conversions import build_manual_conversion_payload
 from .digital_product_exporter import DigitalProductExporter
 from .drafts import DraftGenerator
 from .launch_queue import LaunchQueueExporter
+from .launch_sprint import LaunchSprintExporter
 from .lead_magnet_exporter import LeadMagnetExporter
 from .microtool_exporter import MicrotoolExporter
 from .niche_report_exporter import NicheReportExporter
@@ -441,6 +442,13 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         "sponsor_repo_output_dir": sponsor_repo_output_dir or "",
         "roadmap_output_dir": roadmap_output_dir or "",
         "launch_queue_output_dir": launch_queue_output_dir or "",
+        "launch_sprint_output_dir": (
+            args.launch_sprint_output_dir
+            or cli_bundle_paths.get("launch_sprint_output_dir")
+            or settings.launch_sprint_output_dir
+            or env_bundle_paths.get("launch_sprint_output_dir")
+            or ""
+        ),
     }
     activation_manifest_exporter = (
         ActivationManifestExporter(
@@ -475,6 +483,19 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         if offer_ladder_output_dir
         else None
     )
+    launch_sprint_output_dir = (
+        args.launch_sprint_output_dir
+        or cli_bundle_paths.get("launch_sprint_output_dir")
+        or settings.launch_sprint_output_dir
+        or env_bundle_paths.get("launch_sprint_output_dir")
+    )
+    launch_sprint_exporter = (
+        LaunchSprintExporter(launch_sprint_output_dir)
+        if launch_sprint_output_dir
+        else None
+    )
+    if launch_sprint_exporter and not activation_report:
+        activation_report = collect_activation_report()
     summary = run_revenue_portfolio_once(
         sources=sources,
         supabase=supabase,
@@ -499,6 +520,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         activation_manifest_exporter=activation_manifest_exporter,
         revenue_forecast_exporter=revenue_forecast_exporter,
         offer_ladder_exporter=offer_ladder_exporter,
+        launch_sprint_exporter=launch_sprint_exporter,
         activation_report=activation_report,
         offer_payment_urls=offer_payment_urls,
     )
@@ -582,6 +604,7 @@ def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
         "revenue_forecast_output_dir": (base_path / "revenue-forecast").as_posix(),
         "offer_ladder_output_dir": (base_path / "offer-ladder").as_posix(),
         "launch_queue_output_dir": (base_path / "launch-queue").as_posix(),
+        "launch_sprint_output_dir": (base_path / "launch-sprint").as_posix(),
     }
 
 
@@ -732,6 +755,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--offer-ladder-output-dir",
         default=None,
         help="Write higher-ticket offer ladder paths for each revenue milestone.",
+    )
+    parser.add_argument(
+        "--launch-sprint-output-dir",
+        default=None,
+        help="Write a 30-day launch plan that turns generated assets into owned-channel revenue tests.",
     )
     parser.add_argument(
         "--bundle-output-dir",

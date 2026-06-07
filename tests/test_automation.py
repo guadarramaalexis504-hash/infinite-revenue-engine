@@ -237,6 +237,7 @@ EMPTY=
         self.assertIn("SPONSOR_URLS=", env_example)
         self.assertIn("ROADMAP_OUTPUT_DIR=out/roadmap", env_example)
         self.assertIn("ACTIVATION_MANIFEST_OUTPUT_DIR=out/activation", env_example)
+        self.assertIn("LAUNCH_SPRINT_OUTPUT_DIR=out/launch-sprint", env_example)
         self.assertIn("BUNDLE_OUTPUT_DIR=out/revenue-bundle", env_example)
         self.assertIn("CLICK_ALLOWED_HOSTS=buymeacoffee.com,www.buymeacoffee.com", env_example)
         self.assertIn("CONVERSION_WEBHOOK_TOKEN=", env_example)

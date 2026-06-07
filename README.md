@@ -90,13 +90,21 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 The offer ladder writes `offer_ladder.json` and `OFFER_LADDER.md`. It turns one opportunity into support, starter setup, fixed-scope service, and premium sprint tiers, so the system can prioritize paths where `$20,000` means tens of sales instead of thousands of tips.
 
+Generate a 30-day launch sprint:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --launch-sprint-output-dir out/launch-sprint
+```
+
+The launch sprint writes `launch_sprint.json` and `30_DAY_LAUNCH_PLAN.md`. It answers what can run automatically, what still blocks real payments, which owned-channel assets should publish first, and how to keep scaling after `$15` toward `$20,000`.
+
 Generate the full local revenue bundle in one command:
 
 ```powershell
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, digital product packs, service packages, niche reports, affiliate article drafts, sponsor repo kits, the opportunity roadmap, activation manifest, revenue forecast, offer ladder, and the launch queue using one standard folder tree.
+The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, digital product packs, service packages, niche reports, affiliate article drafts, sponsor repo kits, the opportunity roadmap, activation manifest, revenue forecast, offer ladder, launch queue, and 30-day launch sprint using one standard folder tree.
 
 Record a confirmed sale from any payment path:
 
@@ -225,6 +233,7 @@ Optional environment variables:
 - `ACTIVATION_MANIFEST_OUTPUT_DIR`, optional launch activation manifest path such as `out/activation`
 - `REVENUE_FORECAST_OUTPUT_DIR`, optional offer-level milestone forecast path such as `out/revenue-forecast`
 - `OFFER_LADDER_OUTPUT_DIR`, optional higher-ticket offer ladder path such as `out/offer-ladder`
+- `LAUNCH_SPRINT_OUTPUT_DIR`, optional 30-day activation and launch plan path such as `out/launch-sprint`
 - `BUNDLE_OUTPUT_DIR`, optional all-in-one local revenue bundle path such as `out/revenue-bundle`
 
 `scripts/configure-github.ps1` sets the required secrets and also sets optional activation secrets such as `CLICK_REDIRECT_URL`, `CONVERSION_WEBHOOK_TOKEN`, `SERVICE_INTAKE_URL`, `SITE_BASE_URL`, `OFFER_PAYMENT_URLS`, `CONVERSION_WEBHOOK_BASE_URL`, `TRACKING_PUBLIC_BASE_URL`, `LEAD_CAPTURE_URL`, `AFFILIATE_URLS`, and `SPONSOR_URLS` when present and not placeholders. The GitHub Actions workflow uses GitHub's built-in `github.token` for issue discovery rate limits.

@@ -254,6 +254,22 @@ class FakeOfferLadderExporter:
         return ["offer_ladder.json", "OFFER_LADDER.md"]
 
 
+class FakeLaunchSprintExporter:
+    def __init__(self):
+        self.exports = []
+
+    def export(self, *, opportunities, offers, milestones, activation_report):
+        self.exports.append(
+            {
+                "opportunities": opportunities,
+                "offers": offers,
+                "milestones": milestones,
+                "activation_report": activation_report,
+            }
+        )
+        return ["launch_sprint.json", "30_DAY_LAUNCH_PLAN.md"]
+
+
 class RevenuePortfolioTests(unittest.TestCase):
     def test_run_revenue_portfolio_once_scores_generates_assets_and_continues_past_milestones(self):
         supabase = FakeSupabase()
@@ -572,6 +588,25 @@ class RevenuePortfolioTests(unittest.TestCase):
         self.assertEqual(len(ladder_exporter.exports), 1)
         self.assertEqual(ladder_exporter.exports[0]["milestones"], [15, 200, 1000, 20000])
         self.assertEqual(len(ladder_exporter.exports[0]["offers"]), 2)
+
+    def test_run_revenue_portfolio_once_can_export_launch_sprint(self):
+        sprint_exporter = FakeLaunchSprintExporter()
+
+        summary = run_revenue_portfolio_once(
+            sources=[FakeSource()],
+            supabase=None,
+            dry_run=True,
+            max_opportunities=3,
+            milestones=[15, 200, 1000, 20000],
+            launch_sprint_exporter=sprint_exporter,
+            activation_report={"ready": False, "next_actions": ["Run gh auth login"]},
+        )
+
+        self.assertEqual(summary.launch_sprint_exported, 2)
+        self.assertEqual(len(sprint_exporter.exports), 1)
+        self.assertEqual(sprint_exporter.exports[0]["opportunities"][0].external_id, "kw-portfolio")
+        self.assertEqual(sprint_exporter.exports[0]["milestones"], [15, 200, 1000, 20000])
+        self.assertEqual(sprint_exporter.exports[0]["activation_report"]["ready"], False)
 
     def test_summarize_phase_persists_dashboard_snapshot(self):
         supabase = FakeSupabase()
