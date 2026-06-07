@@ -18,12 +18,14 @@ Current operating target:
 - Tracking deploy bundle: `TRACKING_DEPLOY_OUTPUT_DIR=out/tracking-deploy`.
 - Lead magnets: `LEAD_MAGNET_OUTPUT_DIR=out/lead-magnets`.
 - Digital products: `DIGITAL_PRODUCT_OUTPUT_DIR=out/digital-products`.
+- Affiliate articles: `AFFILIATE_ARTICLE_OUTPUT_DIR=out/affiliate-articles`.
 - Opportunity roadmap: `ROADMAP_OUTPUT_DIR=out/roadmap`.
 - Revenue bundle: `BUNDLE_OUTPUT_DIR=out/revenue-bundle`.
 - Optional click redirect: `CLICK_REDIRECT_URL=https://your-domain.example/click`.
 - Optional service intake: `SERVICE_INTAKE_URL=https://your-form-or-checkout.example`.
 - Optional lead capture: `LEAD_CAPTURE_URL=https://your-form-or-newsletter.example`.
 - Optional checkout mapping: `OFFER_PAYMENT_URLS=fixed_scope_service=https://buy.stripe.com/setup,digital_product=https://gumroad.com/l/template`.
+- Optional affiliate mapping: `AFFILIATE_URLS=fastapi=https://affiliate.example/fastapi,*=https://affiliate.example/default`.
 - Live-readiness check: `.\scripts\doctor.ps1`.
 - Milestones: `$15`, `$200`, `$1,000`, `$20,000`.
 - Default behavior: keep running after milestones because `STOP_AFTER_TARGET=false`.
@@ -119,6 +121,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 
 This writes `digital_products.json`, `DIGITAL_PRODUCTS.md`, and one folder per selected digital product with `README.md`, `STORE_LISTING.md`, `LAUNCH_CHECKLIST.md`, `product.json`, and an owned landing page. Set checkout metadata with `offer_key` before publishing the product.
 
+Generate disclosed affiliate article drafts:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 20 --affiliate-article-output-dir out/affiliate-articles --affiliate-urls "fastapi=https://affiliate.example/fastapi,*=https://affiliate.example/default"
+```
+
+This writes `affiliate_articles.json`, `AFFILIATE_ARTICLES.md`, an index page, and one `ARTICLE.md`/`DISCLOSURE.md`/landing page set per selected affiliate article opportunity. Publish only on owned channels with visible disclosure, verified claims, and allowed affiliate programs.
+
 Generate an opportunity roadmap:
 
 ```powershell
@@ -133,7 +143,7 @@ Generate the full revenue bundle:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, digital product packs, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
+The revenue bundle writes assets, an owned static site, microtools under `site/tools`, offers, checkout setup instructions, tracking deploy files, lead magnets, digital product packs, affiliate article drafts, opportunity roadmap, and launch queue in one standard tree. This is the fastest local review artifact before publishing anything.
 
 Attach real payment links to generated offers:
 

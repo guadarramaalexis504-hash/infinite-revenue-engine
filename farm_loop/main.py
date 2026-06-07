@@ -9,6 +9,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
+from .affiliate_article_exporter import AffiliateArticleExporter
 from .asset_exporter import LocalAssetExporter
 from .automation import collect_activation_report
 from .checkout_setup import CheckoutSetupExporter
@@ -341,6 +342,22 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         if digital_product_output_dir
         else None
     )
+    affiliate_article_output_dir = (
+        args.affiliate_article_output_dir
+        or cli_bundle_paths.get("affiliate_article_output_dir")
+        or settings.affiliate_article_output_dir
+        or env_bundle_paths.get("affiliate_article_output_dir")
+    )
+    affiliate_urls = parse_offer_payment_urls(args.affiliate_urls or settings.affiliate_urls)
+    affiliate_article_exporter = (
+        AffiliateArticleExporter(
+            affiliate_article_output_dir,
+            affiliate_urls=affiliate_urls,
+            click_redirect_url=click_redirect_url,
+        )
+        if affiliate_article_output_dir
+        else None
+    )
     roadmap_output_dir = (
         args.roadmap_output_dir
         or cli_bundle_paths.get("roadmap_output_dir")
@@ -366,6 +383,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         tracking_deploy_exporter=tracking_deploy_exporter,
         lead_magnet_exporter=lead_magnet_exporter,
         digital_product_exporter=digital_product_exporter,
+        affiliate_article_exporter=affiliate_article_exporter,
         roadmap_exporter=roadmap_exporter,
         activation_report=activation_report,
         offer_payment_urls=offer_payment_urls,
@@ -441,6 +459,7 @@ def bundle_output_paths(bundle_output_dir: str) -> dict[str, str]:
         "tracking_deploy_output_dir": (base_path / "tracking-deploy").as_posix(),
         "lead_magnet_output_dir": (base_path / "lead-magnets").as_posix(),
         "digital_product_output_dir": (base_path / "digital-products").as_posix(),
+        "affiliate_article_output_dir": (base_path / "affiliate-articles").as_posix(),
         "roadmap_output_dir": (base_path / "roadmap").as_posix(),
         "launch_queue_output_dir": (base_path / "launch-queue").as_posix(),
     }
@@ -543,6 +562,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--digital-product-output-dir",
         default=None,
         help="Write product packs, store listings, and launch checklists for digital product opportunities.",
+    )
+    parser.add_argument(
+        "--affiliate-article-output-dir",
+        default=None,
+        help="Write disclosed affiliate article drafts, outlines, and landing pages.",
+    )
+    parser.add_argument(
+        "--affiliate-urls",
+        default=None,
+        help="Comma-separated tag=url or *=url affiliate links used in generated affiliate articles.",
     )
     parser.add_argument(
         "--roadmap-output-dir",

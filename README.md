@@ -72,7 +72,7 @@ Generate the full local revenue bundle in one command:
 python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 10 --bundle-output-dir out/revenue-bundle
 ```
 
-The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, digital product packs, the opportunity roadmap, and the launch queue using one standard folder tree.
+The revenue bundle writes review assets, the owned site, interactive tools under `site/tools`, offer drafts, checkout setup, tracking deploy files, lead magnets, digital product packs, affiliate article drafts, the opportunity roadmap, and the launch queue using one standard folder tree.
 
 Record a confirmed sale from any payment path:
 
@@ -191,6 +191,8 @@ Optional environment variables:
 - `LEAD_MAGNET_OUTPUT_DIR`, optional lead magnet export path such as `out/lead-magnets`
 - `LEAD_CAPTURE_URL`, optional owned opt-in form or newsletter URL used by lead magnet CTAs
 - `DIGITAL_PRODUCT_OUTPUT_DIR`, optional digital product pack export path such as `out/digital-products`
+- `AFFILIATE_ARTICLE_OUTPUT_DIR`, optional affiliate article export path such as `out/affiliate-articles`
+- `AFFILIATE_URLS`, optional comma-separated tag=url or *=url affiliate links
 - `ROADMAP_OUTPUT_DIR`, optional ranked opportunity roadmap path such as `out/roadmap`
 - `BUNDLE_OUTPUT_DIR`, optional all-in-one local revenue bundle path such as `out/revenue-bundle`
 
@@ -257,6 +259,14 @@ python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run -
 ```
 
 This writes `digital_products.json`, `DIGITAL_PRODUCTS.md`, and one folder per selected digital product with `README.md`, `STORE_LISTING.md`, `LAUNCH_CHECKLIST.md`, `product.json`, and an owned landing page. Use the included `offer_key` as checkout metadata before publishing.
+
+Generate disclosed affiliate article drafts:
+
+```powershell
+python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 20 --affiliate-article-output-dir out/affiliate-articles --affiliate-urls "fastapi=https://affiliate.example/fastapi,*=https://affiliate.example/default"
+```
+
+This writes `affiliate_articles.json`, `AFFILIATE_ARTICLES.md`, an index page, and one `ARTICLE.md`/`DISCLOSURE.md`/landing page set per selected affiliate article opportunity. Publish only on owned channels with visible disclosure and verified claims.
 
 ## Click Redirect Handler
 
