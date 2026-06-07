@@ -45,6 +45,14 @@ class OfferLadderTests(unittest.TestCase):
         self.assertEqual([tier["tier_type"] for tier in tiers], ["support_signal", "starter_setup", "fixed_scope_service", "premium_sprint"])
         self.assertEqual(tiers[-1]["unit_targets"]["20000"], 21)
         self.assertIn("delivery capacity", tiers[-1]["activation_notes"][0])
+        top_mix = ladder["ladders"][0]["mix_plans"][-1]
+        self.assertEqual(top_mix["milestone_usd"], 20000.0)
+        self.assertEqual(top_mix["strategy"], "premium_then_fixed")
+        self.assertEqual(top_mix["tiers"][0]["tier_type"], "premium_sprint")
+        self.assertEqual(top_mix["tiers"][0]["units"], 5)
+        self.assertEqual(top_mix["tiers"][1]["tier_type"], "fixed_scope_service")
+        self.assertEqual(top_mix["tiers"][1]["units"], 51)
+        self.assertGreaterEqual(top_mix["total_revenue_usd"], 20000)
 
     def test_exporter_writes_json_and_markdown_for_review(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -62,6 +70,8 @@ class OfferLadderTests(unittest.TestCase):
         self.assertEqual(ladder["best_path"]["units_to_top_milestone"], 21)
         self.assertIn("$999", markdown)
         self.assertIn("$20,000", markdown)
+        self.assertIn("Premium + fixed service mix", markdown)
+        self.assertIn("5 x premium_sprint", markdown)
         self.assertIn("Supabase RLS policy checker setup help", markdown)
 
 

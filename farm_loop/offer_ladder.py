@@ -72,6 +72,7 @@ def _ladder_row(offers: list[OfferDraft], milestones: list[float]) -> dict[str, 
         "existing_offer_keys": [offer.offer_key for offer in offers],
         "best_tier": best_tier,
         "tiers": tiers,
+        "mix_plans": _mix_plans(tiers, milestones),
     }
 
 
@@ -135,6 +136,53 @@ def _best_path(ladders: list[dict[str, Any]], milestones: list[float]) -> dict[s
     }
 
 
+def _mix_plans(tiers: list[dict[str, Any]], milestones: list[float]) -> list[dict[str, Any]]:
+    premium = _tier_by_type(tiers, "premium_sprint")
+    fixed = _tier_by_type(tiers, "fixed_scope_service")
+    if not premium or not fixed:
+        return []
+
+    plans: list[dict[str, Any]] = []
+    for milestone in milestones:
+        premium_units = min(5, max(1, math.ceil((float(milestone) * 0.25) / premium["tier_price_usd"])))
+        premium_revenue = premium_units * premium["tier_price_usd"]
+        remaining = max(0.0, float(milestone) - premium_revenue)
+        fixed_units = 0 if remaining <= 0 else math.ceil(remaining / fixed["tier_price_usd"])
+        fixed_revenue = fixed_units * fixed["tier_price_usd"]
+        total_units = premium_units + fixed_units
+        plans.append(
+            {
+                "milestone_usd": float(milestone),
+                "strategy": "premium_then_fixed",
+                "tiers": [
+                    _mix_tier_row(premium, premium_units),
+                    _mix_tier_row(fixed, fixed_units),
+                ],
+                "total_units": total_units,
+                "total_revenue_usd": round(premium_revenue + fixed_revenue, 2),
+                "delivery_warning": f"Requires delivery capacity for {total_units} service engagements.",
+            }
+        )
+    return plans
+
+
+def _tier_by_type(tiers: list[dict[str, Any]], tier_type: str) -> dict[str, Any] | None:
+    for tier in tiers:
+        if tier["tier_type"] == tier_type:
+            return tier
+    return None
+
+
+def _mix_tier_row(tier: dict[str, Any], units: int) -> dict[str, Any]:
+    return {
+        "tier_key": tier["tier_key"],
+        "tier_type": tier["tier_type"],
+        "tier_price_usd": tier["tier_price_usd"],
+        "units": units,
+        "revenue_usd": round(units * tier["tier_price_usd"], 2),
+    }
+
+
 def _activation_notes(tier_type: str) -> list[str]:
     if tier_type == "support_signal":
         return ["Use for validation only; this tier needs too much volume for $20k."]
@@ -191,6 +239,20 @@ def _to_markdown(ladder: dict[str, Any]) -> str:
         for tier in row["tiers"]:
             for note in tier["activation_notes"]:
                 lines.append(f"- `{tier['tier_key']}`: {note}")
+        lines.append("")
+        lines.extend(["Premium + fixed service mix:", ""])
+        lines.append("| Milestone | Mix | Revenue | Delivery load |")
+        lines.append("| ---: | --- | ---: | ---: |")
+        for plan in row["mix_plans"]:
+            mix = " + ".join(
+                f"{tier['units']} x {tier['tier_type']}"
+                for tier in plan["tiers"]
+                if tier["units"] > 0
+            )
+            lines.append(
+                f"| {_money(plan['milestone_usd'])} | {mix} | "
+                f"{_money(plan['total_revenue_usd'])} | {plan['total_units']} |"
+            )
         lines.append("")
     return "\n".join(lines)
 
