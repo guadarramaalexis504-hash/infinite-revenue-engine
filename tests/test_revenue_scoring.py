@@ -26,6 +26,31 @@ class RevenueScoringTests(unittest.TestCase):
 
         self.assertEqual(compute_expected_value(opportunity), 8.9)
 
+    def test_to_payload_includes_score_clamped_to_supabase_check_range(self):
+        base = dict(
+            source="github_bounty",
+            external_id="4147725706",
+            title="Agentic Talent Dashboard bounty",
+            url="https://github.com/owner/repo/issues/68",
+            problem="Bounty issue needs a microtool.",
+            tags=["bounty"],
+            channel="bounty_scanner",
+            payout_estimate_usd=220,
+            conversion_probability=0.14,
+            estimated_cost_usd=3,
+            risk_penalty_usd=4,
+            build_minutes=75,
+        )
+
+        normal = RevenueOpportunity(**base, expected_value_usd=23.8)
+        self.assertEqual(normal.to_payload()["score"], 24)
+
+        negative = RevenueOpportunity(**base, expected_value_usd=-5.0)
+        self.assertEqual(negative.to_payload()["score"], 0)
+
+        huge = RevenueOpportunity(**base, expected_value_usd=4200.0)
+        self.assertEqual(huge.to_payload()["score"], 100)
+
     def test_rank_revenue_opportunities_prefers_high_value_reusable_low_risk_work(self):
         good = RevenueOpportunity(
             source="manual_keywords",

@@ -34,6 +34,8 @@ class RevenueOpportunity:
             "risk_penalty_usd": self.risk_penalty_usd,
             "build_minutes": self.build_minutes,
             "expected_value_usd": self.expected_value_usd,
+            # opportunities.score is NOT NULL with a 0-100 check constraint
+            "score": max(0, min(100, int(round(self.expected_value_usd)))),
             "status": "new",
         }
 
