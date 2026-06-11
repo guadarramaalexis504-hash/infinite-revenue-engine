@@ -1,0 +1,12 @@
+.env
+.env.*
+.venv
+out
+data
+docs
+tests
+scripts
+supabase
+.github
+__pycache__
+*.pyc

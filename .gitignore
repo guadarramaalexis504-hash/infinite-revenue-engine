@@ -9,3 +9,5 @@ venv/
 out/
 .worktrees/
 worktrees/
+
+.vercel
