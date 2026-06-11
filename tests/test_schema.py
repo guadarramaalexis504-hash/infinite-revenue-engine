@@ -35,6 +35,14 @@ class SchemaTests(unittest.TestCase):
         ]:
             self.assertIn(f"add column if not exists {column}", schema)
 
+    def test_schema_gives_offers_a_payload_column_for_offer_metadata(self):
+        schema = Path("supabase/schema.sql").read_text(encoding="utf-8")
+
+        self.assertIn(
+            "add column if not exists payload jsonb not null default '{}'::jsonb",
+            schema,
+        )
+
     def test_schema_links_offers_to_opportunities(self):
         schema = Path("supabase/schema.sql").read_text(encoding="utf-8")
 

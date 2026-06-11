@@ -144,7 +144,8 @@ create table if not exists public.experiments (
 );
 
 alter table public.offers
-    add column if not exists opportunity_id uuid references public.opportunities(id) on delete set null;
+    add column if not exists opportunity_id uuid references public.opportunities(id) on delete set null,
+    add column if not exists payload jsonb not null default '{}'::jsonb;
 
 create table if not exists public.launch_tasks (
     id uuid primary key default gen_random_uuid(),
