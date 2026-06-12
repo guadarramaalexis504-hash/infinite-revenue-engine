@@ -80,6 +80,7 @@ def run_revenue_portfolio_once(
     site_base_url: str = "",
     click_redirect_url: str = "",
     lead_capture_url: str = "",
+    notifier: Any | None = None,
 ) -> RevenuePortfolioSummary:
     if phase == "summarize":
         dashboard_snapshots_created = 0
@@ -96,6 +97,7 @@ def run_revenue_portfolio_once(
             supabase.insert_portfolio_snapshot(snapshot)
             dashboard_snapshots_created = 1
             supabase.insert_event(None, "revenue_portfolio_summarized", snapshot)
+            _notify_summary(notifier, supabase, snapshot, site_base_url)
         return RevenuePortfolioSummary(
             status="success",
             discovered=0,
@@ -407,3 +409,51 @@ def _task_opportunity_id(task: LaunchTask, opportunity_ids: dict[tuple[str, str]
     if not task.source or not task.external_id:
         return None
     return opportunity_ids.get((task.source, task.external_id))
+
+
+def _notify_summary(notifier: Any | None, supabase: Any, snapshot: dict, site_base_url: str) -> None:
+    """Post the daily summary to Discord. Never raises into the pipeline."""
+    if notifier is None or not getattr(notifier, "enabled", False):
+        return
+    from .discord_notify import build_daily_summary_message
+
+    def _count(method: str) -> int:
+        try:
+            return len(getattr(supabase, method)())
+        except Exception:
+            return 0
+
+    revenue = 0.0
+    for row in _safe_list(supabase, "list_conversion_events"):
+        try:
+            revenue += float(row.get("amount_usd") or 0)
+        except (TypeError, ValueError):
+            continue
+    for row in _safe_list(supabase, "list_tip_events"):
+        try:
+            revenue += float(row.get("amount_usd") or 0)
+        except (TypeError, ValueError):
+            continue
+
+    message = build_daily_summary_message(
+        {
+            "opportunities": _count("list_opportunities") if hasattr(supabase, "list_opportunities") else snapshot.get("opportunities", 0),
+            "assets": _count("list_assets"),
+            "offers": _count("list_offers"),
+            "clicks": _count("list_click_events"),
+            "conversions": _count("list_conversion_events"),
+            "revenue_usd": revenue,
+            "site_url": site_base_url or "",
+        }
+    )
+    try:
+        notifier.send(message)
+    except Exception:
+        pass
+
+
+def _safe_list(supabase: Any, method: str) -> list:
+    try:
+        return list(getattr(supabase, method)())
+    except Exception:
+        return []

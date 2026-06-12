@@ -26,6 +26,7 @@ jobs:
       STACKEXCHANGE_KEY: ${{ secrets.STACKEXCHANGE_KEY }}
       BUYMEACOFFEE_WEBHOOK_TOKEN: ${{ secrets.BUYMEACOFFEE_WEBHOOK_TOKEN }}
       TIP_URL: ${{ secrets.TIP_URL }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       GITHUB_TOKEN: ${{ github.token }}
       CLICK_REDIRECT_URL: ${{ secrets.CLICK_REDIRECT_URL }}
       SERVICE_INTAKE_URL: ${{ secrets.SERVICE_INTAKE_URL }}

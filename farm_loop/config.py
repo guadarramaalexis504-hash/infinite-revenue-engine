@@ -63,6 +63,7 @@ class Settings:
     traffic_plan_output_dir: str | None = None
     all_ideas_output_dir: str | None = None
     bundle_output_dir: str | None = None
+    discord_webhook_url: str | None = None
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -114,6 +115,7 @@ class Settings:
             traffic_plan_output_dir=os.getenv("TRAFFIC_PLAN_OUTPUT_DIR"),
             all_ideas_output_dir=os.getenv("ALL_IDEAS_OUTPUT_DIR"),
             bundle_output_dir=os.getenv("BUNDLE_OUTPUT_DIR"),
+            discord_webhook_url=os.getenv("DISCORD_WEBHOOK_URL"),
         )
 
     def require_runtime_secrets(self, dry_run: bool) -> None:

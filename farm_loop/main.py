@@ -17,6 +17,7 @@ from .automation import collect_activation_report
 from .checkout_setup import CheckoutSetupExporter
 from .config import Settings
 from .conversions import build_manual_conversion_payload
+from .discord_notify import DiscordNotifier, build_conversion_message
 from .digital_product_exporter import DigitalProductExporter
 from .drafts import DraftGenerator
 from .launch_queue import LaunchQueueExporter
@@ -566,6 +567,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
         site_base_url=site_base_url,
         click_redirect_url=click_redirect_url,
         lead_capture_url=lead_capture_url,
+        notifier=DiscordNotifier(settings.discord_webhook_url),
     )
     LOGGER.info("portfolio_summary %s", json.dumps(asdict(summary), sort_keys=True))
     return 0
@@ -601,6 +603,15 @@ def run_record_conversion(args: argparse.Namespace) -> int:
         },
     )
     LOGGER.info("conversion_recorded %s", json.dumps({"rows": rows}, sort_keys=True))
+    notifier = DiscordNotifier(settings.discord_webhook_url)
+    if notifier.enabled:
+        notifier.send(
+            build_conversion_message(
+                amount_usd=float(conversion_payload.get("amount_usd") or 0),
+                source=str(conversion_payload.get("source") or "unknown"),
+                offer_key=str((conversion_payload.get("payload") or {}).get("offer_key") or "") or None,
+            )
+        )
     return 0
 
 
