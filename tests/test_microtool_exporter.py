@@ -152,6 +152,27 @@ class MicrotoolExporterTests(unittest.TestCase):
         self.assertIn("HMAC", page)
         self.assertIn("never leaves your browser", page.lower())
 
+    def test_exports_interactive_llmstxt_generator(self):
+        opp = opportunity("LlmstxtGen - generador de llms.txt", "llmstxt-gen", ["llms-txt-generator", "seo"])
+
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(opp, [])])
+            page = (Path(directory) / "llmstxt-gen" / "index.html").read_text(encoding="utf-8")
+
+        self.assertIn("generateLlms", page)
+        self.assertIn("llms.txt", page)
+
+    def test_exports_interactive_ai_robots_generator(self):
+        opp = opportunity("AIRobots - robots.txt para crawlers de AI", "ai-robots", ["robots-txt", "ai-crawlers"])
+
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(opp, [])])
+            page = (Path(directory) / "ai-robots" / "index.html").read_text(encoding="utf-8")
+
+        self.assertIn("generateRobots", page)
+        self.assertIn("GPTBot", page)
+        self.assertIn("ClaudeBot", page)
+
     def test_exports_interactive_regex_tester(self):
         opp = opportunity("Regex Explainer and Test Case Generator", "regex-explainer", ["regex", "testing"])
 

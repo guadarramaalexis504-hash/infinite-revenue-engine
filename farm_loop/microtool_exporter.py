@@ -75,6 +75,8 @@ class MicrotoolExporter:
             "openai_cost_calculator": _openai_cost_tool,
             "webhook_signature_tester": _webhook_signature_tool,
             "regex_tester": _regex_tester_tool,
+            "llmstxt_generator": _llmstxt_generator_tool,
+            "ai_robots_generator": _ai_robots_tool,
         }
         if kind not in builders:
             raise ValueError(f"Unsupported microtool: {opportunity.external_id}")
@@ -124,6 +126,10 @@ def _tool_kind(opportunity: RevenueOpportunity) -> str | None:
         return "webhook_signature_tester"
     if "regex" in haystack:
         return "regex_tester"
+    if "llms" in haystack:
+        return "llmstxt_generator"
+    if "robots" in haystack and ("ai" in haystack or "crawler" in haystack):
+        return "ai_robots_generator"
     return None
 
 
@@ -519,6 +525,115 @@ def _regex_tester_tool() -> str:
           '<ul>' + items.join('') + '</ul>' +
           (notes.length ? '<h3>Pattern breakdown</h3><ul>' + notes.join('') + '</ul>' : '');
       }
+    </script>
+    """
+
+
+def _llmstxt_generator_tool() -> str:
+    return r"""
+    <section class="tool">
+      <style>
+        .llms-grid label { display: block; font-weight: 700; margin: 12px 0 6px; }
+        .llms-grid input { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 8px; }
+        .llms-grid textarea { min-height: 110px; }
+        pre.out { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; white-space: pre-wrap; font-family: Consolas, monospace; }
+      </style>
+      <div class="llms-grid">
+        <label for="site">Site name</label>
+        <input id="site" placeholder="My Project">
+        <label for="desc">One-line description (what should AI assistants know?)</label>
+        <input id="desc" placeholder="Free developer tools for Supabase, GitHub Actions and automation.">
+        <label for="docs">Key pages - one per line: Title | https://url | optional note</label>
+        <textarea id="docs" spellcheck="false" placeholder="Getting started | https://example.com/start | setup guide&#10;Pricing | https://example.com/pricing"></textarea>
+        <label for="optional">Secondary pages (same format, listed under Optional)</label>
+        <textarea id="optional" spellcheck="false" placeholder="Changelog | https://example.com/changelog"></textarea>
+      </div>
+      <button type="button" onclick="generateLlms()">Generate llms.txt</button>
+      <div id="results" class="results" aria-live="polite"></div>
+      <p>llms.txt is a proposed standard: a markdown file at /llms.txt that tells AI assistants what your site is about and which pages matter. Everything runs in your browser.</p>
+    </section>
+    <script>
+      function parseLines(id) {
+        return document.getElementById(id).value.split('\n').map(function (l) { return l.trim(); }).filter(Boolean).map(function (l) {
+          var parts = l.split('|').map(function (p) { return p.trim(); });
+          return { title: parts[0] || 'Page', url: parts[1] || '', note: parts[2] || '' };
+        });
+      }
+      function section(name, rows) {
+        if (!rows.length) return '';
+        return '\n## ' + name + '\n\n' + rows.map(function (r) {
+          return '- [' + r.title + '](' + r.url + ')' + (r.note ? ': ' + r.note : '');
+        }).join('\n') + '\n';
+      }
+      function generateLlms() {
+        var site = document.getElementById('site').value.trim() || 'My Site';
+        var desc = document.getElementById('desc').value.trim();
+        var out = '# ' + site + '\n' + (desc ? '\n> ' + desc + '\n' : '') +
+          section('Docs', parseLines('docs')) + section('Optional', parseLines('optional'));
+        document.getElementById('results').innerHTML =
+          '<p class="ok">Save this as <code>llms.txt</code> at the root of your site (https://yoursite.com/llms.txt):</p>' +
+          '<pre class="out" id="llmsout"></pre><button type="button" onclick="copyLlms()">Copy to clipboard</button>';
+        document.getElementById('llmsout').textContent = out;
+      }
+      function copyLlms() { navigator.clipboard.writeText(document.getElementById('llmsout').textContent); }
+    </script>
+    """
+
+
+def _ai_robots_tool() -> str:
+    return r"""
+    <section class="tool">
+      <style>
+        .bots { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 8px; margin-bottom: 12px; }
+        .bots label { display: flex; gap: 8px; align-items: center; font-weight: 400; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+        pre.out { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; white-space: pre-wrap; font-family: Consolas, monospace; }
+      </style>
+      <p>Tick the AI crawlers you want to <strong>block</strong> in robots.txt. Unticked bots stay allowed.</p>
+      <div class="bots" id="bots"></div>
+      <button type="button" onclick="generateRobots()">Generate robots.txt rules</button>
+      <button type="button" onclick="toggleAll()" style="background:var(--muted)">Toggle all</button>
+      <div id="results" class="results" aria-live="polite"></div>
+      <p>Blocking a bot here only affects crawlers that respect robots.txt. Training-data opt-out and search visibility are different trade-offs: blocking GPTBot or ClaudeBot also removes you from some AI answers. Runs fully in your browser.</p>
+    </section>
+    <script>
+      var BOTS = [
+        ['GPTBot', 'OpenAI - model training'],
+        ['ChatGPT-User', 'OpenAI - live browsing for users'],
+        ['OAI-SearchBot', 'OpenAI - search index'],
+        ['ClaudeBot', 'Anthropic - crawling'],
+        ['anthropic-ai', 'Anthropic - training (legacy token)'],
+        ['Claude-Web', 'Anthropic - live browsing (legacy token)'],
+        ['PerplexityBot', 'Perplexity - search index'],
+        ['Perplexity-User', 'Perplexity - live browsing'],
+        ['CCBot', 'Common Crawl - open dataset used for training'],
+        ['Google-Extended', 'Google - Gemini training opt-out token'],
+        ['Applebot-Extended', 'Apple - AI training opt-out token'],
+        ['Bytespider', 'ByteDance - crawling'],
+        ['Amazonbot', 'Amazon - Alexa and AI'],
+        ['Meta-ExternalAgent', 'Meta - AI crawling']
+      ];
+      var grid = document.getElementById('bots');
+      BOTS.forEach(function (b, i) {
+        var l = document.createElement('label');
+        l.innerHTML = '<input type="checkbox" id="bot' + i + '"> <span><strong>' + b[0] + '</strong><br><small>' + b[1] + '</small></span>';
+        grid.appendChild(l);
+      });
+      function toggleAll() {
+        var first = document.getElementById('bot0').checked;
+        BOTS.forEach(function (_, i) { document.getElementById('bot' + i).checked = !first; });
+      }
+      function generateRobots() {
+        var blocks = [];
+        BOTS.forEach(function (b, i) {
+          if (document.getElementById('bot' + i).checked) blocks.push('User-agent: ' + b[0] + '\nDisallow: /');
+        });
+        var out = blocks.length ? blocks.join('\n\n') + '\n' : '# No AI crawlers blocked - all allowed.\n';
+        document.getElementById('results').innerHTML =
+          '<p class="ok">' + (blocks.length ? blocks.length + ' crawler(s) blocked. Append this to your robots.txt:' : 'Nothing blocked yet - tick some bots above.') + '</p>' +
+          '<pre class="out" id="robotsout"></pre>' + (blocks.length ? '<button type="button" onclick="copyRobots()">Copy to clipboard</button>' : '');
+        document.getElementById('robotsout').textContent = out;
+      }
+      function copyRobots() { navigator.clipboard.writeText(document.getElementById('robotsout').textContent); }
     </script>
     """
 

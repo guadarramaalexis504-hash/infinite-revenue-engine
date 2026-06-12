@@ -3,7 +3,12 @@
     "id": "microtool-supabase-rls-policy-checker",
     "title": "Supabase RLS Policy Checker",
     "problem": "Solo builders need a quick way to catch missing or unsafe RLS policies before exposing tables.",
-    "tags": ["supabase", "rls", "postgres", "security"],
+    "tags": [
+      "supabase",
+      "rls",
+      "postgres",
+      "security"
+    ],
     "channel": "microtool_seo",
     "payout_estimate_usd": 300,
     "conversion_probability": 0.08,
@@ -15,7 +20,11 @@
     "id": "microtool-github-actions-yaml-validator",
     "title": "GitHub Actions YAML Validator",
     "problem": "Developers break workflow files and want a fast preflight check before pushing.",
-    "tags": ["github-actions", "yaml", "ci"],
+    "tags": [
+      "github-actions",
+      "yaml",
+      "ci"
+    ],
     "channel": "microtool_seo",
     "payout_estimate_usd": 250,
     "conversion_probability": 0.08,
@@ -27,7 +36,12 @@
     "id": "microtool-openai-api-cost-calculator",
     "title": "OpenAI API Cost Calculator",
     "problem": "AI app builders need to estimate token and request costs before launching.",
-    "tags": ["openai-api", "costs", "calculator", "ai"],
+    "tags": [
+      "openai-api",
+      "costs",
+      "calculator",
+      "ai"
+    ],
     "channel": "microtool_seo",
     "payout_estimate_usd": 220,
     "conversion_probability": 0.07,
@@ -39,7 +53,11 @@
     "id": "microtool-json-schema-diff",
     "title": "JSON Schema Diff Tool",
     "problem": "API teams need to compare schema changes and understand breaking changes quickly.",
-    "tags": ["json", "schema", "api"],
+    "tags": [
+      "json",
+      "schema",
+      "api"
+    ],
     "channel": "microtool_seo",
     "payout_estimate_usd": 220,
     "conversion_probability": 0.07,
@@ -51,7 +69,11 @@
     "id": "microtool-regex-explainer",
     "title": "Regex Explainer and Test Case Generator",
     "problem": "Developers paste regexes into search and need clear explanations plus edge-case tests.",
-    "tags": ["regex", "testing", "developer-tools"],
+    "tags": [
+      "regex",
+      "testing",
+      "developer-tools"
+    ],
     "channel": "microtool_seo",
     "payout_estimate_usd": 160,
     "conversion_probability": 0.06,
@@ -63,7 +85,12 @@
     "id": "microtool-env-var-auditor",
     "title": "Environment Variable Auditor",
     "problem": "Indie hackers accidentally ship missing, placeholder, or public secrets in env files.",
-    "tags": ["env", "security", "github-actions", "deployment"],
+    "tags": [
+      "env",
+      "security",
+      "github-actions",
+      "deployment"
+    ],
     "channel": "microtool_seo",
     "payout_estimate_usd": 210,
     "conversion_probability": 0.07,
@@ -75,7 +102,11 @@
     "id": "kit-supabase-github-actions-setup",
     "title": "Supabase + GitHub Actions Setup Kit",
     "problem": "Small teams want Supabase schema, cron, secrets, and webhook automation configured end to end.",
-    "tags": ["supabase", "github-actions", "automation"],
+    "tags": [
+      "supabase",
+      "github-actions",
+      "automation"
+    ],
     "channel": "paid_setup_kit",
     "payout_estimate_usd": 299,
     "conversion_probability": 0.05,
@@ -87,7 +118,12 @@
     "id": "kit-openai-saas-starter",
     "title": "OpenAI SaaS Starter Kit",
     "problem": "Builders need a starter with retries, logging, env validation, and usage tracking.",
-    "tags": ["openai-api", "saas", "python", "fastapi"],
+    "tags": [
+      "openai-api",
+      "saas",
+      "python",
+      "fastapi"
+    ],
     "channel": "digital_product",
     "payout_estimate_usd": 99,
     "conversion_probability": 0.09,
@@ -99,7 +135,12 @@
     "id": "template-fastapi-supabase-auth",
     "title": "FastAPI + Supabase Auth Template",
     "problem": "Python developers need a clean auth template using Supabase without leaking service keys.",
-    "tags": ["fastapi", "supabase", "auth", "python"],
+    "tags": [
+      "fastapi",
+      "supabase",
+      "auth",
+      "python"
+    ],
     "channel": "digital_product",
     "payout_estimate_usd": 79,
     "conversion_probability": 0.08,
@@ -111,7 +152,11 @@
     "id": "template-github-sponsors-readme",
     "title": "GitHub Sponsors README and Funding Kit",
     "problem": "Open-source maintainers need a clear sponsor pitch, tiers, and funding file setup.",
-    "tags": ["github-sponsors", "open-source", "readme"],
+    "tags": [
+      "github-sponsors",
+      "open-source",
+      "readme"
+    ],
     "channel": "open_source_sponsorship",
     "payout_estimate_usd": 150,
     "conversion_probability": 0.05,
@@ -123,7 +168,11 @@
     "id": "github-issue-docs-pr-helper",
     "title": "GitHub Docs PR Helper",
     "problem": "Repos with documentation issues often need small PRs that improve examples and setup instructions.",
-    "tags": ["github", "documentation", "pull-request"],
+    "tags": [
+      "github",
+      "documentation",
+      "pull-request"
+    ],
     "channel": "github_issue_helper",
     "payout_estimate_usd": 120,
     "conversion_probability": 0.08,
@@ -135,7 +184,11 @@
     "id": "github-issue-repro-template-helper",
     "title": "GitHub Reproduction Template Helper",
     "problem": "Maintainers need minimal repro templates and failing-test drafts for messy bug reports.",
-    "tags": ["github", "testing", "bug-report"],
+    "tags": [
+      "github",
+      "testing",
+      "bug-report"
+    ],
     "channel": "github_issue_helper",
     "payout_estimate_usd": 140,
     "conversion_probability": 0.07,
@@ -147,7 +200,11 @@
     "id": "article-supabase-rls-checklist",
     "title": "Supabase RLS Launch Checklist",
     "problem": "Searchers want a concrete checklist before exposing Supabase tables through REST.",
-    "tags": ["supabase", "rls", "checklist"],
+    "tags": [
+      "supabase",
+      "rls",
+      "checklist"
+    ],
     "channel": "article_affiliate",
     "payout_estimate_usd": 180,
     "conversion_probability": 0.05,
@@ -159,7 +216,11 @@
     "id": "article-github-actions-cost-quota",
     "title": "GitHub Actions Cost and Quota Guide",
     "problem": "Developers are surprised by CI minutes, cron limits, and failed workflow cost.",
-    "tags": ["github-actions", "ci", "costs"],
+    "tags": [
+      "github-actions",
+      "ci",
+      "costs"
+    ],
     "channel": "article_affiliate",
     "payout_estimate_usd": 170,
     "conversion_probability": 0.05,
@@ -171,7 +232,11 @@
     "id": "leadmagnet-ai-app-launch-checklist",
     "title": "AI App Launch Checklist",
     "problem": "New AI builders need a checklist for keys, billing limits, logging, retries, and safety.",
-    "tags": ["ai", "launch", "checklist"],
+    "tags": [
+      "ai",
+      "launch",
+      "checklist"
+    ],
     "channel": "lead_magnet",
     "payout_estimate_usd": 250,
     "conversion_probability": 0.04,
@@ -183,7 +248,11 @@
     "id": "leadmagnet-supabase-production-checklist",
     "title": "Supabase Production Checklist",
     "problem": "Supabase users need a simple pre-launch checklist covering RLS, backups, auth, and keys.",
-    "tags": ["supabase", "production", "security"],
+    "tags": [
+      "supabase",
+      "production",
+      "security"
+    ],
     "channel": "lead_magnet",
     "payout_estimate_usd": 260,
     "conversion_probability": 0.04,
@@ -195,7 +264,11 @@
     "id": "bounty-docs-label-scanner",
     "title": "Documentation Bounty Scanner",
     "problem": "Small paid docs tasks are scattered across GitHub issues and bounty boards.",
-    "tags": ["bounty", "documentation", "github"],
+    "tags": [
+      "bounty",
+      "documentation",
+      "github"
+    ],
     "channel": "bounty_scanner",
     "payout_estimate_usd": 200,
     "conversion_probability": 0.06,
@@ -207,7 +280,11 @@
     "id": "bounty-beginner-safe-bug-scanner",
     "title": "Beginner-Safe Bug Bounty Scanner",
     "problem": "Developers need non-invasive, rules-compliant beginner bug bounty tasks and triage leads.",
-    "tags": ["bounty", "security", "triage"],
+    "tags": [
+      "bounty",
+      "security",
+      "triage"
+    ],
     "channel": "bounty_scanner",
     "payout_estimate_usd": 400,
     "conversion_probability": 0.03,
@@ -219,7 +296,11 @@
     "id": "niche-report-local-ai-tools",
     "title": "Local AI Tools Niche Report",
     "problem": "Builders and affiliate marketers need a report on emerging local AI tool keywords.",
-    "tags": ["seo", "ai", "niche-report"],
+    "tags": [
+      "seo",
+      "ai",
+      "niche-report"
+    ],
     "channel": "niche_report",
     "payout_estimate_usd": 250,
     "conversion_probability": 0.04,
@@ -231,7 +312,11 @@
     "id": "niche-report-supabase-templates",
     "title": "Supabase Templates Niche Report",
     "problem": "Template sellers need keyword and product angles around Supabase starter kits.",
-    "tags": ["seo", "supabase", "templates"],
+    "tags": [
+      "seo",
+      "supabase",
+      "templates"
+    ],
     "channel": "niche_report",
     "payout_estimate_usd": 220,
     "conversion_probability": 0.04,
@@ -243,7 +328,12 @@
     "id": "offer-webhook-setup-service",
     "title": "Webhook Setup Service",
     "problem": "Creators need Buy Me a Coffee, Stripe, or GitHub webhook events saved into a database.",
-    "tags": ["webhooks", "stripe", "buymeacoffee", "supabase"],
+    "tags": [
+      "webhooks",
+      "stripe",
+      "buymeacoffee",
+      "supabase"
+    ],
     "channel": "paid_setup_kit",
     "payout_estimate_usd": 199,
     "conversion_probability": 0.06,
@@ -255,7 +345,11 @@
     "id": "offer-github-actions-cron-service",
     "title": "GitHub Actions Cron Setup Service",
     "problem": "Non-dev founders need recurring jobs set up safely with secrets and logs.",
-    "tags": ["github-actions", "cron", "automation"],
+    "tags": [
+      "github-actions",
+      "cron",
+      "automation"
+    ],
     "channel": "paid_setup_kit",
     "payout_estimate_usd": 149,
     "conversion_probability": 0.06,
@@ -267,7 +361,12 @@
     "id": "product-notion-ai-cost-tracker",
     "title": "Notion AI Cost Tracker Template",
     "problem": "Solo builders need to track API costs, experiments, and revenue by product idea.",
-    "tags": ["notion", "ai", "costs", "template"],
+    "tags": [
+      "notion",
+      "ai",
+      "costs",
+      "template"
+    ],
     "channel": "digital_product",
     "payout_estimate_usd": 49,
     "conversion_probability": 0.1,
@@ -279,7 +378,12 @@
     "id": "product-excel-saas-metrics-template",
     "title": "Excel SaaS Metrics Template",
     "problem": "Small SaaS founders need a simple spreadsheet for MRR, churn, CAC, and experiments.",
-    "tags": ["excel", "saas", "metrics", "template"],
+    "tags": [
+      "excel",
+      "saas",
+      "metrics",
+      "template"
+    ],
     "channel": "digital_product",
     "payout_estimate_usd": 59,
     "conversion_probability": 0.08,
@@ -291,7 +395,11 @@
     "id": "microtool-webhook-signature-tester",
     "title": "Webhook Signature Tester",
     "problem": "Developers need to test webhook signatures locally without exposing secrets.",
-    "tags": ["webhooks", "security", "developer-tools"],
+    "tags": [
+      "webhooks",
+      "security",
+      "developer-tools"
+    ],
     "channel": "microtool_seo",
     "payout_estimate_usd": 240,
     "conversion_probability": 0.06,
@@ -303,7 +411,11 @@
     "id": "microtool-cron-expression-explainer",
     "title": "Cron Expression Explainer",
     "problem": "People configuring GitHub Actions and servers need to understand cron schedules quickly.",
-    "tags": ["cron", "github-actions", "automation"],
+    "tags": [
+      "cron",
+      "github-actions",
+      "automation"
+    ],
     "channel": "microtool_seo",
     "payout_estimate_usd": 190,
     "conversion_probability": 0.06,
@@ -315,7 +427,11 @@
     "id": "microtool-sql-index-suggestion",
     "title": "SQL Index Suggestion Helper",
     "problem": "Indie developers need first-pass index ideas from slow query shapes.",
-    "tags": ["postgres", "sql", "performance"],
+    "tags": [
+      "postgres",
+      "sql",
+      "performance"
+    ],
     "channel": "microtool_seo",
     "payout_estimate_usd": 280,
     "conversion_probability": 0.05,
@@ -327,7 +443,11 @@
     "id": "opensource-tiny-supabase-admin",
     "title": "Tiny Supabase Admin Scripts",
     "problem": "Developers want small audited scripts for Supabase backups, schema checks, and env validation.",
-    "tags": ["supabase", "open-source", "scripts"],
+    "tags": [
+      "supabase",
+      "open-source",
+      "scripts"
+    ],
     "channel": "open_source_sponsorship",
     "payout_estimate_usd": 180,
     "conversion_probability": 0.05,
@@ -339,7 +459,11 @@
     "id": "opensource-actions-toolbelt",
     "title": "GitHub Actions Toolbelt",
     "problem": "Maintainers need reusable workflows for tests, release notes, cron jobs, and secret checks.",
-    "tags": ["github-actions", "open-source", "ci"],
+    "tags": [
+      "github-actions",
+      "open-source",
+      "ci"
+    ],
     "channel": "open_source_sponsorship",
     "payout_estimate_usd": 200,
     "conversion_probability": 0.05,
@@ -351,7 +475,11 @@
     "id": "article-fastapi-deploy-comparison",
     "title": "FastAPI Deployment Comparison",
     "problem": "Python builders search for the simplest place to deploy FastAPI APIs with env vars and cron.",
-    "tags": ["fastapi", "deployment", "affiliate"],
+    "tags": [
+      "fastapi",
+      "deployment",
+      "affiliate"
+    ],
     "channel": "article_affiliate",
     "payout_estimate_usd": 220,
     "conversion_probability": 0.04,
@@ -363,7 +491,12 @@
     "id": "article-supabase-alternatives-pricing",
     "title": "Supabase Alternatives and Pricing Guide",
     "problem": "Builders compare Supabase, Firebase, Neon, Railway, and hosted Postgres options.",
-    "tags": ["supabase", "pricing", "affiliate", "postgres"],
+    "tags": [
+      "supabase",
+      "pricing",
+      "affiliate",
+      "postgres"
+    ],
     "channel": "article_affiliate",
     "payout_estimate_usd": 320,
     "conversion_probability": 0.04,
@@ -375,7 +508,11 @@
     "id": "leadmagnet-github-actions-secret-safety",
     "title": "GitHub Actions Secret Safety Checklist",
     "problem": "Developers need a short checklist to avoid leaking keys in Actions logs and configs.",
-    "tags": ["github-actions", "security", "secrets"],
+    "tags": [
+      "github-actions",
+      "security",
+      "secrets"
+    ],
     "channel": "lead_magnet",
     "payout_estimate_usd": 220,
     "conversion_probability": 0.04,
@@ -387,7 +524,11 @@
     "id": "offer-ai-automation-audit",
     "title": "AI Automation Audit",
     "problem": "Small businesses need someone to review an automation before it runs unattended.",
-    "tags": ["automation", "audit", "ai"],
+    "tags": [
+      "automation",
+      "audit",
+      "ai"
+    ],
     "channel": "paid_setup_kit",
     "payout_estimate_usd": 249,
     "conversion_probability": 0.05,
@@ -399,7 +540,11 @@
     "id": "microtool-stripe-webhook-verifier",
     "title": "Stripe Webhook Signature Verifier",
     "problem": "Builders struggle to debug Stripe webhook signatures and endpoint payloads locally.",
-    "tags": ["stripe", "webhooks", "debugging"],
+    "tags": [
+      "stripe",
+      "webhooks",
+      "debugging"
+    ],
     "channel": "microtool_seo",
     "payout_estimate_usd": 260,
     "conversion_probability": 0.07,
@@ -411,7 +556,11 @@
     "id": "microtool-supabase-redirect-url-checker",
     "title": "Supabase Auth Redirect URL Checker",
     "problem": "Supabase Auth users get stuck on redirect URL mismatches between local and production.",
-    "tags": ["supabase", "auth", "debugging"],
+    "tags": [
+      "supabase",
+      "auth",
+      "debugging"
+    ],
     "channel": "microtool_seo",
     "payout_estimate_usd": 210,
     "conversion_probability": 0.07,
@@ -423,7 +572,11 @@
     "id": "microtool-cors-preflight-debugger",
     "title": "CORS Preflight Debugger",
     "problem": "API builders need a simple way to understand failed browser preflight requests.",
-    "tags": ["cors", "api", "debugging"],
+    "tags": [
+      "cors",
+      "api",
+      "debugging"
+    ],
     "channel": "microtool_seo",
     "payout_estimate_usd": 190,
     "conversion_probability": 0.06,
@@ -435,7 +588,11 @@
     "id": "microtool-docker-env-compose-checker",
     "title": "Docker Compose Env Checker",
     "problem": "Developers misconfigure Docker Compose env files and need a fast sanity check.",
-    "tags": ["docker", "env", "devops"],
+    "tags": [
+      "docker",
+      "env",
+      "devops"
+    ],
     "channel": "microtool_seo",
     "payout_estimate_usd": 210,
     "conversion_probability": 0.06,
@@ -447,7 +604,12 @@
     "id": "template-nextjs-supabase-stripe-starter",
     "title": "Next.js Supabase Stripe Starter",
     "problem": "Solo founders want a small starter for auth, billing, webhook storage, and protected pages.",
-    "tags": ["nextjs", "supabase", "stripe", "starter"],
+    "tags": [
+      "nextjs",
+      "supabase",
+      "stripe",
+      "starter"
+    ],
     "channel": "digital_product",
     "payout_estimate_usd": 149,
     "conversion_probability": 0.07,
@@ -459,7 +621,11 @@
     "id": "template-github-actions-release-kit",
     "title": "GitHub Actions Release Kit",
     "problem": "Maintainers need reusable workflows for changelogs, tags, builds, and release notes.",
-    "tags": ["github-actions", "release", "template"],
+    "tags": [
+      "github-actions",
+      "release",
+      "template"
+    ],
     "channel": "digital_product",
     "payout_estimate_usd": 69,
     "conversion_probability": 0.09,
@@ -471,7 +637,11 @@
     "id": "template-ai-support-bot-kit",
     "title": "AI Support Bot Starter Kit",
     "problem": "Small businesses want a support bot starter with retrieval, logging, and escalation notes.",
-    "tags": ["ai", "support", "template"],
+    "tags": [
+      "ai",
+      "support",
+      "template"
+    ],
     "channel": "digital_product",
     "payout_estimate_usd": 129,
     "conversion_probability": 0.06,
@@ -483,7 +653,11 @@
     "id": "offer-supabase-rls-fix-service",
     "title": "Supabase RLS Fix Service",
     "problem": "Founders need one paid pass to turn unsafe or missing RLS policies into deployable policies.",
-    "tags": ["supabase", "rls", "consulting"],
+    "tags": [
+      "supabase",
+      "rls",
+      "consulting"
+    ],
     "channel": "paid_setup_kit",
     "payout_estimate_usd": 299,
     "conversion_probability": 0.06,
@@ -495,7 +669,11 @@
     "id": "offer-github-actions-debug-service",
     "title": "GitHub Actions Debug Service",
     "problem": "Teams lose hours on broken CI and want a fixed-price workflow repair.",
-    "tags": ["github-actions", "ci", "service"],
+    "tags": [
+      "github-actions",
+      "ci",
+      "service"
+    ],
     "channel": "paid_setup_kit",
     "payout_estimate_usd": 199,
     "conversion_probability": 0.07,
@@ -507,7 +685,11 @@
     "id": "github-issue-dependency-upgrade-helper",
     "title": "Dependency Upgrade PR Helper",
     "problem": "Repos need small upgrade PRs with clear changelog notes and focused regression checks.",
-    "tags": ["github", "dependencies", "pull-request"],
+    "tags": [
+      "github",
+      "dependencies",
+      "pull-request"
+    ],
     "channel": "github_issue_helper",
     "payout_estimate_usd": 160,
     "conversion_probability": 0.06,
@@ -519,7 +701,11 @@
     "id": "github-issue-ci-flake-triage-helper",
     "title": "CI Flake Triage Helper",
     "problem": "Maintainers need help identifying flaky test signatures and writing reproduction notes.",
-    "tags": ["github", "ci", "testing"],
+    "tags": [
+      "github",
+      "ci",
+      "testing"
+    ],
     "channel": "github_issue_helper",
     "payout_estimate_usd": 170,
     "conversion_probability": 0.06,
@@ -531,7 +717,11 @@
     "id": "article-openai-api-cost-controls",
     "title": "OpenAI API Cost Controls Guide",
     "problem": "AI product builders search for practical ways to cap cost, retry safely, and log usage.",
-    "tags": ["openai-api", "costs", "saas"],
+    "tags": [
+      "openai-api",
+      "costs",
+      "saas"
+    ],
     "channel": "article_affiliate",
     "payout_estimate_usd": 260,
     "conversion_probability": 0.05,
@@ -543,7 +733,11 @@
     "id": "article-stripe-vs-lemon-squeezy",
     "title": "Stripe vs Lemon Squeezy for Tiny SaaS",
     "problem": "Indie sellers compare payment providers for taxes, checkout, subscriptions, and digital goods.",
-    "tags": ["stripe", "lemon-squeezy", "payments"],
+    "tags": [
+      "stripe",
+      "lemon-squeezy",
+      "payments"
+    ],
     "channel": "article_affiliate",
     "payout_estimate_usd": 300,
     "conversion_probability": 0.04,
@@ -555,7 +749,11 @@
     "id": "leadmagnet-ai-automation-roi-calculator",
     "title": "AI Automation ROI Calculator",
     "problem": "Small business owners need a simple calculator before paying for automation setup.",
-    "tags": ["automation", "roi", "lead-magnet"],
+    "tags": [
+      "automation",
+      "roi",
+      "lead-magnet"
+    ],
     "channel": "lead_magnet",
     "payout_estimate_usd": 280,
     "conversion_probability": 0.05,
@@ -567,7 +765,11 @@
     "id": "opensource-webhook-fixtures-library",
     "title": "Webhook Fixture Library",
     "problem": "Developers need reusable sample payloads for Stripe, Buy Me a Coffee, GitHub, and Supabase webhooks.",
-    "tags": ["webhooks", "open-source", "testing"],
+    "tags": [
+      "webhooks",
+      "open-source",
+      "testing"
+    ],
     "channel": "open_source_sponsorship",
     "payout_estimate_usd": 160,
     "conversion_probability": 0.05,
@@ -579,7 +781,11 @@
     "id": "bounty-open-source-docs-starter",
     "title": "Open Source Docs Bounty Starter",
     "problem": "New contributors need a list of docs-only bounty issues with clear acceptance criteria.",
-    "tags": ["bounty", "docs", "open-source"],
+    "tags": [
+      "bounty",
+      "docs",
+      "open-source"
+    ],
     "channel": "bounty_scanner",
     "payout_estimate_usd": 180,
     "conversion_probability": 0.06,
@@ -591,12 +797,645 @@
     "id": "niche-report-ai-spreadsheet-templates",
     "title": "AI Spreadsheet Templates Niche Report",
     "problem": "Template sellers need angles for AI-assisted spreadsheet calculators, dashboards, and trackers.",
-    "tags": ["seo", "spreadsheets", "templates", "ai"],
+    "tags": [
+      "seo",
+      "spreadsheets",
+      "templates",
+      "ai"
+    ],
     "channel": "niche_report",
     "payout_estimate_usd": 230,
     "conversion_probability": 0.04,
     "estimated_cost_usd": 4,
     "risk_penalty_usd": 1,
     "build_minutes": 45
+  },
+  {
+    "id": "microtool-llmstxtgen-generador-de-llms-txt",
+    "title": "LlmstxtGen — generador de llms.txt",
+    "problem": "Form que arma tu llms.txt válido (sitio, secciones, docs prioritarias) con preview y explicación del estándar. Keyword en pleno despegue con competencia casi nula, audiencia dev+SEO perfecta, y cross-traffic natural con ",
+    "tags": [
+      "llms-txt-generator",
+      "what-is-llms-txt",
+      "llms-txt-example"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 280,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-rls-forge-supabase-rls-policy-generator",
+    "title": "RLS Forge — Supabase RLS Policy Generator",
+    "problem": "Wizard (tabla, operación, regla de ownership: user_id, team, public-read) que genera el CREATE POLICY exacto + explicación de cada cláusula. RLS es EL dolor #1 de Supabase, competencia casi nula, y abre upsell directo: p",
+    "tags": [
+      "supabase-rls-policy-generator",
+      "supabase-row-level-security-ex",
+      "create-policy-postgres"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 280,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "microtool-airobots-robots-txt-pa-crawlers-de-ai",
+    "title": "AIRobots — robots.txt pa' crawlers de AI",
+    "problem": "Checklist de bots AI (GPTBot, ClaudeBot, PerplexityBot, CCBot, Google-Extended) con toggle permitir/bloquear → genera el robots.txt + valida el que ya tienes. Tema caliente 2026, búsquedas creciendo y casi nadie tiene un",
+    "tags": [
+      "block-ai-crawlers-robots-txt",
+      "gptbot-robots-txt",
+      "ai-bots-list-robots-txt-genera"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 280,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-cron-preset-library-paginas-programaticas-cron-every-x",
+    "title": "Cron Preset Library — páginas programáticas 'cron every X'",
+    "problem": "200+ páginas estáticas auto-generadas ('cron every 5 minutes', 'cron every monday at 9am', 'cron first day of month'), cada una con la expresión, explicación y próximas ejecuciones. Modelo long-tail probado (Cronitor lo ",
+    "tags": [
+      "cron-every-5-minutes",
+      "cron-every-hour",
+      "cron-expression-examples",
+      "crontab-every-day-at-midnight"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 280,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "product-supabase-saas-schema-kit",
+    "title": "Supabase SaaS Schema Kit",
+    "problem": "Migraciones SQL + políticas RLS multi-tenant + triggers de auth + seed data para arrancar un SaaS en Supabase en una tarde. RLS es el dolor #1 de Supabase y la gente paga por no romperse la cabeza.",
+    "tags": [
+      "supabase",
+      "rls",
+      "sql-schema",
+      "saas-starter"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 129,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "leadmagnet-opportunity-radar-weekly-csv-gated-por-email",
+    "title": "Opportunity Radar Weekly (CSV gated por email)",
+    "problem": "El motor ya descubre y puntúa oportunidades de nicho dev cada 5 min en Supabase; exportarlas semanalmente como CSV/JSON descargable a cambio de email. Dato único que nadie más tiene y alimenta directo el funnel hacia las",
+    "tags": [
+      "niche-opportunities",
+      "dataset",
+      "side-projects",
+      "developer-ideas"
+    ],
+    "channel": "lead_magnet",
+    "payout_estimate_usd": 280,
+    "conversion_probability": 0.04,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-supacost-supabase-pricing-calculator",
+    "title": "SupaCost — Supabase Pricing Calculator",
+    "problem": "Calculadora interactiva: MAUs, storage, egress, edge functions → costo mensual estimado y en qué límite del free tier vas a tronar primero. Keyword con intención comercial alta + candidata perfecta pa' link de afiliado/p",
+    "tags": [
+      "supabase-pricing-calculator",
+      "supabase-free-tier-limits",
+      "supabase-egress-cost"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 280,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "product-supabase-backup-restore-toolkit",
+    "title": "Supabase Backup & Restore Toolkit",
+    "problem": "Action de pg_dump con rotación a storage gratis + runbook de restore probado. Ya tiene backup-supabase.js escrito: empaquetarlo es medio día y se vende a $14 al miedo de perder la base.",
+    "tags": [
+      "supabase-backup",
+      "pg-dump",
+      "disaster-recovery",
+      "github-actions"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 79,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-envtosecrets-convierte-env-a-github-secrets",
+    "title": "EnvToSecrets — convierte .env a GitHub Secrets",
+    "problem": "Pegas tu .env (todo corre local, cero envío de datos — ese es el gancho de confianza) y genera los comandos `gh secret set` + el bloque env del workflow. Búsqueda exacta del dolor que el propio Alexis vivió; audiencia id",
+    "tags": [
+      "env-to-github-secrets",
+      "gh-secret-set-from-env-file",
+      "github-actions-environment-var"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "product-solo-founder-automation-os-el-motor-como-template",
+    "title": "Solo-Founder Automation OS (el motor como template)",
+    "problem": "El propio Infinite Revenue Engine empaquetado como repo template: Python + GitHub Actions cron + Supabase + Pages + tracker Vercel, listo para clonar. Vende la historia real ('esto corre mi negocio solo') a $79-99.",
+    "tags": [
+      "github-actions",
+      "automation",
+      "solo-founder",
+      "template-repo"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 129,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 2,
+    "build_minutes": 85
+  },
+  {
+    "id": "microtool-croncraft-github-actions-cron-generator",
+    "title": "CronCraft — GitHub Actions Cron Generator",
+    "problem": "Form visual (cada X minutos/horas/días, timezone local) que escupe el bloque `on: schedule:` listo pa' pegar, con warning de UTC y del retraso típico de Actions. Rankea por 'github actions cron generator', trae devs exac",
+    "tags": [
+      "github-actions-cron-generator",
+      "github-actions-schedule-syntax",
+      "cron-yaml-github"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-hookverify-verificador-de-firmas-de-webhooks",
+    "title": "HookVerify — verificador de firmas de webhooks",
+    "problem": "Pegas payload + secret + header de firma y verifica el HMAC de Stripe, GitHub o Supabase en el navegador, mostrándote paso a paso cómo se calcula. Debuggear firmas de webhook es un dolor brutal y recurrente; conecta dire",
+    "tags": [
+      "stripe-webhook-signature-verif",
+      "github-webhook-secret-validati",
+      "verify-hmac-signature-online"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "product-cron-cookbook-50-patrones-de-cron-en-github-actions",
+    "title": "Cron Cookbook: 50 patrones de cron en GitHub Actions",
+    "problem": "Recetario markdown: debounce, jitter, retry, dedup, timezones, cold-start (el bug que ya sufrió y arregló). Esfuerzo S porque ya vivió cada patrón; $12 impulso puro.",
+    "tags": [
+      "cron",
+      "github-actions-schedule",
+      "yaml",
+      "cookbook"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 79,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "leadmagnet-the-0-stack-report-benchmark-de-free-tiers-auto-verificado",
+    "title": "The $0 Stack Report — benchmark de free tiers auto-verificado",
+    "problem": "Reporte mensual que compara límites reales de free tier (GitHub Pages/Actions, Vercel, Supabase, Cloudflare, Netlify, Railway) verificados por script, no copiados de pricing pages. Evergreen, super linkeable, y el lector",
+    "tags": [
+      "free-tier",
+      "vercel-vs-netlify",
+      "supabase-limits",
+      "comparison-report"
+    ],
+    "channel": "lead_magnet",
+    "payout_estimate_usd": 280,
+    "conversion_probability": 0.04,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "microtool-supajwt-supabase-jwt-decoder",
+    "title": "SupaJWT — Supabase JWT Decoder",
+    "problem": "Decoder de JWT 100% client-side pero especializado: explica los claims de Supabase (role, aud, exp, app_metadata) y te dice si el token está expirado y qué rol tiene. Le gana a jwt.io en la búsqueda nichada 'supabase jwt",
+    "tags": [
+      "supabase-jwt-decoder",
+      "supabase-service-role-key-vs-a",
+      "decode-jwt-online"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "product-self-healing-pipeline-pack",
+    "title": "Self-Healing Pipeline Pack",
+    "problem": "Workflows de auto-reparación: retry con backoff, alerta por issue automático, health-checks y kill-switch — nacido del outage de 3 días que ya arregló (commit b1444aa). Historia real = copy que vende solo, $15.",
+    "tags": [
+      "ci-reliability",
+      "github-actions-retry",
+      "self-healing",
+      "devops"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 79,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-actionsbill-github-actions-minutes-calculator",
+    "title": "ActionsBill — GitHub Actions Minutes Calculator",
+    "problem": "Calculas: frecuencia del cron × duración del job × multiplicador de runner (Linux/Windows/macOS) → minutos/mes y si te pasas del free tier. Intención comercial (gente decidiendo si paga GitHub) y demo viviente del propio",
+    "tags": [
+      "github-actions-minutes-calcula",
+      "github-actions-pricing",
+      "github-actions-free-tier-limit"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "product-indie-seo-pipeline-kit-destilado-de-aipickd",
+    "title": "Indie SEO Pipeline Kit (destilado de aipickd)",
+    "problem": "Los workflows reales de aipickd (keyword → artículo → publish → IndexNow → refresh) como template sanitizado, con 82+ artículos como prueba viva. Prueba social incluida = conversión alta a $49.",
+    "tags": [
+      "seo-automation",
+      "content-pipeline",
+      "github-actions",
+      "indexnow"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 129,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 2,
+    "build_minutes": 85
+  },
+  {
+    "id": "microtool-csv2sql-csv-a-insert-de-postgres",
+    "title": "CSV2SQL — CSV a INSERT de Postgres",
+    "problem": "Arrastras un CSV y genera INSERTs (o UPSERT con ON CONFLICT) con tipos inferidos y escape correcto, todo en el navegador — clave porque nadie quiere subir su data a un servidor ajeno. Volumen sólido y conversión natural ",
+    "tags": [
+      "csv-to-sql-insert-converter",
+      "csv-to-postgres-insert",
+      "csv-to-upsert"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "product-stripe-payment-links-sin-backend",
+    "title": "Stripe Payment Links sin Backend",
+    "problem": "Guía corta + snippets para vender con Payment Links + webhook en Vercel free tier con entrega automática por email. Lo va a construir para sí mismo de todos modos: documentarlo = producto de $19.",
+    "tags": [
+      "stripe-payment-links",
+      "no-backend",
+      "digital-products",
+      "vercel"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 79,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-nextrun-cron-next-run-calculator-con-timezone",
+    "title": "NextRun — Cron Next Run Calculator con timezone",
+    "problem": "Pegas una expresión cron y te muestra las próximas 10 ejecuciones convertidas a TU zona horaria (lo que crontab.guru no hace bien). Resuelve la duda #1 de quien agenda jobs en UTC; tráfico recurrente de devs.",
+    "tags": [
+      "cron-next-run-calculator",
+      "cron-expression-to-local-time",
+      "cron-utc-converter"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "offer-supabase-production-readiness-report",
+    "title": "Supabase Production Readiness Report",
+    "problem": "Reporte automatizado ($99) que escanea un proyecto Supabase vía Management API: advisors de seguridad, índices faltantes, backups, límites de plan. Se genera solo con una service key de solo-lectura; el motor lo puede ve",
+    "tags": [
+      "supabase",
+      "auditoria",
+      "production-checklist",
+      "reporte-automatizado"
+    ],
+    "channel": "paid_setup_kit",
+    "payout_estimate_usd": 199,
+    "conversion_probability": 0.05,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "product-rls-policy-pack-40-politicas-copy-paste",
+    "title": "RLS Policy Pack: 40 políticas copy-paste",
+    "problem": "40 políticas Row Level Security probadas (multi-tenant, equipos, roles, soft-delete) con tests pgTAP incluidos. Producto angosto, búsqueda desesperada, $19.",
+    "tags": [
+      "supabase-rls",
+      "row-level-security",
+      "postgres-policies",
+      "pgtap"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 79,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "leadmagnet-vault-de-50-github-actions-templates-de-produccion",
+    "title": "Vault de 50 GitHub Actions Templates de producción",
+    "problem": "Pack de YAMLs listos (pipelines cron, retries con backoff, backups de Supabase, rotación de secrets, publish a Pages) entregado por email; el motor ya genera assets cada hora y puede añadir templates nuevos solo. Captura",
+    "tags": [
+      "github-actions-templates",
+      "yaml",
+      "ci-cd",
+      "cron-workflows"
+    ],
+    "channel": "lead_magnet",
+    "payout_estimate_usd": 220,
+    "conversion_probability": 0.04,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "microtool-gitundo-flowchart-interactivo-pa-deshacer-en-git",
+    "title": "GitUndo — flowchart interactivo pa' deshacer en git",
+    "problem": "Wizard de 3-4 preguntas (¿ya hiciste commit? ¿ya pusheaste? ¿quieres conservar cambios?) que te da el comando exacto (reset/revert/restore/reflog) con explicación del riesgo. 'How to undo git commit' tiene volumen masivo",
+    "tags": [
+      "undo-git-commit",
+      "git-reset-vs-revert",
+      "git-undo-tool"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "product-webhook-tracker-in-a-weekend",
+    "title": "Webhook Tracker in a Weekend",
+    "problem": "Su propio tracker de clicks/webhooks (Vercel + Supabase) productizado como template con schema y dashboard mínimo. Código ya existe y corre en producción; $24.",
+    "tags": [
+      "webhooks",
+      "vercel-serverless",
+      "click-tracking",
+      "supabase"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 79,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "leadmagnet-devops-side-income-bootcamp-email-course-de-7-dias",
+    "title": "DevOps Side-Income Bootcamp — email course de 7 días",
+    "problem": "Drip automático que enseña la arquitectura del motor (Actions + Supabase + Pages + tracker Vercel) un componente por día; el día 7 ofrece el blueprint/setup de $49-299. Es el lead magnet que más directo convierte suscrip",
+    "tags": [
+      "email-course",
+      "automation-business",
+      "github-actions",
+      "supabase"
+    ],
+    "channel": "lead_magnet",
+    "payout_estimate_usd": 280,
+    "conversion_probability": 0.04,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "microtool-actionslint-github-actions-workflow-validator",
+    "title": "ActionsLint — GitHub Actions Workflow Validator",
+    "problem": "Pegas tu workflow YAML y valida contra el schema de Actions: detecta indentación rota, `needs` a jobs inexistentes, `on` mal escrito, secrets sin definir. Todo en navegador con js-yaml; el dolor más googleado de Actions.",
+    "tags": [
+      "github-actions-yaml-validator",
+      "validate-workflow-file-online",
+      "github-actions-syntax-checker"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "microtool-cronguru-es-generador-de-expresiones-cron-en-espanol",
+    "title": "CronGuru ES — generador de expresiones cron en español",
+    "problem": "Clon de crontab.guru pero 100% en español ('cada 5 minutos', 'todos los lunes a las 9'), apuntando al SEO dev hispano donde casi no hay competencia. Alexis es nativo, el motor puede replicar el patrón a sus otras tools d",
+    "tags": [
+      "generador-de-expresiones-cron",
+      "cron-cada-5-minutos",
+      "crontab-en-espanol"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "product-github-actions-security-hardening-checklist-premium",
+    "title": "GitHub Actions Security Hardening Checklist Premium",
+    "problem": "Checklist + script de auditoría: pinning por SHA, OIDC, tokens de mínimo privilegio, supply chain. Las empresas chiquitas pagan $15 por dormir tranquilas tras cada CVE de Actions.",
+    "tags": [
+      "actions-security",
+      "supply-chain",
+      "oidc",
+      "checklist"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 79,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "leadmagnet-cron-drift-report-cuanto-se-atrasa-realmente-el-schedule-de",
+    "title": "Cron Drift Report — cuánto se atrasa realmente el schedule de GitHub Actions",
+    "problem": "El motor corre cada 5 min: instrumentar la diferencia real entre cron spec y ejecución durante 30-90 días y publicar el benchmark trimestral (PDF + CSV gated). Dato first-party que ningún blog tiene; imán de links y emai",
+    "tags": [
+      "github-actions-cron",
+      "schedule-delay",
+      "benchmark",
+      "first-party-data"
+    ],
+    "channel": "lead_magnet",
+    "payout_estimate_usd": 220,
+    "conversion_probability": 0.04,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "microtool-gitignoretester-prueba-tu-gitignore",
+    "title": "GitignoreTester — prueba tu .gitignore",
+    "problem": "Pegas tu .gitignore + una lista de rutas y te pinta cuáles quedan ignoradas y POR CUÁL regla (matching de globs en JS). Duda universal de git ('por qué git sigue trackeando este archivo') con cero tools buenas rankeando.",
+    "tags": [
+      "gitignore-tester-online",
+      "gitignore-not-working",
+      "test-gitignore-rules"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "microtool-dockeraudit-dockerfile-linter-online",
+    "title": "DockerAudit — Dockerfile Linter online",
+    "problem": "Pegas tu Dockerfile y un set de ~30 reglas client-side marca: corre como root, tag :latest, apt sin limpiar cache, sin multi-stage — cada hallazgo con su fix. Hadolint existe pero es CLI; la versión 'pega y listo' en nav",
+    "tags": [
+      "dockerfile-linter-online",
+      "dockerfile-best-practices-chec",
+      "dockerfile-security-scan"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "product-github-actions-cost-optimizer-workbook",
+    "title": "GitHub Actions Cost Optimizer Workbook",
+    "problem": "Workbook + scripts para recortar minutos de Actions: caching agresivo, concurrency groups, poda de matrices. Se paga solo ('ahorra $20/mes por $15 una vez').",
+    "tags": [
+      "actions-minutes",
+      "ci-cost",
+      "caching",
+      "optimization"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 79,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "leadmagnet-build-in-public-revenue-ledger-mensual",
+    "title": "Build-in-Public Revenue Ledger mensual",
+    "problem": "PDF auto-generado desde las tablas reales del motor (clicks, conversiones, revenue, costos $0) publicado cada mes con resumen gated por email. La transparencia radical es el gancho de suscripción más barato que existe y ",
+    "tags": [
+      "build-in-public",
+      "revenue-report",
+      "indie-hacker",
+      "transparency"
+    ],
+    "channel": "lead_magnet",
+    "payout_estimate_usd": 220,
+    "conversion_probability": 0.04,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-jwtbench-generador-y-verificador-de-jwt-hs256",
+    "title": "JWTBench — generador y verificador de JWT HS256",
+    "problem": "Crea tokens de prueba firmados con HS256 usando crypto.subtle (todo local, ideal pa' testear APIs y RLS) y verifica firmas. Complementa a SupaJWT y captura 'jwt generator online' sin mandar secretos a ningún servidor — e",
+    "tags": [
+      "jwt-generator-online",
+      "jwt-hs256-sign-online",
+      "create-test-jwt"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-spfcheck-checker-de-spf-dkim-dmarc-sin-backend",
+    "title": "SPFCheck — checker de SPF/DKIM/DMARC sin backend",
+    "problem": "Consulta los registros TXT vía DNS-over-HTTPS de Cloudflare (tiene CORS, así que corre 100% client-side), parsea SPF/DMARC y explica cada mecanismo con semáforo de problemas. Keyword evergreen de email deliverability; út",
+    "tags": [
+      "spf-record-checker",
+      "dmarc-checker-online",
+      "dkim-lookup"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "product-actions-starter-pack-ci-cd-para-node",
+    "title": "Actions Starter Pack: CI/CD para Node",
+    "problem": "Repo template con 12 workflows listos: test, lint, release, deploy a Pages, dependabot auto-merge, crons. El 'arranca tu CI en 10 minutos' clásico a $19.",
+    "tags": [
+      "ci-cd",
+      "node",
+      "github-actions",
+      "starter-kit"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 79,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
   }
 ]
