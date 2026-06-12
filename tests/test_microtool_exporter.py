@@ -83,6 +83,85 @@ class MicrotoolExporterTests(unittest.TestCase):
 
         self.assertEqual(written, [])
 
+    def test_detects_all_new_microtool_kinds(self):
+        cases = [
+            ("Cron Expression Explainer", "cron-explainer", ["cron", "automation"]),
+            ("Environment Variable Auditor", "env-auditor", ["env", "security"]),
+            ("Docker Compose Env Checker", "docker-env", ["docker", "env"]),
+            ("OpenAI API Cost Calculator", "openai-cost", ["openai-api", "costs", "calculator"]),
+            ("Webhook Signature Tester", "webhook-sig", ["webhooks", "security"]),
+            ("Stripe Webhook Signature Verifier", "stripe-webhook", ["stripe", "webhooks"]),
+            ("Regex Explainer and Test Case Generator", "regex-explainer", ["regex", "testing"]),
+        ]
+        for title, external_id, tags in cases:
+            with self.subTest(tool=external_id):
+                self.assertTrue(is_supported_microtool(opportunity(title, external_id, tags)))
+
+    def test_exports_interactive_cron_explainer(self):
+        opp = opportunity("Cron Expression Explainer", "cron-explainer", ["cron", "github-actions"])
+
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(opp, [])])
+            page = (Path(directory) / "cron-explainer" / "index.html").read_text(encoding="utf-8")
+
+        self.assertIn("explainCron", page)
+        self.assertIn("minute", page.lower())
+        self.assertIn("next runs", page.lower())
+
+    def test_exports_interactive_env_auditor(self):
+        opp = opportunity("Environment Variable Auditor", "env-auditor", ["env", "security"])
+
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(opp, [])])
+            page = (Path(directory) / "env-auditor" / "index.html").read_text(encoding="utf-8")
+
+        self.assertIn("auditEnv", page)
+        self.assertIn("placeholder", page.lower())
+        self.assertIn("duplicate", page.lower())
+        self.assertIn("never leaves your browser", page.lower())
+
+    def test_exports_interactive_docker_compose_checker(self):
+        opp = opportunity("Docker Compose Env Checker", "docker-env", ["docker", "env"])
+
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(opp, [])])
+            page = (Path(directory) / "docker-env" / "index.html").read_text(encoding="utf-8")
+
+        self.assertIn("checkCompose", page)
+        self.assertIn("env_file", page)
+
+    def test_exports_interactive_openai_cost_calculator(self):
+        opp = opportunity("OpenAI API Cost Calculator", "openai-cost", ["openai-api", "costs"])
+
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(opp, [])])
+            page = (Path(directory) / "openai-cost" / "index.html").read_text(encoding="utf-8")
+
+        self.assertIn("calculateCost", page)
+        self.assertIn("per month", page.lower())
+        self.assertIn("verify current pricing", page.lower())
+
+    def test_exports_interactive_webhook_signature_tester(self):
+        opp = opportunity("Webhook Signature Tester", "webhook-sig", ["webhooks", "security"])
+
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(opp, [])])
+            page = (Path(directory) / "webhook-sig" / "index.html").read_text(encoding="utf-8")
+
+        self.assertIn("computeSignature", page)
+        self.assertIn("HMAC", page)
+        self.assertIn("never leaves your browser", page.lower())
+
+    def test_exports_interactive_regex_tester(self):
+        opp = opportunity("Regex Explainer and Test Case Generator", "regex-explainer", ["regex", "testing"])
+
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(opp, [])])
+            page = (Path(directory) / "regex-explainer" / "index.html").read_text(encoding="utf-8")
+
+        self.assertIn("testRegex", page)
+        self.assertIn("matches", page.lower())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -40,7 +40,7 @@ jobs:
         run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
 
       - name: Generate owned static site
-        run: python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 12 --site-output-dir out/site --microtool-output-dir out/site/tools --click-redirect-url "${CLICK_REDIRECT_URL}" --intake-url "${SERVICE_INTAKE_URL}" --site-base-url "${SITE_BASE_URL}" --offer-payment-urls "${OFFER_PAYMENT_URLS}"
+        run: python -m farm_loop.main --portfolio-once --portfolio-phase generate --dry-run --max-opportunities 24 --site-output-dir out/site --microtool-output-dir out/site/tools --click-redirect-url "${CLICK_REDIRECT_URL}" --intake-url "${SERVICE_INTAKE_URL}" --site-base-url "${SITE_BASE_URL}" --offer-payment-urls "${OFFER_PAYMENT_URLS}"
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
