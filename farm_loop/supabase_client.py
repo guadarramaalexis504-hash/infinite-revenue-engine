@@ -186,6 +186,22 @@ class SupabaseClient:
             limit=limit,
         )
 
+    def list_offers_for_checkout(self, *, limit: int = 1000) -> Any:
+        return self._recent_rows(
+            "offers",
+            "id,channel,title,price_usd,payment_url,payload,created_at",
+            limit=limit,
+        )
+
+    def update_offer_payment_url(self, offer_id: str, payment_url: str) -> Any:
+        path = f"offers?id=eq.{quote(str(offer_id), safe='')}"
+        return self.request(
+            "PATCH",
+            path,
+            json_body={"payment_url": payment_url},
+            prefer="return=minimal",
+        )
+
     def list_experiments(self, *, limit: int = 500) -> Any:
         return self._recent_rows(
             "experiments",

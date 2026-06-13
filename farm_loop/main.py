@@ -615,6 +615,64 @@ def run_record_conversion(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_create_stripe_links(args: argparse.Namespace) -> int:
+    from types import SimpleNamespace
+
+    from .stripe_links import StripeLinkBuilder, build_offer_payment_urls_string
+
+    settings = Settings.from_env()
+    builder = StripeLinkBuilder(settings.stripe_secret_key)
+    if not builder.enabled:
+        LOGGER.error("STRIPE_SECRET_KEY missing or placeholder; set it before creating links.")
+        return 1
+    if not settings.supabase_url or not settings.supabase_key:
+        raise ValueError("Missing required environment variables: SUPABASE_URL, SUPABASE_KEY")
+
+    supabase = SupabaseClient(settings.supabase_url, settings.supabase_key)
+    rows = supabase.list_offers_for_checkout()
+    offers = []
+    id_by_offer_key: dict[str, str] = {}
+    for row in rows if isinstance(rows, list) else []:
+        payload = row.get("payload") or {}
+        offer_key = payload.get("offer_key") or ""
+        if not offer_key or row.get("payment_url"):
+            continue  # skip already-linked offers
+        id_by_offer_key.setdefault(offer_key, str(row.get("id")))
+        offers.append(
+            SimpleNamespace(
+                offer_type=payload.get("offer_type", ""),
+                price_usd=float(row.get("price_usd") or 0),
+                offer_key=offer_key,
+                title=row.get("title", ""),
+                channel=row.get("channel", ""),
+                source=payload.get("source", ""),
+                external_id=payload.get("external_id", ""),
+            )
+        )
+
+    links = builder.create_for_offers(offers)
+    for offer_key, url in links.items():
+        offer_id = id_by_offer_key.get(offer_key)
+        if offer_id:
+            try:
+                supabase.update_offer_payment_url(offer_id, url)
+            except Exception as exc:  # noqa: BLE001
+                LOGGER.error("could not update offer %s: %s", offer_id, exc)
+
+    payment_urls_string = build_offer_payment_urls_string(links)
+    LOGGER.info("stripe_links_created %s", json.dumps({"count": len(links)}, sort_keys=True))
+    LOGGER.info("OFFER_PAYMENT_URLS=%s", payment_urls_string)
+
+    notifier = DiscordNotifier(settings.discord_webhook_url)
+    if notifier.enabled and links:
+        notifier.send(
+            f"**💳 {len(links)} Stripe Payment Links creados** y guardados en las ofertas. "
+            "El checkout real ya esta vivo.",
+            username="Revenue Engine",
+        )
+    return 0
+
+
 def _parse_json_object(value: str | None) -> dict[str, Any]:
     if not value:
         return {}
@@ -671,6 +729,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     mode.add_argument("--loop", action="store_true", help="Run continuously.")
     mode.add_argument("--portfolio-once", action="store_true", help="Run one revenue portfolio cycle and exit.")
     mode.add_argument("--record-conversion", action="store_true", help="Record one confirmed conversion and exit.")
+    mode.add_argument("--create-stripe-links", action="store_true", help="Create Stripe Payment Links for paid offers in Supabase and write them back.")
     parser.add_argument("--interval-seconds", type=int, default=300)
     parser.add_argument("--dry-run", action="store_true", help="Avoid Supabase writes and OpenAI draft generation.")
     parser.add_argument("--force-drafts", action="store_true", help="Generate drafts even after TARGET_USD is reached.")
@@ -848,6 +907,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.record_conversion:
             return run_record_conversion(args)
+        if args.create_stripe_links:
+            return run_create_stripe_links(args)
         if args.portfolio_once:
             return run_portfolio_single(args)
         if args.loop:
