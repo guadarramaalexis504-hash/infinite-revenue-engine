@@ -77,6 +77,8 @@ class MicrotoolExporter:
             "regex_tester": _regex_tester_tool,
             "llmstxt_generator": _llmstxt_generator_tool,
             "ai_robots_generator": _ai_robots_tool,
+            "supabase_pricing_calculator": _supabase_pricing_tool,
+            "rls_policy_generator": _rls_policy_generator_tool,
         }
         if kind not in builders:
             raise ValueError(f"Unsupported microtool: {opportunity.external_id}")
@@ -110,6 +112,11 @@ class MicrotoolExporter:
 
 def _tool_kind(opportunity: RevenueOpportunity) -> str | None:
     haystack = " ".join([opportunity.title, opportunity.external_id, *opportunity.tags]).lower()
+    # Specific, named tools win over the generic detectors below.
+    if "supabase" in haystack and ("pricing" in haystack or "supacost" in haystack):
+        return "supabase_pricing_calculator"
+    if "rls" in haystack and ("generator" in haystack or "forge" in haystack):
+        return "rls_policy_generator"
     if "supabase" in haystack and "rls" in haystack:
         return "supabase_rls"
     if ("github-actions" in haystack or "github actions" in haystack) and "yaml" in haystack:
@@ -634,6 +641,120 @@ def _ai_robots_tool() -> str:
         document.getElementById('robotsout').textContent = out;
       }
       function copyRobots() { navigator.clipboard.writeText(document.getElementById('robotsout').textContent); }
+    </script>
+    """
+
+
+def _supabase_pricing_tool() -> str:
+    return r"""
+    <section class="tool">
+      <style>
+        .sc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .sc-grid label { font-weight: 700; font-size: 0.9rem; display:block; margin-bottom:4px; }
+        .sc-grid input { width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 8px; }
+        .cost-big { font-size: 1.6rem; font-weight: 700; color: var(--accent); }
+      </style>
+      <p>Estimate your monthly Supabase bill and see which free-tier limit you hit first. Verify current pricing on supabase.com/pricing — these are example Pro-plan rates and run entirely in your browser.</p>
+      <div class="sc-grid">
+        <div><label for="mau">Monthly active users</label><input id="mau" type="number" value="5000"></div>
+        <div><label for="db">Database size (GB)</label><input id="db" type="number" step="0.1" value="2"></div>
+        <div><label for="storage">File storage (GB)</label><input id="storage" type="number" step="0.1" value="5"></div>
+        <div><label for="egress">Egress / bandwidth (GB)</label><input id="egress" type="number" step="0.1" value="20"></div>
+        <div><label for="funcs">Edge function invocations (millions)</label><input id="funcs" type="number" step="0.1" value="1"></div>
+      </div>
+      <button type="button" onclick="calcSupabase()">Calculate cost</button>
+      <div id="results" class="results" aria-live="polite"></div>
+    </section>
+    <script>
+      // Example free-tier limits and Pro overage rates (verify on the pricing page).
+      var FREE = { mau: 50000, db: 0.5, storage: 1, egress: 5, funcs: 0.5 };
+      var PRO_INCLUDED = { mau: 100000, db: 8, storage: 100, egress: 250, funcs: 2 };
+      var OVER = { mau: 0.00325, db: 0.125, storage: 0.021, egress: 0.09, funcs: 2.0 }; // $ per unit over Pro
+      var PRO_BASE = 25;
+      function num(id){ return parseFloat(document.getElementById(id).value) || 0; }
+      function calcSupabase(){
+        var u = { mau:num('mau'), db:num('db'), storage:num('storage'), egress:num('egress'), funcs:num('funcs') };
+        var overFree = [], items = [], overageCost = 0;
+        var labels = { mau:'monthly active users', db:'database GB', storage:'storage GB', egress:'egress GB', funcs:'edge fn (M)' };
+        for (var k in FREE){
+          if (u[k] > FREE[k]) overFree.push(labels[k]);
+          var over = Math.max(0, u[k] - PRO_INCLUDED[k]);
+          var c = over * OVER[k];
+          overageCost += c;
+          if (over > 0) items.push('<li class="warn">Over Pro included '+labels[k]+': +'+over.toFixed(2)+' &rarr; $'+c.toFixed(2)+'</li>');
+        }
+        var onFree = overFree.length === 0;
+        var proTotal = PRO_BASE + overageCost;
+        var html = '<ul>';
+        if (onFree) html += '<li class="ok">You fit within the <strong>free tier</strong> — $0/month.</li>';
+        else html += '<li class="warn">You exceed the free tier on: <strong>'+overFree.join(', ')+'</strong>. You need at least the Pro plan.</li>';
+        html += '</ul>';
+        if (!onFree){
+          html += '<h3>Pro plan estimate</h3><ul><li class="ok">Base: $'+PRO_BASE.toFixed(2)+'</li>'+items.join('')+
+                  '<li class="ok">Estimated total: <span class="cost-big">$'+proTotal.toFixed(2)+'/mo</span></li></ul>';
+        }
+        document.getElementById('results').innerHTML = html;
+      }
+    </script>
+    """
+
+
+def _rls_policy_generator_tool() -> str:
+    return r"""
+    <section class="tool">
+      <style>
+        .rls-grid label { display:block; font-weight:700; margin:12px 0 6px; }
+        .rls-grid input, .rls-grid select { width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; font-family:Consolas,monospace; }
+        pre.out { background: var(--surface); border:1px solid var(--line); border-radius:8px; padding:14px; white-space:pre-wrap; font-family:Consolas,monospace; }
+      </style>
+      <p>Generate ready-to-paste Supabase Row Level Security policies. Pick the table, the operations, and who owns the row — get the exact <code>create policy</code> SQL with an explanation. Runs in your browser.</p>
+      <div class="rls-grid">
+        <label for="table">Table name</label>
+        <input id="table" value="public.documents">
+        <label for="owner">Ownership column (the user id on the row)</label>
+        <input id="owner" value="user_id">
+        <label for="rule">Access rule</label>
+        <select id="rule">
+          <option value="owner">Only the owner can see/change their rows (auth.uid() = owner)</option>
+          <option value="public_read_owner_write">Anyone can read, only owner can write</option>
+          <option value="authenticated">Any logged-in user (authenticated role)</option>
+        </select>
+      </div>
+      <button type="button" onclick="generatePolicy()">Generate RLS policies</button>
+      <div id="results" class="results" aria-live="polite"></div>
+    </section>
+    <script>
+      function esc(s){ return String(s).replace(/[^a-zA-Z0-9_.]/g,''); }
+      function generatePolicy(){
+        var t = esc(document.getElementById('table').value) || 'public.my_table';
+        var col = esc(document.getElementById('owner').value) || 'user_id';
+        var rule = document.getElementById('rule').value;
+        var sql = 'alter table ' + t + ' enable row level security;\n\n';
+        var note = '';
+        if (rule === 'owner'){
+          ['select','insert','update','delete'].forEach(function(op){
+            var clause = op === 'insert' ? 'with check' : 'using';
+            sql += 'create policy "'+op+'_own" on '+t+'\n  for '+op+' to authenticated\n  '+clause+' (auth.uid() = '+col+');\n\n';
+          });
+          note = 'Each policy restricts the row to its owner. INSERT uses WITH CHECK so users can only create rows assigned to themselves; the others use USING.';
+        } else if (rule === 'public_read_owner_write'){
+          sql += 'create policy "read_all" on '+t+'\n  for select to anon, authenticated\n  using (true);\n\n';
+          ['insert','update','delete'].forEach(function(op){
+            var clause = op === 'insert' ? 'with check' : 'using';
+            sql += 'create policy "'+op+'_own" on '+t+'\n  for '+op+' to authenticated\n  '+clause+' (auth.uid() = '+col+');\n\n';
+          });
+          note = 'Everyone (including anon) can read; only the authenticated owner can insert/update/delete their rows. Make sure exposing all rows publicly is intended.';
+        } else {
+          sql += 'create policy "authenticated_all" on '+t+'\n  for all to authenticated\n  using (true) with check (true);\n\n';
+          note = 'Any logged-in user has full access. Use only when every authenticated user should see every row (e.g. shared team data with no per-row ownership).';
+        }
+        document.getElementById('results').innerHTML =
+          '<pre class="out" id="rlsout"></pre><button type="button" onclick="copyRls()">Copy SQL</button>' +
+          '<ul><li class="ok">'+note+'</li>' +
+          '<li class="warn">RLS denies by default once enabled: with no matching policy, access is blocked. Test with a non-service-role key.</li></ul>';
+        document.getElementById('rlsout').textContent = sql.trim();
+      }
+      function copyRls(){ navigator.clipboard.writeText(document.getElementById('rlsout').textContent); }
     </script>
     """
 

@@ -173,6 +173,35 @@ class MicrotoolExporterTests(unittest.TestCase):
         self.assertIn("GPTBot", page)
         self.assertIn("ClaudeBot", page)
 
+    def test_detects_and_exports_supabase_pricing_calculator(self):
+        opp = opportunity("SupaCost - Supabase Pricing Calculator", "supacost", ["supabase-pricing-calculator", "supabase-egress-cost"])
+        self.assertTrue(is_supported_microtool(opp))
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(opp, [])])
+            page = (Path(directory) / "supacost" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("calcSupabase", page)
+        self.assertIn("free tier", page.lower())
+        self.assertIn("egress", page.lower())
+
+    def test_detects_and_exports_rls_policy_generator(self):
+        opp = opportunity("RLS Forge - Supabase RLS Policy Generator", "rls-forge", ["supabase-rls-policy-generator", "create-policy-postgres"])
+        self.assertTrue(is_supported_microtool(opp))
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(opp, [])])
+            page = (Path(directory) / "rls-forge" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("generatePolicy", page)
+        self.assertIn("create policy", page.lower())
+        self.assertIn("auth.uid()", page)
+
+    def test_rls_forge_does_not_collide_with_rls_checker(self):
+        # The plain checker idea must still render the analyzer, not the generator.
+        checker = opportunity("Supabase RLS Policy Checker", "rls-checker", ["supabase", "rls", "security"])
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(checker, [])])
+            page = (Path(directory) / "rls-checker" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("analyzeRls", page)
+        self.assertNotIn("generatePolicy", page)
+
     def test_exports_interactive_regex_tester(self):
         opp = opportunity("Regex Explainer and Test Case Generator", "regex-explainer", ["regex", "testing"])
 
