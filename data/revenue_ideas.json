@@ -1437,5 +1437,354 @@
     "estimated_cost_usd": 4,
     "risk_penalty_usd": 1,
     "build_minutes": 50
+  },
+  {
+    "id": "offer-github-actions-cost-audit",
+    "title": "GitHub Actions Cost Audit",
+    "problem": "Análisis de minutos facturados por workflow + plan de recortes (caching, concurrency, paths-filter, runners correctos), $199; versión solo-reporte automatizada a $79. Empresas con monorepos queman cientos de dólares al m",
+    "tags": [
+      "github-actions",
+      "costos",
+      "billing",
+      "optimizacion"
+    ],
+    "channel": "paid_setup_kit",
+    "payout_estimate_usd": 199,
+    "conversion_probability": 0.05,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "offer-github-actions-security-hardening",
+    "title": "GitHub Actions Security Hardening",
+    "problem": "Pinear actions a SHA, permisos least-privilege, OIDC en vez de secretos long-lived, bloqueo de third-party actions, $249; versión scan automatizado del repo a $99. Los supply-chain attacks de 2025 dejaron el mercado sens",
+    "tags": [
+      "github-actions",
+      "seguridad",
+      "supply-chain",
+      "oidc"
+    ],
+    "channel": "paid_setup_kit",
+    "payout_estimate_usd": 199,
+    "conversion_probability": 0.05,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-hmacbox-generador-hmac-sha-256-client-side",
+    "title": "HMACBox — generador HMAC SHA-256 client-side",
+    "problem": "Generador genérico de HMAC (SHA-1/256/512, salida hex/base64) con crypto.subtle, sin backend. Keyword evergreen con volumen decente; los incumbentes (freeformatter) son feos y mandan tus datos al servidor — ahí está el á",
+    "tags": [
+      "hmac-sha256-generator-online",
+      "hmac-calculator",
+      "hmac-base64"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-ogpreview-preview-de-open-graph-y-meta-tags",
+    "title": "OGPreview — preview de Open Graph y meta tags",
+    "problem": "Pegas tus meta tags (o los editas en un form) y ves el preview de la card en Google/Twitter/LinkedIn/WhatsApp + el HTML listo. Útil pa' devs Y pa' la audiencia SEO de aipickd; keyword competida pero con long-tail abundan",
+    "tags": [
+      "open-graph-preview-tool",
+      "og-image-size",
+      "meta-tags-generator"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "product-supabase-edge-functions-recipes",
+    "title": "Supabase Edge Functions Recipes",
+    "problem": "25 edge functions listas: webhook de Stripe, emails con Resend, rate limiting, cron triggers, firmas HMAC. Snippets organizados que ahorran horas, $19.",
+    "tags": [
+      "supabase-edge-functions",
+      "deno",
+      "snippets",
+      "serverless"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 79,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "leadmagnet-supabase-rls-audit-kit",
+    "title": "Supabase RLS Audit Kit",
+    "problem": "Pack de queries SQL + checklist que detecta tablas sin Row Level Security y políticas débiles (nació del hallazgo real de 14 tablas expuestas). Los freebies de seguridad convierten muy bien y posicionan para consultoría/",
+    "tags": [
+      "supabase-rls",
+      "security-audit",
+      "sql-scripts",
+      "postgres"
+    ],
+    "channel": "lead_magnet",
+    "payout_estimate_usd": 220,
+    "conversion_probability": 0.04,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-envexample-generador-de-env-example",
+    "title": "EnvExample — generador de .env.example",
+    "problem": "Pegas tu .env y devuelve el .env.example sin valores + tabla markdown de variables documentada pa'l README. Tool única (casi nadie la tiene), perfecta pa' captar emails con 'descarga tu plantilla'.",
+    "tags": [
+      "env-example-generator",
+      "env-file-documentation",
+      "dotenv-template-generator"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 120,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "product-oidc-deploy-pack",
+    "title": "OIDC Deploy Pack",
+    "problem": "Deploys sin llaves desde Actions a AWS/GCP/Azure/Vercel vía OIDC: configs Terraform-free + walkthrough. Tema que todos saben que deberían hacer y nadie configura; $19.",
+    "tags": [
+      "oidc",
+      "keyless-deploy",
+      "github-actions",
+      "cloud-auth"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 79,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "leadmagnet-actions-spend-calculator-con-reporte-personalizado-por-email",
+    "title": "Actions Spend Calculator con reporte personalizado por email",
+    "problem": "Microtool en el sitio de Pages: metes tus minutos/runners y te llega un PDF personalizado con tu proyección de costos y cómo bajarla — el email se captura como parte del flujo, no como peaje. El tracker de Vercel ya pued",
+    "tags": [
+      "github-actions-pricing",
+      "calculator",
+      "ci-costs",
+      "microtool"
+    ],
+    "channel": "lead_magnet",
+    "payout_estimate_usd": 220,
+    "conversion_probability": 0.04,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "microtool-workflowdoctor-auditor-de-velocidad-de-workflows",
+    "title": "WorkflowDoctor — auditor de velocidad de workflows",
+    "problem": "Pegas tu YAML y un motor de reglas detecta: falta cache de dependencias, checkout sin shallow clone, sin concurrency group, jobs serializables en paralelo — con el fix listo pa' copiar. Rankea por 'speed up github action",
+    "tags": [
+      "speed-up-github-actions",
+      "github-actions-cache-dependenc",
+      "optimize-ci-pipeline"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 2,
+    "build_minutes": 85
+  },
+  {
+    "id": "microtool-jqbox-jq-playground-en-el-navegador",
+    "title": "JQBox — jq playground en el navegador",
+    "problem": "Playground de jq con jq-wasm: pegas JSON, escribes el filtro, ves resultado al instante + cheatsheet de recetas comunes. jqplay.org se cae seguido y la keyword tiene tráfico fiel de devs; las recetas dan long-tail extra.",
+    "tags": [
+      "jq-playground-online",
+      "jq-tester",
+      "jq-examples-cheat-sheet"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 190,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "product-the-env-survival-kit",
+    "title": "The .env Survival Kit",
+    "problem": "Generador de .env.example, validador de env vars, checklist de rotación de secrets y action de sync a GitHub Secrets. Ticket bajo ($9) pero dolor universal de devs — volumen.",
+    "tags": [
+      "env-vars",
+      "dotenv",
+      "secrets-management",
+      "github-secrets"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 39,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "product-supabase-auth-flows-pack",
+    "title": "Supabase Auth Flows Pack",
+    "problem": "Magic link, OAuth y OTP completos con tabla profiles RLS-safe, templates de email y variantes vanilla JS/Next. Auth es lo primero que todo proyecto necesita; $24.",
+    "tags": [
+      "supabase-auth",
+      "magic-link",
+      "oauth",
+      "boilerplate"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 79,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "leadmagnet-supabase-free-tier-survival-guide-con-datos-de-uso-reales",
+    "title": "Supabase Free Tier Survival Guide con datos de uso reales",
+    "problem": "PDF + snippets SQL de monitoreo usando las métricas reales del proyecto Supabase del motor (filas, requests, límites) para enseñar a no salirse del free tier. Audiencia enorme de devs que viven en el free tier.",
+    "tags": [
+      "supabase-free-tier",
+      "usage-monitoring",
+      "postgres",
+      "cost-optimization"
+    ],
+    "channel": "lead_magnet",
+    "payout_estimate_usd": 220,
+    "conversion_probability": 0.04,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-matrixmaker-github-actions-matrix-generator",
+    "title": "MatrixMaker — GitHub Actions Matrix Generator",
+    "problem": "Defines ejes (OS, versiones de Node/Python, flags) y genera el YAML de `strategy.matrix` con include/exclude + contador de jobs totales (pa' no quemar minutos). Nicho chico pero sin competencia y 100% alineado a la audie",
+    "tags": [
+      "github-actions-matrix-generato",
+      "matrix-strategy-include-exclud",
+      "github-actions-matrix-examples"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 120,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "product-actions-matrix-monorepo-kit",
+    "title": "Actions Matrix Monorepo Kit",
+    "problem": "Templates de CI para monorepos pnpm/turborepo: path filtering, builds solo de lo afectado, cache compartido. Nicho con presupuesto (equipos), $24.",
+    "tags": [
+      "monorepo",
+      "turborepo",
+      "pnpm",
+      "matrix-builds"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 79,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
+  },
+  {
+    "id": "leadmagnet-solo-automation-audit-scorecard",
+    "title": "Solo Automation Audit Scorecard",
+    "problem": "Template markdown/Notion con rúbrica de 0-100 para que un solo founder califique qué tan automatizado está su negocio; el resultado bajo duele y el upsell natural es la oferta de setup de $49. Se entrega por email y el m",
+    "tags": [
+      "automation-audit",
+      "solo-founder",
+      "template",
+      "scorecard"
+    ],
+    "channel": "lead_magnet",
+    "payout_estimate_usd": 220,
+    "conversion_probability": 0.04,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-cron2systemd-convertidor-crontab-a-systemd-timer",
+    "title": "Cron2Systemd — convertidor crontab a systemd timer",
+    "problem": "Pegas una línea de crontab y genera el par .service/.timer con OnCalendar equivalente. Keyword de baja competencia con intención clarísima; nicho sysadmin/devops que también consume las otras tools.",
+    "tags": [
+      "cron-to-systemd-timer-converte",
+      "oncalendar-syntax",
+      "systemd-timer-generator"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 120,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "microtool-pkcegen-generador-de-code-verifier-challenge-pkce",
+    "title": "PKCEGen — generador de code verifier/challenge PKCE",
+    "problem": "Genera el par code_verifier + code_challenge (S256) pa' probar flujos OAuth a mano, con el curl de ejemplo listo. Búsqueda chica pero de implementadores serios (futuros compradores) y competencia casi nula.",
+    "tags": [
+      "pkce-code-verifier-generator",
+      "pkce-challenge-s256",
+      "oauth-pkce-flow-test"
+    ],
+    "channel": "microtool_seo",
+    "payout_estimate_usd": 120,
+    "conversion_probability": 0.07,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "product-static-site-money-pages",
+    "title": "Static Site Money Pages",
+    "problem": "Pack de landing pages estáticas para vender productos digitales en GitHub Pages con botones BMC/Stripe embebidos, cero backend. Se come su propia comida: son las páginas que el motor ya usa. $14.",
+    "tags": [
+      "landing-page",
+      "github-pages",
+      "html-template",
+      "conversion"
+    ],
+    "channel": "digital_product",
+    "payout_estimate_usd": 39,
+    "conversion_probability": 0.08,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 30
+  },
+  {
+    "id": "leadmagnet-github-actions-failure-almanac",
+    "title": "GitHub Actions Failure Almanac",
+    "problem": "Mini-reporte mensual de modos de falla reales con sus fixes, sembrado con los postmortems propios del motor (como el outage de 3 días por cold-start del categories-fetch). El dolor compartido genera suscripciones leales ",
+    "tags": [
+      "github-actions-debugging",
+      "postmortem",
+      "ci-failures",
+      "incident-report"
+    ],
+    "channel": "lead_magnet",
+    "payout_estimate_usd": 220,
+    "conversion_probability": 0.04,
+    "estimated_cost_usd": 4,
+    "risk_penalty_usd": 1,
+    "build_minutes": 50
   }
 ]
