@@ -202,6 +202,41 @@ class MicrotoolExporterTests(unittest.TestCase):
         self.assertIn("analyzeRls", page)
         self.assertNotIn("generatePolicy", page)
 
+    def test_detects_and_exports_cron_generator(self):
+        opp = opportunity("CronCraft - GitHub Actions Cron Generator", "croncraft", ["github-actions-cron-generator", "cron-yaml-github"])
+        self.assertTrue(is_supported_microtool(opp))
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(opp, [])])
+            page = (Path(directory) / "croncraft" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("buildCron", page)
+        self.assertIn("schedule:", page)
+
+    def test_cron_generator_does_not_collide_with_explainer(self):
+        explainer = opportunity("Cron Expression Explainer", "cron-explain", ["cron", "github-actions"])
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(explainer, [])])
+            page = (Path(directory) / "cron-explain" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("explainCron", page)
+        self.assertNotIn("buildCron", page)
+
+    def test_detects_and_exports_jwt_decoder(self):
+        opp = opportunity("SupaJWT - Supabase JWT Decoder", "supajwt", ["supabase-jwt-decoder", "decode-jwt-online"])
+        self.assertTrue(is_supported_microtool(opp))
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(opp, [])])
+            page = (Path(directory) / "supajwt" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("decodeJwt", page)
+        self.assertIn("never leaves your browser", page.lower())
+
+    def test_detects_and_exports_actions_minutes_calculator(self):
+        opp = opportunity("ActionsBill - GitHub Actions Minutes Calculator", "actionsbill", ["github-actions-minutes-calculator", "github-actions-pricing"])
+        self.assertTrue(is_supported_microtool(opp))
+        with tempfile.TemporaryDirectory() as directory:
+            MicrotoolExporter(directory).export_portfolio([(opp, [])])
+            page = (Path(directory) / "actionsbill" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("calcActions", page)
+        self.assertIn("free tier", page.lower())
+
     def test_exports_interactive_regex_tester(self):
         opp = opportunity("Regex Explainer and Test Case Generator", "regex-explainer", ["regex", "testing"])
 

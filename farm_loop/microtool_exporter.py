@@ -79,6 +79,9 @@ class MicrotoolExporter:
             "ai_robots_generator": _ai_robots_tool,
             "supabase_pricing_calculator": _supabase_pricing_tool,
             "rls_policy_generator": _rls_policy_generator_tool,
+            "cron_generator": _cron_generator_tool,
+            "jwt_decoder": _jwt_decoder_tool,
+            "actions_minutes_calculator": _actions_minutes_tool,
         }
         if kind not in builders:
             raise ValueError(f"Unsupported microtool: {opportunity.external_id}")
@@ -119,6 +122,12 @@ def _tool_kind(opportunity: RevenueOpportunity) -> str | None:
         return "rls_policy_generator"
     if "supabase" in haystack and "rls" in haystack:
         return "supabase_rls"
+    if "jwt" in haystack:
+        return "jwt_decoder"
+    if ("actions" in haystack or "github-actions" in haystack) and ("minutes" in haystack or "bill" in haystack):
+        return "actions_minutes_calculator"
+    if "cron" in haystack and ("generator" in haystack or "craft" in haystack):
+        return "cron_generator"
     if ("github-actions" in haystack or "github actions" in haystack) and "yaml" in haystack:
         return "github_actions_yaml"
     if "docker" in haystack and ("compose" in haystack or "env" in haystack):
@@ -755,6 +764,151 @@ def _rls_policy_generator_tool() -> str:
         document.getElementById('rlsout').textContent = sql.trim();
       }
       function copyRls(){ navigator.clipboard.writeText(document.getElementById('rlsout').textContent); }
+    </script>
+    """
+
+
+def _cron_generator_tool() -> str:
+    return r"""
+    <section class="tool">
+      <style>
+        .cg-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+        .cg-grid label { font-weight:700; font-size:0.9rem; display:block; margin-bottom:4px; }
+        .cg-grid select, .cg-grid input { width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; }
+        pre.out { background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:14px; white-space:pre-wrap; font-family:Consolas,monospace; }
+      </style>
+      <p>Build a GitHub Actions <code>schedule</code> block visually. Pick a frequency and get the exact cron expression and YAML to paste. Runs in your browser.</p>
+      <div class="cg-grid">
+        <div><label for="freq">Frequency</label>
+          <select id="freq" onchange="cgToggle()">
+            <option value="minutes">Every N minutes</option>
+            <option value="hours">Every N hours</option>
+            <option value="daily" selected>Every day at a time</option>
+            <option value="weekly">Every week on a day</option>
+            <option value="monthly">Every month on a day</option>
+          </select></div>
+        <div id="wrap-n" style="display:none"><label for="n">N</label><input id="n" type="number" value="5" min="1"></div>
+        <div id="wrap-time"><label for="hh">Hour (0-23, UTC)</label><input id="hh" type="number" value="9" min="0" max="23"></div>
+        <div id="wrap-min"><label for="mm">Minute (0-59)</label><input id="mm" type="number" value="0" min="0" max="59"></div>
+        <div id="wrap-dow" style="display:none"><label for="dow">Day of week</label>
+          <select id="dow"><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option><option value="0">Sunday</option></select></div>
+        <div id="wrap-dom" style="display:none"><label for="dom">Day of month (1-31)</label><input id="dom" type="number" value="1" min="1" max="31"></div>
+      </div>
+      <button type="button" onclick="buildCron()">Generate cron</button>
+      <div id="results" class="results" aria-live="polite"></div>
+      <p>GitHub Actions runs schedules in UTC and may be delayed a few minutes under load.</p>
+    </section>
+    <script>
+      function v(id){ return document.getElementById(id).value; }
+      function cgToggle(){
+        var f = v('freq');
+        document.getElementById('wrap-n').style.display = (f==='minutes'||f==='hours') ? '' : 'none';
+        document.getElementById('wrap-time').style.display = (f==='minutes'||f==='hours') ? 'none' : '';
+        document.getElementById('wrap-min').style.display = (f==='minutes') ? 'none' : '';
+        document.getElementById('wrap-dow').style.display = (f==='weekly') ? '' : 'none';
+        document.getElementById('wrap-dom').style.display = (f==='monthly') ? '' : 'none';
+      }
+      function clampInt(id, lo, hi){ var x=parseInt(v(id),10); if(isNaN(x))x=lo; return Math.max(lo,Math.min(hi,x)); }
+      function buildCron(){
+        var f=v('freq'), expr='';
+        if(f==='minutes'){ var n=clampInt('n',1,59); expr=(n===1?'*':'*/'+n)+' * * * *'; }
+        else if(f==='hours'){ var n2=clampInt('n',1,23); expr='0 '+(n2===1?'*':'*/'+n2)+' * * *'; }
+        else { var hh=clampInt('hh',0,23), mm=clampInt('mm',0,59);
+          if(f==='daily') expr=mm+' '+hh+' * * *';
+          else if(f==='weekly') expr=mm+' '+hh+' * * '+v('dow');
+          else expr=mm+' '+hh+' '+clampInt('dom',1,31)+' * *'; }
+        var yaml='on:\n  schedule:\n    - cron: \"'+expr+'\"';
+        document.getElementById('results').innerHTML =
+          '<h3>Cron expression</h3><pre class=\"out\">'+expr+'</pre>'+
+          '<h3>GitHub Actions YAML</h3><pre class=\"out\" id=\"cgyaml\"></pre><button type=\"button\" onclick=\"cgCopy()\">Copy YAML</button>';
+        document.getElementById('cgyaml').textContent = yaml;
+      }
+      function cgCopy(){ navigator.clipboard.writeText(document.getElementById('cgyaml').textContent); }
+      cgToggle();
+    </script>
+    """
+
+
+def _jwt_decoder_tool() -> str:
+    return r"""
+    <section class="tool">
+      <label for="input">Paste a JWT (it never leaves your browser - decoded locally, signature not sent anywhere)</label>
+      <textarea id="input" spellcheck="false" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."></textarea>
+      <button type="button" onclick="decodeJwt()">Decode JWT</button>
+      <div id="results" class="results" aria-live="polite"></div>
+    </section>
+    <script>
+      function b64urlDecode(s){
+        s = s.replace(/-/g,'+').replace(/_/g,'/');
+        while(s.length % 4) s += '=';
+        try { return decodeURIComponent(escape(atob(s))); } catch(e){ return null; }
+      }
+      function decodeJwt(){
+        var token = document.getElementById('input').value.trim();
+        var out = document.getElementById('results');
+        var parts = token.split('.');
+        if(parts.length !== 3){ out.innerHTML='<ul><li class="warn">Not a JWT - expected 3 dot-separated parts, got '+parts.length+'.</li></ul>'; return; }
+        var header = b64urlDecode(parts[0]), payload = b64urlDecode(parts[1]);
+        if(!header || !payload){ out.innerHTML='<ul><li class="warn">Could not decode - the header or payload is not valid base64url.</li></ul>'; return; }
+        var items = [];
+        try {
+          var p = JSON.parse(payload);
+          var now = Math.floor(Date.now()/1000);
+          if(p.exp){ var expd = new Date(p.exp*1000).toISOString(); items.push('<li class="'+(p.exp<now?'warn':'ok')+'">exp: '+expd+(p.exp<now?' (EXPIRED)':' (valid)')+'</li>'); }
+          if(p.iat) items.push('<li class="ok">iat: '+new Date(p.iat*1000).toISOString()+'</li>');
+          if(p.role) items.push('<li class="ok">role: <code>'+String(p.role)+'</code></li>');
+          if(p.sub) items.push('<li class="ok">sub: <code>'+String(p.sub)+'</code></li>');
+          if(p.aud) items.push('<li class="ok">aud: <code>'+String(p.aud)+'</code></li>');
+        } catch(e){}
+        function pretty(s){ try { return JSON.stringify(JSON.parse(s), null, 2); } catch(e){ return s; } }
+        out.innerHTML =
+          '<h3>Header</h3><pre>'+pretty(header).replace(/</g,'&lt;')+'</pre>'+
+          '<h3>Payload</h3><pre>'+pretty(payload).replace(/</g,'&lt;')+'</pre>'+
+          (items.length?'<h3>Claims</h3><ul>'+items.join('')+'</ul>':'')+
+          '<p class="notice">Signature is shown but <strong>not verified</strong> - verification needs the secret, which never leaves your browser here. Never paste production service-role tokens into any online tool.</p>';
+      }
+    </script>
+    """
+
+
+def _actions_minutes_tool() -> str:
+    return r"""
+    <section class="tool">
+      <style>
+        .ab-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+        .ab-grid label { font-weight:700; font-size:0.9rem; display:block; margin-bottom:4px; }
+        .ab-grid input, .ab-grid select { width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; }
+        .cost-big { font-size:1.6rem; font-weight:700; color:var(--accent); }
+      </style>
+      <p>Estimate your monthly GitHub Actions minutes from a cron schedule and see if you blow past the free tier. Verify current pricing on GitHub's billing docs. Runs in your browser.</p>
+      <div class="ab-grid">
+        <div><label for="permonth">Runs per day</label><input id="permonth" type="number" value="288" min="0"><small>e.g. every 5 min = 288/day</small></div>
+        <div><label for="dur">Minutes per run</label><input id="dur" type="number" step="0.1" value="2"></div>
+        <div><label for="runner">Runner</label>
+          <select id="runner"><option value="1">Linux (1x)</option><option value="2">Windows (2x)</option><option value="10">macOS (10x)</option></select></div>
+        <div><label for="free">Free minutes/month (plan)</label><input id="free" type="number" value="2000"></div>
+        <div><label for="rate">$ per extra minute (Linux)</label><input id="rate" type="number" step="0.001" value="0.008"></div>
+      </div>
+      <button type="button" onclick="calcActions()">Calculate minutes</button>
+      <div id="results" class="results" aria-live="polite"></div>
+    </section>
+    <script>
+      function n(id){ return parseFloat(document.getElementById(id).value) || 0; }
+      function calcActions(){
+        var mult = parseFloat(document.getElementById('runner').value);
+        var rawPerMonth = n('permonth') * 30 * n('dur');
+        var billed = rawPerMonth * mult;
+        var free = n('free');
+        var over = Math.max(0, billed - free);
+        var cost = over * n('rate') * mult;
+        document.getElementById('results').innerHTML =
+          '<ul>'+
+          '<li class="ok">Raw minutes/month: <strong>'+rawPerMonth.toFixed(0)+'</strong></li>'+
+          '<li class="ok">Billed minutes (runner multiplier '+mult+'x): <strong>'+billed.toFixed(0)+'</strong></li>'+
+          '<li class="'+(over>0?'warn':'ok')+'">'+(over>0?('Over free tier by '+over.toFixed(0)+' minutes'):'Within the free tier')+'</li>'+
+          (over>0?'<li class="ok">Estimated overage: <span class="cost-big">$'+cost.toFixed(2)+'/mo</span></li>':'')+
+          '</ul>';
+      }
     </script>
     """
 
