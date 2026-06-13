@@ -1,6 +1,53 @@
 from __future__ import annotations
 
+import hashlib
+import hmac
+import time
 from typing import Any
+
+
+def verify_stripe_signature(
+    raw_body: str | bytes,
+    signature_header: str,
+    secret: str | None,
+    *,
+    tolerance: int = 300,
+    now: int | None = None,
+) -> bool:
+    """Verify a Stripe `Stripe-Signature` header (scheme v1, HMAC-SHA256).
+
+    Stripe signs `"{timestamp}.{raw_body}"`. We recompute the HMAC with the
+    endpoint secret and constant-time compare against every v1 in the header,
+    and reject signatures whose timestamp drifts beyond `tolerance` seconds.
+    """
+    if not secret or not signature_header:
+        return False
+    if isinstance(raw_body, bytes):
+        raw_body = raw_body.decode("utf-8", errors="replace")
+
+    timestamp: str | None = None
+    signatures: list[str] = []
+    for part in signature_header.split(","):
+        if "=" not in part:
+            return False
+        key, _, value = part.strip().partition("=")
+        if key == "t":
+            timestamp = value
+        elif key == "v1":
+            signatures.append(value)
+    if not timestamp or not signatures:
+        return False
+    try:
+        ts = int(timestamp)
+    except ValueError:
+        return False
+
+    current = int(now if now is not None else time.time())
+    if abs(current - ts) > tolerance:
+        return False
+
+    expected = hmac.new(secret.encode(), f"{ts}.{raw_body}".encode(), hashlib.sha256).hexdigest()
+    return any(hmac.compare_digest(expected, candidate) for candidate in signatures)
 
 
 TOKEN_HEADERS = {

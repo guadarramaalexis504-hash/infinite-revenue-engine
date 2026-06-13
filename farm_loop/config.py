@@ -65,6 +65,7 @@ class Settings:
     bundle_output_dir: str | None = None
     discord_webhook_url: str | None = None
     stripe_secret_key: str | None = None
+    stripe_webhook_secret: str | None = None
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -118,6 +119,7 @@ class Settings:
             bundle_output_dir=os.getenv("BUNDLE_OUTPUT_DIR"),
             discord_webhook_url=os.getenv("DISCORD_WEBHOOK_URL"),
             stripe_secret_key=os.getenv("STRIPE_SECRET_KEY"),
+            stripe_webhook_secret=os.getenv("STRIPE_WEBHOOK_SECRET"),
         )
 
     def require_runtime_secrets(self, dry_run: bool) -> None:

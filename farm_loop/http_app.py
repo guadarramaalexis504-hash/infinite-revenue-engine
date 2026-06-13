@@ -67,12 +67,15 @@ def create_tracking_app(
                 query = _query(environ)
                 if "X-Revenue-Webhook-Token" not in headers and query.get("token"):
                     headers["X-Revenue-Webhook-Token"] = query["token"]
+                payload, raw_body = _read_body(environ)
                 result = handle_conversion_webhook(
                     headers=headers,
-                    payload=_json_body(environ),
+                    payload=payload,
                     expected_token=settings.conversion_webhook_token or "",
                     provider=provider,
                     supabase=supabase,
+                    raw_body=raw_body,
+                    stripe_webhook_secret=getattr(settings, "stripe_webhook_secret", None),
                 )
                 return _json_response(start_response, "200 OK", result)
 
@@ -102,17 +105,23 @@ def _headers(environ: dict[str, Any]) -> dict[str, str]:
 
 
 def _json_body(environ: dict[str, Any]) -> dict[str, Any]:
+    return _read_body(environ)[0]
+
+
+def _read_body(environ: dict[str, Any]) -> tuple[dict[str, Any], str]:
+    """Return (parsed_payload, raw_text). The raw text is needed to verify
+    HMAC webhook signatures, which must hash the exact bytes received."""
     length = int(environ.get("CONTENT_LENGTH") or "0")
     raw = environ["wsgi.input"].read(length)
     content_type = str(environ.get("CONTENT_TYPE") or "").split(";", 1)[0].strip().lower()
     body = raw.decode("utf-8") if raw else ""
     if content_type == "application/x-www-form-urlencoded":
         parsed = parse_qs(body, keep_blank_values=True)
-        return {key: values[-1] if values else "" for key, values in parsed.items()}
+        return {key: values[-1] if values else "" for key, values in parsed.items()}, body
     payload = json.loads(body if body else "{}")
     if not isinstance(payload, dict):
         raise ValueError("JSON request body must be an object")
-    return payload
+    return payload, body
 
 
 def _json_response(start_response: StartResponse, status: str, payload: dict[str, Any]) -> list[bytes]:

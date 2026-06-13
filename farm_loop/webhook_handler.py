@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from .conversions import parse_confirmed_conversion_event
-from .webhooks import parse_buymeacoffee_event, verify_webhook_token
+from .webhooks import parse_buymeacoffee_event, verify_stripe_signature, verify_webhook_token
 
 
 def handle_buymeacoffee_webhook(
@@ -38,8 +38,18 @@ def handle_conversion_webhook(
     expected_token: str,
     provider: str,
     supabase: Any,
+    raw_body: str = "",
+    stripe_webhook_secret: str | None = None,
+    now: int | None = None,
 ) -> dict[str, Any]:
-    if not verify_webhook_token(headers, expected_token):
+    normalized = {key.lower(): value for key, value in headers.items()}
+    # Real Stripe events are authenticated by HMAC signature, not a shared
+    # token. When a Stripe endpoint secret is configured, require it.
+    if provider == "stripe" and stripe_webhook_secret:
+        signature = normalized.get("stripe-signature", "")
+        if not verify_stripe_signature(raw_body, signature, stripe_webhook_secret, now=now):
+            raise PermissionError("Invalid Stripe webhook signature")
+    elif not verify_webhook_token(headers, expected_token):
         raise PermissionError("Invalid conversion webhook token")
 
     conversion_payload = parse_confirmed_conversion_event(payload, provider=provider)
