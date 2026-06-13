@@ -140,6 +140,7 @@ def run_revenue_portfolio_once(
                 if decision.launch_task:
                     supabase.insert_launch_task(decision.launch_task)
                     launch_tasks_created += 1
+            variants_created = _seed_winner_variants(supabase, notifier)
             supabase.insert_event(
                 None,
                 "revenue_portfolio_pruned",
@@ -149,6 +150,7 @@ def run_revenue_portfolio_once(
                     "prune_decisions_created": prune_decisions_created,
                     "experiments_updated": experiments_updated,
                     "launch_tasks_created": launch_tasks_created,
+                    "winner_variants_created": variants_created,
                 },
             )
         return RevenuePortfolioSummary(
@@ -457,3 +459,38 @@ def _safe_list(supabase: Any, method: str) -> list:
         return list(getattr(supabase, method)())
     except Exception:
         return []
+
+
+def _seed_winner_variants(supabase: Any, notifier: Any | None) -> int:
+    """When offers convert, clone the winners into fresh opportunities so the
+    next cycle builds more assets around what already earns money."""
+    from .revenue_scoring import RevenueOpportunity, score_opportunity
+    from .revenue_winners import build_winner_plan
+
+    offers = _safe_list(supabase, "list_offers_for_checkout")
+    if not offers:
+        offers = _safe_list(supabase, "list_offers")
+    plan = build_winner_plan(
+        offers=offers,
+        clicks=_safe_list(supabase, "list_click_events"),
+        conversions=_safe_list(supabase, "list_conversion_events"),
+    )
+    created = 0
+    for variant in plan.variant_opportunities:
+        try:
+            opportunity = RevenueOpportunity(**variant)
+            supabase.upsert_revenue_opportunity(score_opportunity(opportunity).to_payload())
+            created += 1
+        except Exception:
+            continue
+    if created and notifier is not None and getattr(notifier, "enabled", False):
+        names = ", ".join(w.title for w in plan.winners[:3])
+        try:
+            notifier.send(
+                f"**🏆 {len(plan.winners)} oferta(s) ganadora(s)** ({names}) → "
+                f"sembré **{created} variantes** nuevas para duplicar lo que convierte.",
+                username="Revenue Engine",
+            )
+        except Exception:
+            pass
+    return created
