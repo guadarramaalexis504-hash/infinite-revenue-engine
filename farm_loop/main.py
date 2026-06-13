@@ -273,6 +273,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
             tools_path=tools_path,
             site_base_url=site_base_url,
             offer_payment_urls=offer_payment_urls,
+            cron_path="cron/",
         )
         if site_output_dir
         else None
@@ -673,6 +674,27 @@ def run_create_stripe_links(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_build_cron_pages(args: argparse.Namespace) -> int:
+    from .cron_pages import CronPagesExporter
+
+    settings = Settings.from_env()
+    output_dir = args.cron_pages_output_dir or os.getenv("CRON_PAGES_OUTPUT_DIR")
+    if not output_dir:
+        LOGGER.error("Set --cron-pages-output-dir (or CRON_PAGES_OUTPUT_DIR) to build cron pages.")
+        return 1
+    base = args.site_base_url or settings.site_base_url or ""
+    site_base_url = f"{base.rstrip('/')}/cron" if base else ""
+    exporter = CronPagesExporter(
+        output_dir,
+        site_base_url=site_base_url,
+        tools_path=args.cron_tools_path,
+        offers_path=args.cron_offers_path,
+    )
+    written = exporter.export()
+    LOGGER.info("cron_pages_built %s", json.dumps({"pages": len(written), "output_dir": output_dir}, sort_keys=True))
+    return 0
+
+
 def _parse_json_object(value: str | None) -> dict[str, Any]:
     if not value:
         return {}
@@ -730,6 +752,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     mode.add_argument("--portfolio-once", action="store_true", help="Run one revenue portfolio cycle and exit.")
     mode.add_argument("--record-conversion", action="store_true", help="Record one confirmed conversion and exit.")
     mode.add_argument("--create-stripe-links", action="store_true", help="Create Stripe Payment Links for paid offers in Supabase and write them back.")
+    mode.add_argument("--build-cron-pages", action="store_true", help="Generate the programmatic-SEO cron schedule pages.")
+    parser.add_argument("--cron-pages-output-dir", default=None, help="Output directory for the cron schedule pages.")
+    parser.add_argument("--cron-tools-path", default="../tools/", help="Relative path from cron pages to the interactive tools.")
+    parser.add_argument("--cron-offers-path", default="../offers/", help="Relative path from cron pages to the offers catalog.")
     parser.add_argument("--interval-seconds", type=int, default=300)
     parser.add_argument("--dry-run", action="store_true", help="Avoid Supabase writes and OpenAI draft generation.")
     parser.add_argument("--force-drafts", action="store_true", help="Generate drafts even after TARGET_USD is reached.")
@@ -909,6 +935,8 @@ def main(argv: list[str] | None = None) -> int:
             return run_record_conversion(args)
         if args.create_stripe_links:
             return run_create_stripe_links(args)
+        if args.build_cron_pages:
+            return run_build_cron_pages(args)
         if args.portfolio_once:
             return run_portfolio_single(args)
         if args.loop:

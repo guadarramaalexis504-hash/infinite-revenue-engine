@@ -21,6 +21,7 @@ class StaticSiteExporter:
         tools_path: str = "",
         site_base_url: str = "",
         offer_payment_urls: dict[str, str] | None = None,
+        cron_path: str = "",
     ) -> None:
         self.output_dir = Path(output_dir)
         self.tip_url = tip_url
@@ -29,6 +30,7 @@ class StaticSiteExporter:
         self.tools_path = tools_path
         self.site_base_url = site_base_url.rstrip("/")
         self.offer_payment_urls = offer_payment_urls or {}
+        self.cron_path = cron_path
 
     def export_portfolio(self, opportunities_with_assets: list[tuple[RevenueOpportunity, list[AssetDraft]]]) -> list[str]:
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -66,6 +68,7 @@ class StaticSiteExporter:
     def _index_page(self, opportunities: list[RevenueOpportunity]) -> str:
         cards = "\n".join(self._opportunity_card(opportunity) for opportunity in opportunities)
         tools_link = self._tools_link(prefix="")
+        cron_link = '<a class="nav-link" href="cron/">Cron reference</a>' if self.cron_path else ""
         return self._page(
             "Infinite Revenue Engine",
             f"""
@@ -76,6 +79,7 @@ class StaticSiteExporter:
                 <a class="nav-link" href="offers/">Offers</a>
                 <a class="nav-link" href="intake/">Intake</a>
                 {tools_link}
+                {cron_link}
               </header>
               <section class="hero">
                 <div>
@@ -306,6 +310,8 @@ class StaticSiteExporter:
         paths = ["", "offers/", "intake/"]
         if self.tools_path:
             paths.append(self.tools_path.lstrip("/"))
+        if self.cron_path:
+            paths.append(self.cron_path.lstrip("/"))
         paths.extend(f"{slugify(opportunity.external_id)}/" for opportunity in opportunities)
         urls = "\n".join(f"  <url><loc>{escape(self._absolute_url(path))}</loc></url>" for path in self._unique_paths(paths))
         return f"""<?xml version="1.0" encoding="UTF-8"?>
