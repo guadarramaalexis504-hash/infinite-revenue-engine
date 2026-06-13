@@ -62,6 +62,9 @@ class SupabaseClient:
                     continue
                 if response.status_code >= 400:
                     raise RuntimeError(f"Supabase {method} {url} failed: {response.status_code} {response.text}")
+                # return=minimal and 204 responses have an empty body; nothing to parse.
+                if response.status_code == 204 or not getattr(response, "content", b"-"):
+                    return None
                 return response.json()
             except requests.RequestException as exc:
                 last_error = exc

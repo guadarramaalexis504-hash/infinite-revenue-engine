@@ -633,11 +633,15 @@ def run_create_stripe_links(args: argparse.Namespace) -> int:
     rows = supabase.list_offers_for_checkout()
     offers = []
     id_by_offer_key: dict[str, str] = {}
+    seen_offer_keys: set[str] = set()
     for row in rows if isinstance(rows, list) else []:
         payload = row.get("payload") or {}
         offer_key = payload.get("offer_key") or ""
         if not offer_key or row.get("payment_url"):
             continue  # skip already-linked offers
+        if offer_key in seen_offer_keys:
+            continue  # one payment link per unique offer, not per duplicate row
+        seen_offer_keys.add(offer_key)
         id_by_offer_key.setdefault(offer_key, str(row.get("id")))
         offers.append(
             SimpleNamespace(
@@ -650,6 +654,12 @@ def run_create_stripe_links(args: argparse.Namespace) -> int:
                 external_id=payload.get("external_id", ""),
             )
         )
+
+    # Highest-value offers first, and cap how many we create per run.
+    offers.sort(key=lambda o: o.price_usd, reverse=True)
+    max_links = getattr(args, "max_stripe_links", 0) or 0
+    if max_links > 0:
+        offers = offers[:max_links]
 
     links = builder.create_for_offers(offers)
     for offer_key, url in links.items():
@@ -753,6 +763,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     mode.add_argument("--record-conversion", action="store_true", help="Record one confirmed conversion and exit.")
     mode.add_argument("--create-stripe-links", action="store_true", help="Create Stripe Payment Links for paid offers in Supabase and write them back.")
     mode.add_argument("--build-cron-pages", action="store_true", help="Generate the programmatic-SEO cron schedule pages.")
+    parser.add_argument("--max-stripe-links", type=int, default=25, help="Maximum number of Stripe Payment Links to create per run.")
     parser.add_argument("--cron-pages-output-dir", default=None, help="Output directory for the cron schedule pages.")
     parser.add_argument("--cron-tools-path", default="../tools/", help="Relative path from cron pages to the interactive tools.")
     parser.add_argument("--cron-offers-path", default="../offers/", help="Relative path from cron pages to the offers catalog.")
