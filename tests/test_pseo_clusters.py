@@ -123,13 +123,26 @@ class DatasetTests(unittest.TestCase):
         ascii_pages = self._by_slug(build_ascii_cluster())
         self.assertIn("ascii-65", ascii_pages)
         self.assertIn("0x41", ascii_pages["ascii-65"].body)
+        # ASCII special chars are escaped in the table cell, not raw (which broke markup).
+        self.assertIn("<td>&lt;</td>", ascii_pages["ascii-60"].body)
         entities = self._by_slug(build_html_entity_cluster())
         self.assertIn("entity-copy", entities)
         self.assertIn("©", entities["entity-copy"].body)  # ©
         # The "<" entity page must escape the raw char, not break the markup.
         lt_body = entities["entity-lt"].body
         self.assertNotIn('emoji-hero"><', lt_body)
-        self.assertIn("writeText('&lt;')", lt_body)
+        # Copy button passes the real char via a JSON-encoded, attribute-safe literal.
+        self.assertIn("writeText(&quot;&lt;&quot;)", lt_body)
+        # Upper/lowercase entity pairs get distinct slugs AND the correct character.
+        self.assertIn("entity-aacute", entities)      # á (lowercase)
+        self.assertIn("entity-aacute-uc", entities)   # Á (uppercase)
+        self.assertIn("á", entities["entity-aacute"].body)
+        self.assertIn("Á", entities["entity-aacute-uc"].body)
+        # Zero-width / invisible entities fall back to a named display.
+        self.assertIn("entity-zwj", entities)
+        self.assertIn("(zwj)", entities["entity-zwj"].body)
+        # The duplicate thinking emoji collapses to a single page.
+        self.assertEqual(sum(1 for p in build_emoji_cluster().pages if "\U0001F914" in p.h1), 1)
         countries = self._by_slug(build_country_cluster())
         self.assertIn("mexico", countries)
         self.assertIn("MEX", countries["mexico"].body)

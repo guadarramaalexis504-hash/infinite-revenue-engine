@@ -4,6 +4,14 @@ from farm_loop.main import bundle_output_paths, parse_args, tools_path_for_site
 
 
 class CLITests(unittest.TestCase):
+    def test_main_imports_os_for_env_var_fallbacks(self):
+        # run_build_* use `os.getenv(...)` as the output-dir fallback; a missing
+        # `import os` made that path raise NameError instead of a clean error.
+        import farm_loop.main as main_module
+
+        self.assertTrue(hasattr(main_module, "os"))
+        self.assertEqual(main_module.os.__name__, "os")
+
     def test_parse_args_supports_portfolio_phases(self):
         args = parse_args(["--portfolio-once", "--portfolio-phase", "summarize", "--dry-run"])
 

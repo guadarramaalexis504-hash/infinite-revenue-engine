@@ -181,7 +181,7 @@ def build_web_tools() -> list[WebTool]:
                 "function o(v){E('out').value=v;}"
                 "function up(){o(E('in').value.toUpperCase());}"
                 "function low(){o(E('in').value.toLowerCase());}"
-                "function title(){o(E('in').value.replace(/\\w\\S*/g,function(t){return t.charAt(0).toUpperCase()+t.substr(1).toLowerCase();}));}"
+                "function title(){o(E('in').value.replace(/[\\p{L}\\p{N}][\\p{L}\\p{M}\\p{N}']*/gu,function(t){return t.charAt(0).toUpperCase()+t.slice(1).toLowerCase();}));}"
                 "function cp(){navigator.clipboard.writeText(E('out').value);}"
             ),
         ),
@@ -355,7 +355,7 @@ function cp(){navigator.clipboard.writeText(E('out').value);}"""
         </div>
         <script>
         function E(i){return document.getElementById(i);}
-        function up(base){var v=E('b'+base).value.trim();if(v===''){return;}var n=parseInt(v,base);if(isNaN(n)){E('err').textContent='Invalid base-'+base+' number';return;}E('err').textContent='';if(base!==10)E('b10').value=n.toString(10);if(base!==16)E('b16').value=n.toString(16);if(base!==2)E('b2').value=n.toString(2);if(base!==8)E('b8').value=n.toString(8);}
+        function up(base){var raw=E('b'+base).value.trim();if(raw===''){['b10','b16','b2','b8'].forEach(function(id){if(id!=='b'+base)E(id).value='';});E('err').textContent='';return;}var n=parseInt(raw,base);var norm=raw.toLowerCase().replace(/^0+(?=.)/,'');if(isNaN(n)||n.toString(base)!==norm){E('err').textContent='Invalid base-'+base+' number';return;}E('err').textContent='';if(base!==10)E('b10').value=n.toString(10);if(base!==16)E('b16').value=n.toString(16);if(base!==2)E('b2').value=n.toString(2);if(base!==8)E('b8').value=n.toString(8);}
         </script>
         """,
     ))

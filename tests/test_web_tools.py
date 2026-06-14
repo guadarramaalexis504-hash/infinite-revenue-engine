@@ -43,6 +43,14 @@ class WebToolsTests(unittest.TestCase):
         self.assertIn("btoa", page)  # the real tool logic
         self.assertIn("Runs entirely in your browser", page)
 
+    def test_tool_js_bugfixes(self):
+        bodies = {t.slug: t.body for t in build_web_tools()}
+        # Title case handles Unicode letters (accents), not ASCII-only \w.
+        self.assertIn("\\p{L}", bodies["text-case-converter"])
+        # Number base converter clears stale fields and validates strictly.
+        self.assertIn("Invalid base-", bodies["number-base-converter"])
+        self.assertIn("forEach", bodies["number-base-converter"])
+
     def test_sitemap_uses_absolute_urls(self):
         with tempfile.TemporaryDirectory() as directory:
             WebToolsExporter(directory, site_base_url="https://x.test/apps").export()

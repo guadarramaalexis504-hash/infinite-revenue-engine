@@ -505,11 +505,13 @@ def _codepoints(char: str) -> str:
 def build_emoji_cluster() -> PseoCluster:
     pages: list[PseoPage] = []
     seen: set[str] = set()
+    seen_chars: set[str] = set()
     for char, name, keywords in COMMON_EMOJI:
         slug = _slug(name)
-        if slug in seen:
+        if slug in seen or char in seen_chars:
             continue
         seen.add(slug)
+        seen_chars.add(char)
         codepoints = _codepoints(char)
         html_entity = "".join(f"&#x{ord(c):X};" for c in char)
         body = f"""
@@ -575,7 +577,7 @@ def build_ascii_cluster() -> PseoCluster:
         else:
             name = display = chr(code)
             printable = True
-        char_cell = display if printable else f"<em>{escape(display)}</em>"
+        char_cell = escape(display) if printable else f"<em>{escape(display)}</em>"
         html_entity = f"&#{code};"
         kind = "printable character" if printable else "control character"
         body = f"""
@@ -618,24 +620,29 @@ String.fromCharCode({code})   // JavaScript
 # ---------------------------------------------------------------------------
 
 def build_html_entity_cluster() -> PseoCluster:
+    import unicodedata
     from html.entities import codepoint2name
 
     pages: list[PseoPage] = []
     seen: set[str] = set()
     for codepoint, name in sorted(codepoint2name.items()):
-        slug = f"entity-{name.lower()}"
+        # codepoint2name has case-distinct names for distinct characters
+        # (Aacute=Á vs aacute=á); a plain .lower() slug would collide them, so
+        # mark non-lowercase names with a suffix to keep URLs distinct.
+        slug = f"entity-{name.lower()}" + ("-uc" if name != name.lower() else "")
         if slug in seen or not name.isalnum():
             continue
         seen.add(slug)
         char = chr(codepoint)
-        visible = char.strip() != "" and codepoint not in (160, 173)
+        # Format/control/space code points (nbsp, shy, zwj, lrm, …) have no glyph.
+        visible = unicodedata.category(char) not in ("Cf", "Cc", "Zs", "Zl", "Zp")
         display = char if visible else f"({name})"
         named_ref = f"&{name};"
         numeric_ref = f"&#{codepoint};"
         hex_ref = f"&#x{codepoint:X};"
         body = f"""
         <div class="emoji-hero">{escape(char) if visible else escape(display)}</div>
-        <button class="copy" onclick="navigator.clipboard.writeText('{escape(char)}')">Copy {escape(display)}</button>
+        <button class="copy" onclick="navigator.clipboard.writeText({escape(json.dumps(char))})">Copy {escape(display)}</button>
         <h2>The {escape(named_ref)} HTML entity</h2>
         <p>The named character reference <code>{escape(named_ref)}</code> renders the character <strong>{escape(display)}</strong> (Unicode U+{codepoint:04X}).</p>
         <table>
