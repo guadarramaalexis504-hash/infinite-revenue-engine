@@ -1057,6 +1057,87 @@ def build_all_clusters() -> list[PseoCluster]:
     ]
 
 
+def render_reference_hub(
+    clusters: list[PseoCluster],
+    *,
+    site_base_url: str = "",
+    include_apps: bool = True,
+    include_cron: bool = True,
+) -> str:
+    """A single /reference/ hub linking every cluster — concentrates internal
+    link equity and replaces a 19-link homepage nav with one entry point."""
+    from .seo_head import head_meta
+
+    base = site_base_url.rstrip("/")
+
+    def absurl(path: str) -> str:
+        p = path.lstrip("/")
+        return f"{base}/{p}" if base else (f"/{p}" if p else "/")
+
+    cards = [
+        f'<a class="ref-card" href="../{escape(c.key)}/">'
+        f"<strong>{escape(c.title)}</strong>"
+        f"<span>{escape(c.intro)}</span>"
+        f"<em>{len(c.pages)} pages</em></a>"
+        for c in clusters
+    ]
+    if include_apps:
+        cards.append(
+            '<a class="ref-card" href="../apps/"><strong>Free developer tools</strong>'
+            "<span>Fast, private, single-purpose tools that run entirely in your browser.</span>"
+            "<em>tools</em></a>"
+        )
+    if include_cron:
+        cards.append(
+            '<a class="ref-card" href="../cron/"><strong>Cron schedule reference</strong>'
+            "<span>Every common cron expression with GitHub Actions snippets and next run times.</span>"
+            "<em>pages</em></a>"
+        )
+    title = "Reference — developer lookup tables and tools"
+    desc = (
+        "Browse every reference: colors, network ports, HTTP status codes, emoji, MIME types, "
+        "country & currency codes, git/regex/linux recipes, and free in-browser tools."
+    )
+    head = head_meta(title=title, description=desc, canonical=absurl("reference/"), og_type="website")
+    cards_html = "\n      ".join(cards)
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{escape(title)}</title>
+{head}
+  <style>
+    :root {{ color-scheme: light; --bg:#f7f7f3; --ink:#17201b; --muted:#5c665f; --line:#d8ddd5; --surface:#fff; --accent:#116a5b; }}
+    * {{ box-sizing:border-box; }}
+    body {{ margin:0; background:var(--bg); color:var(--ink); font-family:Arial,Helvetica,sans-serif; line-height:1.5; }}
+    a {{ color:var(--accent); text-decoration:none; }} a:hover {{ text-decoration:underline; }}
+    .shell {{ max-width:1100px; margin:0 auto; padding:24px 20px 56px; }}
+    .topbar {{ display:flex; gap:16px; flex-wrap:wrap; padding:12px 0 24px; color:var(--muted); }}
+    h1 {{ font-size:clamp(1.8rem,4vw,3rem); margin:0 0 6px; }}
+    .lead {{ color:var(--muted); max-width:760px; }}
+    .ref-grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:24px; }}
+    .ref-card {{ display:block; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:16px; }}
+    .ref-card:hover {{ border-color:var(--accent); text-decoration:none; }}
+    .ref-card strong {{ display:block; font-size:1.1rem; }}
+    .ref-card span {{ display:block; color:var(--muted); font-size:.9rem; margin:6px 0; }}
+    .ref-card em {{ color:var(--accent); font-size:.78rem; font-style:normal; text-transform:uppercase; font-weight:700; }}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar"><a href="../">Home</a><a href="../apps/">Free tools</a><a href="../offers/">Offers</a></header>
+    <h1>Reference</h1>
+    <p class="lead">{escape(desc)}</p>
+    <section class="ref-grid">
+      {cards_html}
+    </section>
+  </main>
+</body>
+</html>
+"""
+
+
 # ---------------------------------------------------------------------------
 # Exporter
 # ---------------------------------------------------------------------------

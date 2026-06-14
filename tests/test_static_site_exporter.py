@@ -92,6 +92,24 @@ class StaticSiteExporterTests(unittest.TestCase):
         self.assertIn("application/ld+json", index)
         self.assertIn('rel="canonical" href="https://revenue.example/offers/"', offers)
 
+    def test_homepage_nav_uses_reference_hub_not_flat_cluster_links(self):
+        assets = AssetGenerator().generate_all(self.opportunity)
+        with tempfile.TemporaryDirectory() as directory:
+            StaticSiteExporter(
+                directory,
+                site_base_url="https://x.test",
+                pseo_clusters=[("Emoji", "emoji/"), ("Colors", "color/"), ("Free tools", "apps/")],
+            ).export_portfolio([(self.opportunity, assets)])
+            index = (Path(directory) / "index.html").read_text(encoding="utf-8")
+            sitemap = (Path(directory) / "sitemap.xml").read_text(encoding="utf-8")
+        self.assertIn('href="reference/"', index)
+        self.assertIn('href="apps/"', index)
+        # Individual cluster links are no longer dumped flat into the homepage nav.
+        self.assertNotIn('href="emoji/"', index)
+        self.assertNotIn('href="color/"', index)
+        # The hub is still in the sitemap.
+        self.assertIn("https://x.test/reference/", sitemap)
+
     def test_discovery_files_written(self):
         with tempfile.TemporaryDirectory() as directory:
             StaticSiteExporter(

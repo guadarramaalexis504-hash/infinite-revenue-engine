@@ -710,7 +710,7 @@ def run_build_cron_pages(args: argparse.Namespace) -> int:
 
 
 def run_build_pseo_clusters(args: argparse.Namespace) -> int:
-    from .pseo_clusters import PseoClusterExporter, build_all_clusters
+    from .pseo_clusters import PseoClusterExporter, build_all_clusters, render_reference_hub
     from .discord_notify import DiscordNotifier, build_site_build_message
 
     settings = Settings.from_env()
@@ -721,7 +721,8 @@ def run_build_pseo_clusters(args: argparse.Namespace) -> int:
     base = (args.site_base_url or settings.site_base_url or "").rstrip("/")
     total = 0
     cluster_counts: list[tuple[str, int]] = []
-    for cluster in build_all_clusters():
+    clusters = build_all_clusters()
+    for cluster in clusters:
         cluster_dir = Path(output_dir) / cluster.key
         site_base_url = f"{base}/{cluster.key}" if base else ""
         exporter = PseoClusterExporter(
@@ -739,6 +740,10 @@ def run_build_pseo_clusters(args: argparse.Namespace) -> int:
             "pseo_cluster_built %s",
             json.dumps({"cluster": cluster.key, "pages": page_count}, sort_keys=True),
         )
+    hub_dir = Path(output_dir) / "reference"
+    hub_dir.mkdir(parents=True, exist_ok=True)
+    (hub_dir / "index.html").write_text(render_reference_hub(clusters, site_base_url=base), encoding="utf-8")
+
     total_pages = sum(count for _, count in cluster_counts)
     LOGGER.info(
         "pseo_clusters_built %s",

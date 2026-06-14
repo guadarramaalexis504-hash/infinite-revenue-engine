@@ -95,10 +95,9 @@ class StaticSiteExporter:
         cards = "\n".join(self._opportunity_card(opportunity) for opportunity in opportunities)
         tools_link = self._tools_link(prefix="")
         cron_link = '<a class="nav-link" href="cron/">Cron reference</a>' if self.cron_path else ""
-        cluster_links = "".join(
-            f'<a class="nav-link" href="{escape(path)}">{escape(label)}</a>'
-            for label, path in self.pseo_clusters
-        )
+        cluster_paths = {path for _, path in self.pseo_clusters}
+        apps_link = '<a class="nav-link" href="apps/">Free tools</a>' if "apps/" in cluster_paths else ""
+        reference_link = '<a class="nav-link" href="reference/">Reference</a>' if self.pseo_clusters else ""
         return self._page(
             "Infinite Revenue Engine",
             f"""
@@ -108,9 +107,10 @@ class StaticSiteExporter:
                 <span>Owned static site</span>
                 <a class="nav-link" href="offers/">Offers</a>
                 <a class="nav-link" href="intake/">Intake</a>
+                {apps_link}
                 {tools_link}
                 {cron_link}
-                {cluster_links}
+                {reference_link}
               </header>
               <section class="hero">
                 <div>
@@ -353,6 +353,8 @@ class StaticSiteExporter:
             paths.append(self.tools_path.lstrip("/"))
         if self.cron_path:
             paths.append(self.cron_path.lstrip("/"))
+        if self.pseo_clusters:
+            paths.append("reference/")
         for _, cluster_path in self.pseo_clusters:
             paths.append(cluster_path.lstrip("/"))
         paths.extend(f"{slugify(opportunity.external_id)}/" for opportunity in opportunities)

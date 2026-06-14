@@ -84,6 +84,18 @@ class DatasetTests(unittest.TestCase):
         for core in ("emoji", "color", "port"):
             self.assertIn(core, keys)
 
+    def test_render_reference_hub_lists_clusters(self):
+        from farm_loop.pseo_clusters import render_reference_hub
+
+        html = render_reference_hub(
+            [build_emoji_cluster(), build_color_cluster()], site_base_url="https://x.test"
+        )
+        self.assertIn("../emoji/", html)
+        self.assertIn("../color/", html)
+        self.assertIn("../apps/", html)
+        self.assertIn('rel="canonical" href="https://x.test/reference/"', html)
+        self.assertIn("<h1>Reference</h1>", html)
+
     def test_cluster_nav_matches_cluster_keys(self):
         nav_keys = {path.strip("/") for _, path in CLUSTER_NAV}
         cluster_keys = {c.key for c in build_all_clusters()}
