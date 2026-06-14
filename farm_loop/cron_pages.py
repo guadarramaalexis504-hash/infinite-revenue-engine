@@ -13,6 +13,8 @@ from datetime import datetime, timedelta, timezone
 from html import escape
 from pathlib import Path
 
+from .seo_head import head_meta
+
 
 @dataclass(frozen=True)
 class CronPreset:
@@ -311,6 +313,9 @@ class CronPagesExporter:
               </article>
             </main>
             """,
+            description=preset.description,
+            canonical=self._absolute_url(f"{preset.slug}/"),
+            og_type="article",
         )
 
     def _index_page(self, presets: list[CronPreset]) -> str:
@@ -340,6 +345,9 @@ class CronPagesExporter:
               {''.join(sections)}
             </main>
             """,
+            description=f"{len(presets)} ready-to-copy cron schedules with GitHub Actions snippets and the next run times for each.",
+            canonical=self._absolute_url(""),
+            og_type="website",
         )
 
     def _nav(self, *, prefix: str) -> str:
@@ -373,14 +381,15 @@ class CronPagesExporter:
             return f"{self.site_base_url}/{normalized}" if normalized else f"{self.site_base_url}/"
         return f"/{normalized}" if normalized else "/"
 
-    def _page(self, title: str, body: str) -> str:
+    def _page(self, title: str, body: str, *, description: str = "", canonical: str = "", og_type: str = "article") -> str:
+        head = head_meta(title=title, description=description, canonical=canonical, og_type=og_type)
         return f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{escape(title)}</title>
-  <meta name="description" content="{escape(title)}">
+{head}
   <style>
     :root {{ color-scheme: light; --bg:#f7f7f3; --ink:#17201b; --muted:#5c665f; --line:#d8ddd5; --surface:#fff; --accent:#116a5b; --accent-soft:#e2f3ee; }}
     * {{ box-sizing: border-box; }}

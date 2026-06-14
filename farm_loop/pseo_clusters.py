@@ -1132,7 +1132,7 @@ class PseoClusterExporter:
         )
         nav = self._nav(prefix="")
         return self._page(
-            f"{self.cluster.title} — {self.cluster.intro}",
+            f"{self.cluster.title} — {len(self.cluster.pages)} entries",
             f"""
             <main class="shell">
               <header class="topbar"><strong>{escape(self.cluster.title)}</strong>{nav}</header>

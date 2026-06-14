@@ -93,6 +93,16 @@ class ExporterTests(unittest.TestCase):
             sitemap = (Path(directory) / "sitemap.xml").read_text(encoding="utf-8")
             self.assertIn("https://example.com/every-5-minutes/", sitemap)
 
+    def test_preset_page_has_canonical_og_and_real_description(self):
+        with tempfile.TemporaryDirectory() as directory:
+            self._export(directory)
+            page = (Path(directory) / "every-5-minutes" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('rel="canonical" href="https://example.com/every-5-minutes/"', page)
+        self.assertIn('property="og:title"', page)
+        self.assertIn("application/ld+json", page)
+        # Meta description is the preset's real explanation, not a copy of the title.
+        self.assertIn('<meta name="description" content="Runs every 5 minutes', page)
+
 
 if __name__ == "__main__":
     unittest.main()

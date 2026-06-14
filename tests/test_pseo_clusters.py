@@ -201,6 +201,17 @@ class ExporterTests(unittest.TestCase):
             index = (Path(directory) / "index.html").read_text(encoding="utf-8")
             self.assertIn("fire/", index)
 
+    def test_cluster_index_title_is_concise(self):
+        import re
+
+        with tempfile.TemporaryDirectory() as directory:
+            cluster = build_color_cluster()
+            self._export(directory, cluster)
+            index = (Path(directory) / "index.html").read_text(encoding="utf-8")
+        title = re.search(r"<title>(.*?)</title>", index).group(1)
+        self.assertLess(len(title), 70)  # was 108 chars (full intro)
+        self.assertIn("entries", title)
+
     def test_detail_page_has_canonical_og_and_jsonld(self):
         with tempfile.TemporaryDirectory() as directory:
             cluster = build_color_cluster()
