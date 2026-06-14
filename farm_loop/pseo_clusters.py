@@ -37,6 +37,12 @@ CLUSTER_NAV: list[tuple[str, str]] = [
     ("Emoji", "emoji/"),
     ("Colors", "color/"),
     ("Ports", "port/"),
+    ("ASCII", "ascii/"),
+    ("HTML entities", "html-entity/"),
+    ("HTTP codes", "http-status/"),
+    ("MIME types", "mime/"),
+    ("HTTP headers", "header/"),
+    ("Exit codes", "exit/"),
 ]
 
 
@@ -524,8 +530,311 @@ def build_emoji_cluster() -> PseoCluster:
     )
 
 
+# ---------------------------------------------------------------------------
+# ASCII — one page per ASCII code (0-127)
+# ---------------------------------------------------------------------------
+
+_ASCII_CONTROL: dict[int, str] = {
+    0: "NUL (null)", 1: "SOH (start of heading)", 2: "STX (start of text)",
+    3: "ETX (end of text)", 4: "EOT (end of transmission)", 5: "ENQ (enquiry)",
+    6: "ACK (acknowledge)", 7: "BEL (bell)", 8: "BS (backspace)",
+    9: "HT (horizontal tab)", 10: "LF (line feed / newline)", 11: "VT (vertical tab)",
+    12: "FF (form feed)", 13: "CR (carriage return)", 14: "SO (shift out)",
+    15: "SI (shift in)", 16: "DLE (data link escape)", 17: "DC1 (device control 1)",
+    18: "DC2 (device control 2)", 19: "DC3 (device control 3)", 20: "DC4 (device control 4)",
+    21: "NAK (negative acknowledge)", 22: "SYN (synchronous idle)", 23: "ETB (end of block)",
+    24: "CAN (cancel)", 25: "EM (end of medium)", 26: "SUB (substitute)",
+    27: "ESC (escape)", 28: "FS (file separator)", 29: "GS (group separator)",
+    30: "RS (record separator)", 31: "US (unit separator)", 127: "DEL (delete)",
+}
+
+
+def build_ascii_cluster() -> PseoCluster:
+    pages: list[PseoPage] = []
+    for code in range(128):
+        if code in _ASCII_CONTROL:
+            name = _ASCII_CONTROL[code]
+            display = name.split(" ", 1)[0]
+            printable = False
+        elif code == 32:
+            name, display, printable = "Space", "(space)", True
+        else:
+            name = display = chr(code)
+            printable = True
+        char_cell = display if printable else f"<em>{escape(display)}</em>"
+        html_entity = f"&#{code};"
+        kind = "printable character" if printable else "control character"
+        body = f"""
+        <h2>ASCII {code}</h2>
+        <p>Decimal <strong>{code}</strong> is the {escape(kind)} <strong>{escape(name)}</strong>.</p>
+        <table>
+          <tr><th>Character</th><td>{char_cell}</td></tr>
+          <tr><th>Decimal</th><td>{code}</td></tr>
+          <tr><th>Hex</th><td>0x{code:02X}</td></tr>
+          <tr><th>Octal</th><td>0o{code:03o}</td></tr>
+          <tr><th>Binary</th><td>{code:08b}</td></tr>
+          <tr><th>HTML</th><td><code>{escape(html_entity)}</code></td></tr>
+        </table>
+        <h2>In code</h2>
+        <pre>chr({code})   # Python
+String.fromCharCode({code})   // JavaScript
+'\\x{code:02x}'   # escape</pre>
+        <p class="notice">Working with text, encoding, or unicode? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=f"ascii-{code}",
+                title=f"ASCII {code} — {name}: hex, binary, octal & HTML code",
+                h1=f"ASCII {code}: {name}",
+                lead=f"ASCII code {code} is {name}. Decimal {code}, hex 0x{code:02X}, binary {code:08b}, HTML &#{code};.",
+                body=body,
+                related_label=f"{code} — {display}",
+            )
+        )
+    return PseoCluster(
+        key="ascii",
+        title="ASCII table reference",
+        intro=f"{len(pages)} ASCII codes (0-127) with the character, decimal, hex, octal, binary, and HTML code for each.",
+        pages=tuple(pages),
+    )
+
+
+# ---------------------------------------------------------------------------
+# HTML entities — one page per named HTML entity (from Python's built-in table)
+# ---------------------------------------------------------------------------
+
+def build_html_entity_cluster() -> PseoCluster:
+    from html.entities import codepoint2name
+
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for codepoint, name in sorted(codepoint2name.items()):
+        slug = f"entity-{name.lower()}"
+        if slug in seen or not name.isalnum():
+            continue
+        seen.add(slug)
+        char = chr(codepoint)
+        visible = char.strip() != "" and codepoint not in (160, 173)
+        display = char if visible else f"({name})"
+        named_ref = f"&{name};"
+        numeric_ref = f"&#{codepoint};"
+        hex_ref = f"&#x{codepoint:X};"
+        body = f"""
+        <div class="emoji-hero">{char if visible else escape(display)}</div>
+        <button class="copy" onclick="navigator.clipboard.writeText('{char}')">Copy {escape(display)}</button>
+        <h2>The {escape(named_ref)} HTML entity</h2>
+        <p>The named character reference <code>{escape(named_ref)}</code> renders the character <strong>{escape(display)}</strong> (Unicode U+{codepoint:04X}).</p>
+        <table>
+          <tr><th>Named entity</th><td><code>{escape(named_ref)}</code></td></tr>
+          <tr><th>Numeric (decimal)</th><td><code>{escape(numeric_ref)}</code></td></tr>
+          <tr><th>Numeric (hex)</th><td><code>{escape(hex_ref)}</code></td></tr>
+          <tr><th>Unicode</th><td>U+{codepoint:04X}</td></tr>
+        </table>
+        <p class="notice">Building web pages or escaping text? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=slug,
+                title=f"{named_ref} HTML entity — the {display} character ({numeric_ref})",
+                h1=f"{named_ref} ({display})",
+                lead=f"The HTML entity {named_ref} renders {display} (U+{codepoint:04X}). Use {named_ref}, {numeric_ref}, or {hex_ref}.",
+                body=body,
+                related_label=f"{named_ref} {display}",
+            )
+        )
+    return PseoCluster(
+        key="html-entity",
+        title="HTML entity reference",
+        intro=f"{len(pages)} HTML named character entities with their symbol, named, decimal, and hex references.",
+        pages=tuple(pages),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Reference clusters from vetted datasets (HTTP codes, MIME, headers, exit codes)
+# ---------------------------------------------------------------------------
+
+def build_http_status_cluster() -> PseoCluster:
+    from .pseo_data_batch_a import HTTP_STATUS
+
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for entry in HTTP_STATUS:
+        code, name = entry["code"], entry["name"]
+        slug = f"http-{code}"
+        if slug in seen:
+            continue
+        seen.add(slug)
+        body = f"""
+        <h2>What does HTTP {code} mean?</h2>
+        <p><strong>{code} {escape(name)}</strong> — {escape(entry["description"])}</p>
+        <table>
+          <tr><th>Status code</th><td>{code}</td></tr>
+          <tr><th>Reason phrase</th><td>{escape(name)}</td></tr>
+          <tr><th>Category</th><td>{escape(entry["category"])}</td></tr>
+        </table>
+        <p class="notice">Debugging an API, redirect, or webhook? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=slug,
+                title=f"HTTP {code} {name} — what it means and when it happens",
+                h1=f"HTTP {code} — {name}",
+                lead=f"HTTP status code {code} {name}: {entry['description']}",
+                body=body,
+                related_label=f"{code} {name}",
+            )
+        )
+    return PseoCluster(
+        key="http-status",
+        title="HTTP status code reference",
+        intro=f"{len(pages)} HTTP status codes explained — what each means and when a server returns it.",
+        pages=tuple(pages),
+    )
+
+
+def build_mime_cluster() -> PseoCluster:
+    from .pseo_data_batch_a import MIME_TYPES
+
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for entry in MIME_TYPES:
+        ext = entry["ext"].lower().lstrip(".")
+        mime = entry["mime"]
+        slug = _slug(ext)
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        body = f"""
+        <h2>What is the .{escape(ext)} MIME type?</h2>
+        <p>The MIME type (media type) for a <strong>.{escape(ext)}</strong> file is <strong>{escape(mime)}</strong>. {escape(entry["description"])}</p>
+        <pre class="expr">{escape(mime)}</pre>
+        <button class="copy" onclick="navigator.clipboard.writeText('{mime}')">Copy MIME type</button>
+        <table>
+          <tr><th>Extension</th><td>.{escape(ext)}</td></tr>
+          <tr><th>MIME type</th><td>{escape(mime)}</td></tr>
+          <tr><th>Kind</th><td>{escape(entry["kind"])}</td></tr>
+        </table>
+        <h2>Serve it with the right header</h2>
+        <pre>Content-Type: {escape(mime)}</pre>
+        <p class="notice">Setting up uploads, downloads, or a server? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=slug,
+                title=f".{ext} MIME type — {mime}",
+                h1=f".{ext} files — {mime}",
+                lead=f"The MIME type for .{ext} files is {mime}. {entry['description']}",
+                body=body,
+                related_label=f".{ext} — {mime}",
+            )
+        )
+    return PseoCluster(
+        key="mime",
+        title="MIME type reference",
+        intro=f"{len(pages)} file extensions mapped to their MIME (media) type for Content-Type headers, uploads, and downloads.",
+        pages=tuple(pages),
+    )
+
+
+def build_http_header_cluster() -> PseoCluster:
+    from .pseo_data_batch_a import HTTP_HEADERS
+
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for entry in HTTP_HEADERS:
+        name = entry["name"]
+        slug = _slug(name)
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        body = f"""
+        <h2>The {escape(name)} header</h2>
+        <p>{escape(entry["description"])}</p>
+        <table>
+          <tr><th>Header</th><td>{escape(name)}</td></tr>
+          <tr><th>Direction</th><td>{escape(entry["direction"])}</td></tr>
+        </table>
+        <h2>Example</h2>
+        <pre>{escape(name)}: {escape(entry["example"])}</pre>
+        <p class="notice">Configuring CORS, caching, or security headers? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=slug,
+                title=f"{name} header — what it does, with an example",
+                h1=f"{name}",
+                lead=f"The {name} HTTP header ({entry['direction'].lower()}): {entry['description']}",
+                body=body,
+                related_label=name,
+            )
+        )
+    return PseoCluster(
+        key="header",
+        title="HTTP header reference",
+        intro=f"{len(pages)} HTTP request and response headers explained with real examples.",
+        pages=tuple(pages),
+    )
+
+
+def build_exit_code_cluster() -> PseoCluster:
+    from .pseo_data_batch_a import EXIT_SIGNALS
+
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for entry in EXIT_SIGNALS:
+        number, label, kind = entry["number"], entry["label"], entry["kind"]
+        if kind == "signal":
+            slug = f"signal-{_slug(label)}"
+            title = f"{label} (signal {number}) — meaning and cause"
+            h1 = f"{label} — signal {number}"
+            heading = f"What is {label} (signal {number})?"
+            lead = f"{label} is Unix signal {number}: {entry['description']}"
+            related = f"{label} (sig {number})"
+            row_label = "Signal number"
+        else:
+            slug = f"exit-code-{number}"
+            title = f"Exit code {number} — {label}"
+            h1 = f"Exit code {number}: {label}"
+            heading = f"What does exit code {number} mean?"
+            lead = f"Exit code {number} ({label}): {entry['description']}"
+            related = f"exit {number} — {label}"
+            row_label = "Exit code"
+        if slug in seen:
+            continue
+        seen.add(slug)
+        body = f"""
+        <h2>{escape(heading)}</h2>
+        <p>{escape(entry["description"])}</p>
+        <table>
+          <tr><th>{row_label}</th><td>{number}</td></tr>
+          <tr><th>Name</th><td>{escape(label)}</td></tr>
+        </table>
+        <p class="notice">Debugging a crash, container, or CI failure? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(slug=slug, title=title, h1=h1, lead=lead, body=body, related_label=related)
+        )
+    return PseoCluster(
+        key="exit",
+        title="Exit codes & signals reference",
+        intro=f"{len(pages)} Unix exit codes and signals explained — what each means and what causes it.",
+        pages=tuple(pages),
+    )
+
+
 def build_all_clusters() -> list[PseoCluster]:
-    return [build_emoji_cluster(), build_color_cluster(), build_port_cluster()]
+    return [
+        build_emoji_cluster(),
+        build_color_cluster(),
+        build_port_cluster(),
+        build_ascii_cluster(),
+        build_html_entity_cluster(),
+        build_http_status_cluster(),
+        build_mime_cluster(),
+        build_http_header_cluster(),
+        build_exit_code_cluster(),
+    ]
 
 
 # ---------------------------------------------------------------------------

@@ -8,8 +8,14 @@ from farm_loop.pseo_clusters import (
     PseoClusterExporter,
     PseoPage,
     build_all_clusters,
+    build_ascii_cluster,
     build_color_cluster,
     build_emoji_cluster,
+    build_exit_code_cluster,
+    build_html_entity_cluster,
+    build_http_header_cluster,
+    build_http_status_cluster,
+    build_mime_cluster,
     build_port_cluster,
 )
 
@@ -67,13 +73,49 @@ class DatasetTests(unittest.TestCase):
         self.assertIn("\U0001F525", page.body)  # 🔥
         self.assertIn("U+1F525", page.body.upper())
 
-    def test_build_all_clusters_returns_the_three(self):
-        clusters = build_all_clusters()
-        self.assertEqual({c.key for c in clusters}, {"emoji", "color", "port"})
+    def test_build_all_clusters_includes_core_clusters(self):
+        keys = [c.key for c in build_all_clusters()]
+        self.assertEqual(len(keys), len(set(keys)))  # unique keys
+        for core in ("emoji", "color", "port"):
+            self.assertIn(core, keys)
 
     def test_cluster_nav_matches_cluster_keys(self):
         nav_keys = {path.strip("/") for _, path in CLUSTER_NAV}
-        self.assertEqual(nav_keys, {"emoji", "color", "port"})
+        cluster_keys = {c.key for c in build_all_clusters()}
+        self.assertEqual(nav_keys, cluster_keys)
+
+    def test_reference_clusters_present_and_clean(self):
+        specs = {
+            "ascii": (build_ascii_cluster, 120),
+            "html-entity": (build_html_entity_cluster, 180),
+            "http-status": (build_http_status_cluster, 55),
+            "mime": (build_mime_cluster, 120),
+            "header": (build_http_header_cluster, 60),
+            "exit": (build_exit_code_cluster, 35),
+        }
+        for key, (builder, min_count) in specs.items():
+            cluster = builder()
+            self.assertEqual(cluster.key, key)
+            self.assertGreaterEqual(len(cluster.pages), min_count)
+            self._assert_clean_slugs(cluster)
+
+    def test_reference_cluster_anchor_content(self):
+        http = self._by_slug(build_http_status_cluster())
+        self.assertIn("Not Found", http["http-404"].body)
+        self.assertIn("http-200", http)
+        mime = self._by_slug(build_mime_cluster())
+        self.assertIn("application/json", mime["json"].body)
+        headers = self._by_slug(build_http_header_cluster())
+        self.assertIn("content-type", headers)
+        exits = self._by_slug(build_exit_code_cluster())
+        self.assertIn("exit-code-137", exits)
+        self.assertIn("signal-sigkill", exits)
+        ascii_pages = self._by_slug(build_ascii_cluster())
+        self.assertIn("ascii-65", ascii_pages)
+        self.assertIn("0x41", ascii_pages["ascii-65"].body)
+        entities = self._by_slug(build_html_entity_cluster())
+        self.assertIn("entity-copy", entities)
+        self.assertIn("©", entities["entity-copy"].body)  # ©
 
 
 class ExporterTests(unittest.TestCase):
