@@ -385,6 +385,148 @@ function cp(){navigator.clipboard.writeText(E('out').value);}"""
         """,
     ))
 
+    tools.append(WebTool(
+        slug="regex-tester",
+        title="Regex Tester — test regular expressions online, live",
+        h1="Regex Tester",
+        description="Test a regular expression against your text live, with highlighted matches. Runs entirely in your browser.",
+        body=r"""
+        <div class="tool">
+          <label for="re">Regular expression</label>
+          <input id="re" oninput="run()" placeholder="\d{3}-\d{4}">
+          <label for="fl">Flags</label>
+          <input id="fl" value="g" oninput="run()" style="max-width:140px">
+          <label for="txt">Test string</label>
+          <textarea id="txt" rows="6" oninput="run()" placeholder="Paste text to test against the pattern..."></textarea>
+          <label>Matches</label>
+          <div class="out-box" id="res"></div>
+          <p class="err" id="err"></p>
+        </div>
+        <script>
+        function E(i){return document.getElementById(i);}
+        function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+        function run(){var p=E('re').value,f=E('fl').value,t=E('txt').value;E('err').textContent='';if(!p){E('res').innerHTML='';return;}var rx;try{rx=new RegExp(p,f.indexOf('g')>=0?f:f+'g');}catch(e){E('err').textContent='Invalid regex: '+e.message;return;}var html='',last=0,count=0,m;rx.lastIndex=0;while((m=rx.exec(t))!==null){count++;html+=esc(t.slice(last,m.index))+'<mark>'+esc(m[0])+'</mark>';last=m.index+m[0].length;if(m.index===rx.lastIndex)rx.lastIndex++;if(count>5000)break;}html+=esc(t.slice(last));E('res').innerHTML='<p>'+count+' match(es)</p>'+html;}
+        </script>
+        """,
+    ))
+
+    tools.append(WebTool(
+        slug="text-diff",
+        title="Text Diff — compare two texts online",
+        h1="Text Diff Checker",
+        description="Compare two blocks of text line by line and see what was added or removed. Nothing leaves your browser.",
+        body=r"""
+        <div class="tool">
+          <div class="row">
+            <div style="flex:1;min-width:240px"><label for="a">Original</label><textarea id="a" rows="8"></textarea></div>
+            <div style="flex:1;min-width:240px"><label for="b">Changed</label><textarea id="b" rows="8"></textarea></div>
+          </div>
+          <div class="row"><button type="button" onclick="run()">Compare</button></div>
+          <label>Diff</label>
+          <div class="out-box" id="res"></div>
+        </div>
+        <script>
+        function E(i){return document.getElementById(i);}
+        function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+        function run(){var a=E('a').value.split('\n'),b=E('b').value.split('\n'),n=a.length,m=b.length;var dp=[];for(var i=0;i<=n;i++)dp.push(new Array(m+1).fill(0));for(var i=n-1;i>=0;i--)for(var j=m-1;j>=0;j--)dp[i][j]=a[i]===b[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);var out='',i=0,j=0;while(i<n&&j<m){if(a[i]===b[j]){out+='<div>&nbsp;&nbsp;'+esc(a[i])+'</div>';i++;j++;}else if(dp[i+1][j]>=dp[i][j+1]){out+='<div style="background:#fde8e8">- '+esc(a[i])+'</div>';i++;}else{out+='<div style="background:#e6f4ea">+ '+esc(b[j])+'</div>';j++;}}while(i<n){out+='<div style="background:#fde8e8">- '+esc(a[i])+'</div>';i++;}while(j<m){out+='<div style="background:#e6f4ea">+ '+esc(b[j])+'</div>';j++;}E('res').innerHTML=out||'<p>No differences.</p>';}
+        </script>
+        """,
+    ))
+
+    tools.append(WebTool(
+        slug="csv-to-json",
+        title="CSV to JSON Converter — and JSON to CSV, online",
+        h1="CSV to JSON Converter",
+        description="Convert CSV to a JSON array of objects, or JSON back to CSV, in your browser. Handles quoted fields.",
+        body=_tool_ui(
+            input_rows=8,
+            controls=_btn("CSV to JSON", "toJson()") + _btn("JSON to CSV", "toCsv()") + _btn("Copy", "cp()"),
+            output_rows=8,
+            script=(
+                r"""function E(i){return document.getElementById(i);}function er(m){E('err').textContent=m;}
+function parseCSV(t){var rows=[],row=[],cur='',q=false;for(var i=0;i<t.length;i++){var c=t[i];if(q){if(c==='"'){if(t[i+1]==='"'){cur+='"';i++;}else q=false;}else cur+=c;}else{if(c==='"')q=true;else if(c===','){row.push(cur);cur='';}else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;row.push(cur);rows.push(row);row=[];cur='';}else cur+=c;}}if(cur!==''||row.length){row.push(cur);rows.push(row);}return rows;}
+function toJson(){try{var rows=parseCSV(E('in').value.replace(/\s+$/,''));if(rows.length<2){er('Need a header row and at least one data row.');return;}var h=rows[0],out=[];for(var i=1;i<rows.length;i++){var o={};for(var j=0;j<h.length;j++)o[h[j]]=rows[i][j];out.push(o);}E('out').value=JSON.stringify(out,null,2);er('');}catch(e){er('Error: '+e.message);}}
+function toCsv(){try{var d=JSON.parse(E('in').value);if(!Array.isArray(d)||!d.length){er('Provide a non-empty JSON array of objects.');return;}var keys=Object.keys(d[0]);var q=function(v){v=v==null?'':String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;};var lines=[keys.join(',')];for(var i=0;i<d.length;i++)lines.push(keys.map(function(k){return q(d[i][k]);}).join(','));E('out').value=lines.join('\n');er('');}catch(e){er('Invalid JSON: '+e.message);}}
+function cp(){navigator.clipboard.writeText(E('out').value);}"""
+            ),
+        ),
+    ))
+
+    tools.append(WebTool(
+        slug="markdown-preview",
+        title="Markdown Preview — render Markdown online, live",
+        h1="Markdown Preview",
+        description="Type Markdown and see it rendered live in your browser. Supports headings, bold, italic, code, links, and lists.",
+        body=r"""
+        <div class="tool">
+          <label for="in">Markdown</label>
+          <textarea id="in" rows="10" oninput="run()" placeholder="# Hello&#10;&#10;**bold**, *italic*, `code`, [link](https://example.com)"></textarea>
+          <label>Preview</label>
+          <div class="out-box" id="res"></div>
+        </div>
+        <script>
+        function E(i){return document.getElementById(i);}
+        function md(t){t=t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        t=t.replace(/^######\s*(.*)$/gm,'<h6>$1</h6>').replace(/^#####\s*(.*)$/gm,'<h5>$1</h5>').replace(/^####\s*(.*)$/gm,'<h4>$1</h4>').replace(/^###\s*(.*)$/gm,'<h3>$1</h3>').replace(/^##\s*(.*)$/gm,'<h2>$1</h2>').replace(/^#\s*(.*)$/gm,'<h1>$1</h1>');
+        t=t.replace(/`([^`]+)`/g,'<code>$1</code>');
+        t=t.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\*([^*]+)\*/g,'<em>$1</em>');
+        t=t.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,'<a href="$2" rel="nofollow noopener">$1</a>');
+        t=t.replace(/^\s*[-*]\s+(.*)$/gm,'<li>$1</li>');
+        return t.replace(/\n{2,}/g,'</p><p>').replace(/\n/g,'<br>');}
+        function run(){E('res').innerHTML='<p>'+md(E('in').value)+'</p>';}
+        run();
+        </script>
+        """,
+    ))
+
+    tools.append(WebTool(
+        slug="image-to-base64",
+        title="Image to Base64 — convert an image to a data URI online",
+        h1="Image to Base64 (Data URI)",
+        description="Convert an image file to a Base64 data URI in your browser, ready to inline in CSS or HTML. The file never leaves your browser.",
+        body=r"""
+        <div class="tool">
+          <label for="f">Image file</label>
+          <input type="file" id="f" accept="image/*" onchange="conv()">
+          <label for="out">Data URI</label>
+          <textarea id="out" rows="6" readonly></textarea>
+          <div class="row"><button type="button" onclick="cp()">Copy</button></div>
+          <div id="prev"></div>
+          <p class="trust">&#128274; The file is read locally and never uploaded.</p>
+        </div>
+        <script>
+        function conv(){var f=document.getElementById('f').files[0];if(!f)return;var r=new FileReader();r.onload=function(){document.getElementById('out').value=r.result;document.getElementById('prev').innerHTML='<img src="'+r.result+'" alt="preview" style="max-width:100%;margin-top:12px;border-radius:8px;border:1px solid var(--line)">';};r.readAsDataURL(f);}
+        function cp(){navigator.clipboard.writeText(document.getElementById('out').value);}
+        </script>
+        """,
+    ))
+
+    tools.append(WebTool(
+        slug="hmac-generator",
+        title="HMAC Generator — SHA-256/1/384/512 in your browser",
+        h1="HMAC Generator",
+        description="Compute an HMAC of a message with a secret key using the WebCrypto API. Choose SHA-256/1/384/512. Nothing is uploaded.",
+        body=r"""
+        <div class="tool">
+          <label for="msg">Message</label>
+          <textarea id="msg" rows="4"></textarea>
+          <label for="key">Secret key</label>
+          <input id="key" placeholder="your-secret">
+          <label for="alg">Hash</label>
+          <select id="alg"><option>SHA-256</option><option>SHA-1</option><option>SHA-384</option><option>SHA-512</option></select>
+          <div class="row"><button type="button" onclick="run()">Generate HMAC</button><button type="button" onclick="cp()">Copy</button></div>
+          <label for="out">HMAC (hex)</label>
+          <textarea id="out" rows="3" readonly></textarea>
+          <p class="err" id="err"></p>
+        </div>
+        <script>
+        function E(i){return document.getElementById(i);}
+        async function run(){try{var enc=new TextEncoder();var key=await crypto.subtle.importKey('raw',enc.encode(E('key').value),{name:'HMAC',hash:E('alg').value},false,['sign']);var sig=await crypto.subtle.sign('HMAC',key,enc.encode(E('msg').value));E('out').value=[...new Uint8Array(sig)].map(function(b){return b.toString(16).padStart(2,'0');}).join('');E('err').textContent='';}catch(e){E('err').textContent='Error: '+e.message;}}
+        function cp(){navigator.clipboard.writeText(E('out').value);}
+        </script>
+        """,
+    ))
+
     return tools
 
 
@@ -517,6 +659,10 @@ class WebToolsExporter:
     input {{ width:100%; border:1px solid var(--line); border-radius:8px; padding:10px; font-family:Consolas,monospace; font-size:.95rem; background:var(--bg); }}
     input[type=color] {{ height:48px; padding:4px; cursor:pointer; }}
     input[type=number] {{ max-width:160px; }}
+    input[type=file] {{ padding:8px; }}
+    select {{ width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--bg); font-size:.95rem; }}
+    mark {{ background:#ffe89e; color:#17201b; }}
+    #res div, #next div {{ font-family:Consolas,monospace; font-size:.9rem; }}
     .swatch {{ height:80px; border-radius:8px; border:1px solid var(--line); margin-top:10px; }}
     .out-box {{ background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:12px; min-height:46px; font-family:Consolas,monospace; word-break:break-word; }}
     .opt {{ display:inline-flex; align-items:center; gap:6px; margin:0 14px 8px 0; font-weight:400; }}

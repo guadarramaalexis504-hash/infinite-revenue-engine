@@ -8,10 +8,13 @@ from farm_loop.web_tools import APPS_NAV, WebToolsExporter, build_web_tools
 class WebToolsTests(unittest.TestCase):
     def test_builds_distinct_functional_tools(self):
         tools = build_web_tools()
-        self.assertGreaterEqual(len(tools), 16)
+        self.assertGreaterEqual(len(tools), 22)
         slugs = [t.slug for t in tools]
         self.assertEqual(len(slugs), len(set(slugs)))
-        for expected in ("base64-encode-decode", "jwt-decoder", "password-generator", "color-converter"):
+        for expected in (
+            "base64-encode-decode", "jwt-decoder", "password-generator", "color-converter",
+            "regex-tester", "text-diff", "csv-to-json", "hmac-generator",
+        ):
             self.assertIn(expected, slugs)
         for tool in tools:
             self.assertTrue(tool.slug.replace("-", "").isalnum())
