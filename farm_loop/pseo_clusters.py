@@ -43,6 +43,8 @@ CLUSTER_NAV: list[tuple[str, str]] = [
     ("MIME types", "mime/"),
     ("HTTP headers", "header/"),
     ("Exit codes", "exit/"),
+    ("Country codes", "country/"),
+    ("Currencies", "currency/"),
 ]
 
 
@@ -823,6 +825,91 @@ def build_exit_code_cluster() -> PseoCluster:
     )
 
 
+def build_country_cluster() -> PseoCluster:
+    from .pseo_data_iso import COUNTRIES
+
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for entry in COUNTRIES:
+        name = entry["name"]
+        slug = _slug(name)
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        iso2, iso3, dialing = entry["iso2"], entry["iso3"], entry["dialing"]
+        body = f"""
+        <h2>{escape(name)} country codes</h2>
+        <table>
+          <tr><th>ISO alpha-2</th><td>{escape(iso2)}</td></tr>
+          <tr><th>ISO alpha-3</th><td>{escape(iso3)}</td></tr>
+          <tr><th>ISO numeric</th><td>{escape(str(entry["numeric"]))}</td></tr>
+          <tr><th>Dialing code</th><td>{escape(dialing)}</td></tr>
+          <tr><th>Capital</th><td>{escape(entry["capital"])}</td></tr>
+          <tr><th>Region</th><td>{escape(entry["region"])}</td></tr>
+        </table>
+        <button class="copy" onclick="navigator.clipboard.writeText('{escape(iso2)}')">Copy {escape(iso2)}</button>
+        <p class="notice">Building a form, address field, or phone input? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=slug,
+                title=f"{name} country code — {iso2}, {iso3}, dialing {dialing}",
+                h1=f"{name} — {iso2}",
+                lead=f"{name}: ISO country code {iso2} (alpha-3 {iso3}), dialing code {dialing}, capital {entry['capital']}.",
+                body=body,
+                related_label=f"{name} ({iso2})",
+            )
+        )
+    return PseoCluster(
+        key="country",
+        title="Country code reference",
+        intro=f"{len(pages)} countries with ISO 3166 codes (alpha-2, alpha-3, numeric), dialing codes, and capitals.",
+        pages=tuple(pages),
+    )
+
+
+def build_currency_cluster() -> PseoCluster:
+    from .pseo_data_iso import CURRENCIES
+
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for entry in CURRENCIES:
+        code, name = entry["code"], entry["name"]
+        slug = _slug(code)
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        symbol = entry["symbol"]
+        body = f"""
+        <h2>{escape(code)} — {escape(name)}</h2>
+        <table>
+          <tr><th>Code</th><td>{escape(code)}</td></tr>
+          <tr><th>Name</th><td>{escape(name)}</td></tr>
+          <tr><th>Symbol</th><td>{escape(symbol)}</td></tr>
+          <tr><th>ISO numeric</th><td>{escape(str(entry["numeric"]))}</td></tr>
+          <tr><th>Used in</th><td>{escape(entry["used_in"])}</td></tr>
+        </table>
+        <button class="copy" onclick="navigator.clipboard.writeText('{escape(code)}')">Copy {escape(code)}</button>
+        <p class="notice">Pricing, invoicing, or a checkout in {escape(code)}? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=slug,
+                title=f"{code} — {name} currency code & symbol ({symbol})",
+                h1=f"{code} — {name}",
+                lead=f"{code} is the ISO 4217 currency code for the {name} ({symbol}), used in {entry['used_in']}.",
+                body=body,
+                related_label=f"{code} — {name}",
+            )
+        )
+    return PseoCluster(
+        key="currency",
+        title="Currency code reference",
+        intro=f"{len(pages)} world currencies with their ISO 4217 code, symbol, and where each is used.",
+        pages=tuple(pages),
+    )
+
+
 def build_all_clusters() -> list[PseoCluster]:
     return [
         build_emoji_cluster(),
@@ -834,6 +921,8 @@ def build_all_clusters() -> list[PseoCluster]:
         build_mime_cluster(),
         build_http_header_cluster(),
         build_exit_code_cluster(),
+        build_country_cluster(),
+        build_currency_cluster(),
     ]
 
 

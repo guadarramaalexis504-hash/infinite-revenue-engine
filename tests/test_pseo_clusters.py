@@ -10,6 +10,8 @@ from farm_loop.pseo_clusters import (
     build_all_clusters,
     build_ascii_cluster,
     build_color_cluster,
+    build_country_cluster,
+    build_currency_cluster,
     build_emoji_cluster,
     build_exit_code_cluster,
     build_html_entity_cluster,
@@ -92,6 +94,8 @@ class DatasetTests(unittest.TestCase):
             "mime": (build_mime_cluster, 120),
             "header": (build_http_header_cluster, 60),
             "exit": (build_exit_code_cluster, 35),
+            "country": (build_country_cluster, 190),
+            "currency": (build_currency_cluster, 140),
         }
         for key, (builder, min_count) in specs.items():
             cluster = builder()
@@ -116,6 +120,13 @@ class DatasetTests(unittest.TestCase):
         entities = self._by_slug(build_html_entity_cluster())
         self.assertIn("entity-copy", entities)
         self.assertIn("©", entities["entity-copy"].body)  # ©
+        countries = self._by_slug(build_country_cluster())
+        self.assertIn("mexico", countries)
+        self.assertIn("MEX", countries["mexico"].body)
+        self.assertIn("+52", countries["mexico"].body)
+        currencies = self._by_slug(build_currency_cluster())
+        self.assertIn("mxn", currencies)
+        self.assertIn("Peso", currencies["mxn"].body)
 
 
 class ExporterTests(unittest.TestCase):
