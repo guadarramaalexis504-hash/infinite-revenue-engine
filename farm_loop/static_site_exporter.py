@@ -7,6 +7,7 @@ from .asset_exporter import slugify
 from .assets import AssetDraft
 from .offers import OfferDraft, generate_offers
 from .revenue_scoring import RevenueOpportunity
+from .seo_head import head_meta, meta_description
 from .tracking import build_click_redirect_url, build_tracking_url
 
 
@@ -68,6 +69,15 @@ class StaticSiteExporter:
         robots_path = self.output_dir / "robots.txt"
         robots_path.write_text(self._robots_txt(), encoding="utf-8")
 
+        llms_path = self.output_dir / "llms.txt"
+        llms_path.write_text(self._llms_txt(), encoding="utf-8")
+
+        humans_path = self.output_dir / "humans.txt"
+        humans_path.write_text(self._humans_txt(), encoding="utf-8")
+
+        not_found_path = self.output_dir / "404.html"
+        not_found_path.write_text(self._not_found_page(), encoding="utf-8")
+
         return [
             str(index_path),
             str(offers_path),
@@ -75,6 +85,9 @@ class StaticSiteExporter:
             str(sitemap_path),
             str(sitemap_index_path),
             str(robots_path),
+            str(llms_path),
+            str(humans_path),
+            str(not_found_path),
             *written,
         ]
 
@@ -110,6 +123,9 @@ class StaticSiteExporter:
               </section>
             </main>
             """,
+            description="Free developer tools, programmatic reference pages, and setup offers — one fast static site.",
+            canonical=self._absolute_url(""),
+            og_type="website",
         )
 
     def _opportunity_card(self, opportunity: RevenueOpportunity) -> str:
@@ -162,6 +178,9 @@ class StaticSiteExporter:
               </article>
             </main>
             """,
+            description=meta_description(opportunity.problem),
+            canonical=self._absolute_url(f"{slugify(opportunity.external_id)}/"),
+            og_type="article",
         )
 
     def _offers_page(self, opportunities: list[RevenueOpportunity]) -> str:
@@ -190,6 +209,8 @@ class StaticSiteExporter:
               </section>
             </main>
             """,
+            description="Reviewable services, support CTAs, and digital products from the revenue portfolio.",
+            canonical=self._absolute_url("offers/"),
         )
 
     def _catalog_offer_card(self, opportunity: RevenueOpportunity, offer: OfferDraft) -> str:
@@ -233,6 +254,8 @@ class StaticSiteExporter:
               </section>
             </main>
             """,
+            description="Scope and intake for paid setup and automation work.",
+            canonical=self._absolute_url("intake/"),
         )
 
     def _intake_card(self, opportunity: RevenueOpportunity) -> str:
@@ -363,6 +386,64 @@ Allow: /
 Sitemap: {self._absolute_url("sitemap_index.xml")}
 """
 
+    def _llms_txt(self) -> str:
+        lines = [
+            "# Infinite Revenue Engine",
+            "",
+            "> Free, private, in-browser developer tools and a large programmatic reference "
+            "(colors, network ports, HTTP status codes, emoji, MIME types, country & currency "
+            "codes, git/regex/linux recipes, and more), plus setup offers.",
+            "",
+            "## Reference & tools",
+        ]
+        for label, path in self.pseo_clusters:
+            lines.append(f"- [{label}]({self._absolute_url(path)})")
+        if self.cron_path:
+            lines.append(f"- [Cron schedule reference]({self._absolute_url(self.cron_path)})")
+        if self.tools_path:
+            lines.append(f"- [Interactive tools]({self._absolute_url(self.tools_path)})")
+        lines += [
+            "",
+            "## Offers",
+            f"- [Offer catalog]({self._absolute_url('offers/')})",
+            f"- [Setup intake]({self._absolute_url('intake/')})",
+            "",
+            f"Sitemap index: {self._absolute_url('sitemap_index.xml')}",
+        ]
+        return "\n".join(lines) + "\n"
+
+    def _humans_txt(self) -> str:
+        return (
+            "/* TEAM */\n"
+            "  Built and run autonomously by a solo founder.\n\n"
+            "/* SITE */\n"
+            "  Stack: Python, GitHub Actions, Supabase, GitHub Pages.\n"
+            "  Components: programmatic-SEO reference pages + client-side tools.\n"
+            "  Standards: HTML5, semantic markup, JSON-LD, sitemap index.\n"
+        )
+
+    def _not_found_page(self) -> str:
+        links = " · ".join(
+            f'<a href="{escape(self._absolute_url(path))}">{escape(label)}</a>'
+            for label, path in (("Home", ""), ("Free tools", "apps/"), ("Offers", "offers/"), ("Intake", "intake/"))
+        )
+        return self._page(
+            "Page not found (404)",
+            f"""
+            <main class="shell">
+              <header class="topbar"><a href="{escape(self._absolute_url(''))}">Infinite Revenue Engine</a></header>
+              <section class="hero">
+                <div>
+                  <h1>Page not found</h1>
+                  <p class="lead">That page doesn't exist or has moved. Try one of these:</p>
+                  <p>{links}</p>
+                </div>
+              </section>
+            </main>
+            """,
+            noindex=True,
+        )
+
     def _absolute_url(self, path: str) -> str:
         normalized = path.strip().lstrip("/")
         if self.site_base_url:
@@ -383,13 +464,32 @@ Sitemap: {self._absolute_url("sitemap_index.xml")}
             unique.append(path)
         return unique
 
-    def _page(self, title: str, body: str) -> str:
+    def _page(
+        self,
+        title: str,
+        body: str,
+        *,
+        description: str = "",
+        canonical: str = "",
+        og_type: str = "website",
+        jsonld=None,
+        noindex: bool = False,
+    ) -> str:
+        head = head_meta(
+            title=title,
+            description=description,
+            canonical=canonical,
+            og_type=og_type,
+            jsonld=jsonld,
+            noindex=noindex,
+        )
         return f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{escape(title)}</title>
+{head}
   <style>
     :root {{
       color-scheme: light;

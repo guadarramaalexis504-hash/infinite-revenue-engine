@@ -43,7 +43,7 @@ class StaticSiteExporterTests(unittest.TestCase):
             sitemap = (root / "sitemap.xml").read_text(encoding="utf-8")
             robots = (root / "robots.txt").read_text(encoding="utf-8")
 
-        self.assertEqual(len(written), 7)
+        self.assertEqual(len(written), 10)
         self.assertIn("Infinite Revenue Engine", index)
         self.assertIn("Webhook Setup Service", index)
         self.assertIn("offer-webhook-setup-service/", index)
@@ -78,6 +78,38 @@ class StaticSiteExporterTests(unittest.TestCase):
         self.assertIn("User-agent: *", robots)
         self.assertIn("Allow: /", robots)
         self.assertIn("Sitemap: https://revenue.example/sitemap_index.xml", robots)
+
+    def test_main_pages_have_canonical_og_and_jsonld(self):
+        assets = AssetGenerator().generate_all(self.opportunity)
+        with tempfile.TemporaryDirectory() as directory:
+            StaticSiteExporter(
+                directory, site_base_url="https://revenue.example"
+            ).export_portfolio([(self.opportunity, assets)])
+            index = (Path(directory) / "index.html").read_text(encoding="utf-8")
+            offers = (Path(directory) / "offers" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('rel="canonical" href="https://revenue.example/"', index)
+        self.assertIn('property="og:title"', index)
+        self.assertIn("application/ld+json", index)
+        self.assertIn('rel="canonical" href="https://revenue.example/offers/"', offers)
+
+    def test_discovery_files_written(self):
+        with tempfile.TemporaryDirectory() as directory:
+            StaticSiteExporter(
+                directory,
+                site_base_url="https://revenue.example",
+                tools_path="tools/",
+                pseo_clusters=[("Emoji", "emoji/"), ("Free tools", "apps/")],
+            ).export_portfolio([])
+            root = Path(directory)
+            llms = (root / "llms.txt").read_text(encoding="utf-8")
+            humans = (root / "humans.txt").read_text(encoding="utf-8")
+            not_found = (root / "404.html").read_text(encoding="utf-8")
+        self.assertIn("# Infinite Revenue Engine", llms)
+        self.assertIn("https://revenue.example/emoji/", llms)
+        self.assertIn("https://revenue.example/offers/", llms)
+        self.assertIn("Stack:", humans)
+        self.assertIn('name="robots" content="noindex', not_found)
+        self.assertIn("Page not found", not_found)
 
     def test_sitemap_index_references_cluster_and_cron_sub_sitemaps(self):
         with tempfile.TemporaryDirectory() as directory:
