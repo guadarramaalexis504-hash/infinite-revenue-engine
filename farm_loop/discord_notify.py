@@ -100,3 +100,15 @@ def build_ideas_message(titles: list[str], *, total: int) -> str:
     body = "\n".join(f"{i}. {t}" for i, t in enumerate(shown, 1))
     header = f"**💡 {total} ideas en el banco — top {len(shown)}:**"
     return f"{header}\n{body}"
+
+
+def build_site_build_message(*, clusters: list[tuple[str, int]], total_pages: int, site_url: str | None = None) -> str:
+    lines = [
+        f"**🌱 Sitio reconstruido — {total_pages:,} páginas pSEO en {len(clusters)} clusters**",
+    ]
+    ranked = sorted(clusters, key=lambda item: item[1], reverse=True)
+    lines.append(" · ".join(f"{key} **{count}**" for key, count in ranked))
+    lines.append("Desplegado en automático por el cron diario. Cero trabajo manual.")
+    if site_url:
+        lines.append(f"🔗 {site_url}")
+    return "\n".join(lines)

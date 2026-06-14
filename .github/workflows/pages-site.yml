@@ -25,6 +25,7 @@ jobs:
       SERVICE_INTAKE_URL: ${{ secrets.SERVICE_INTAKE_URL }}
       SITE_BASE_URL: ${{ secrets.SITE_BASE_URL }}
       OFFER_PAYMENT_URLS: ${{ secrets.OFFER_PAYMENT_URLS }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       KEYWORD_CSV_PATH: "data/revenue_keywords.csv"
       IDEA_CATALOG_PATH: "data/revenue_ideas.json"
     steps:

@@ -6,7 +6,23 @@ from farm_loop.discord_notify import (
     build_daily_summary_message,
     build_error_message,
     build_ideas_message,
+    build_site_build_message,
 )
+
+
+class SiteBuildMessageTests(unittest.TestCase):
+    def test_includes_total_clusters_and_url(self):
+        msg = build_site_build_message(
+            clusters=[("emoji", 116), ("color", 148), ("country", 216)],
+            total_pages=480,
+            site_url="https://revenue.example",
+        )
+        self.assertIn("480", msg)
+        self.assertIn("3 clusters", msg)
+        self.assertIn("country", msg)
+        self.assertIn("https://revenue.example", msg)
+        # Highest-count cluster should be listed first.
+        self.assertLess(msg.index("country"), msg.index("emoji"))
 
 
 class FakeResponse:

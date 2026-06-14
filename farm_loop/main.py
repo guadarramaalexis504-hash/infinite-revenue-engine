@@ -709,6 +709,7 @@ def run_build_cron_pages(args: argparse.Namespace) -> int:
 
 def run_build_pseo_clusters(args: argparse.Namespace) -> int:
     from .pseo_clusters import PseoClusterExporter, build_all_clusters
+    from .discord_notify import DiscordNotifier, build_site_build_message
 
     settings = Settings.from_env()
     output_dir = args.pseo_output_dir or os.getenv("PSEO_OUTPUT_DIR")
@@ -717,6 +718,7 @@ def run_build_pseo_clusters(args: argparse.Namespace) -> int:
         return 1
     base = (args.site_base_url or settings.site_base_url or "").rstrip("/")
     total = 0
+    cluster_counts: list[tuple[str, int]] = []
     for cluster in build_all_clusters():
         cluster_dir = Path(output_dir) / cluster.key
         site_base_url = f"{base}/{cluster.key}" if base else ""
@@ -728,12 +730,24 @@ def run_build_pseo_clusters(args: argparse.Namespace) -> int:
             offers_path=args.pseo_offers_path,
         )
         written = exporter.export()
+        page_count = sum(1 for path in written if path.endswith("index.html"))
+        cluster_counts.append((cluster.key, page_count))
         total += len(written)
         LOGGER.info(
             "pseo_cluster_built %s",
-            json.dumps({"cluster": cluster.key, "pages": len(written)}, sort_keys=True),
+            json.dumps({"cluster": cluster.key, "pages": page_count}, sort_keys=True),
         )
-    LOGGER.info("pseo_clusters_built %s", json.dumps({"files": total, "output_dir": output_dir}, sort_keys=True))
+    total_pages = sum(count for _, count in cluster_counts)
+    LOGGER.info(
+        "pseo_clusters_built %s",
+        json.dumps({"files": total, "pages": total_pages, "output_dir": output_dir}, sort_keys=True),
+    )
+
+    notifier = DiscordNotifier(settings.discord_webhook_url)
+    if notifier.enabled:
+        notifier.send(
+            build_site_build_message(clusters=cluster_counts, total_pages=total_pages, site_url=base or None)
+        )
     return 0
 
 
