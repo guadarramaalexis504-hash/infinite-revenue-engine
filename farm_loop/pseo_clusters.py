@@ -1188,11 +1188,33 @@ class PseoClusterExporter:
             f'<li><a href="../{escape(p.slug)}/">{escape(p.related_label)}</a></li>' for p in related
         )
         nav = self._nav(prefix="../")
+        root = self.site_base_url.rsplit("/", 1)[0] if self.site_base_url else ""
+
+        def _root_url(rel: str) -> str:
+            rel = rel.lstrip("/")
+            return f"{root}/{rel}" if root else (f"/{rel}" if rel else "/")
+
+        breadcrumb = {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": _root_url("")},
+                {"@type": "ListItem", "position": 2, "name": "Reference", "item": _root_url("reference/")},
+                {"@type": "ListItem", "position": 3, "name": self.cluster.title, "item": self._absolute_url("")},
+                {"@type": "ListItem", "position": 4, "name": page.title, "item": self._absolute_url(f"{page.slug}/")},
+            ],
+        }
+        crumbs = (
+            '<nav class="crumbs" aria-label="Breadcrumb">'
+            '<a href="../../">Home</a> › <a href="../../reference/">Reference</a> › '
+            f'<a href="../">{escape(self.cluster.title)}</a></nav>'
+        )
         return self._page(
             page.title,
             f"""
             <main class="shell">
               <header class="topbar"><a href="../">{escape(self.cluster.title)}</a>{nav}</header>
+              {crumbs}
               <article class="detail">
                 <p class="channel">{escape(self.cluster.title)}</p>
                 <h1>{page.h1}</h1>
@@ -1205,6 +1227,7 @@ class PseoClusterExporter:
             """,
             description=_meta_description(page.lead),
             canonical=self._absolute_url(f"{page.slug}/"),
+            extra_ld=[breadcrumb],
         )
 
     def _index_page(self) -> str:
@@ -1259,7 +1282,7 @@ class PseoClusterExporter:
             return f"{self.site_base_url}/{normalized}" if normalized else f"{self.site_base_url}/"
         return f"/{normalized}" if normalized else "/"
 
-    def _head_meta(self, title: str, description: str, canonical: str) -> str:
+    def _head_meta(self, title: str, description: str, canonical: str, *, extra_ld: list | None = None) -> str:
         lines: list[str] = []
         if canonical:
             lines.append(f'  <link rel="canonical" href="{escape(canonical)}">')
@@ -1268,7 +1291,7 @@ class PseoClusterExporter:
         lines.append(f'  <meta property="og:title" content="{escape(title)}">')
         lines.append(f'  <meta property="og:description" content="{escape(description)}">')
         lines.append('  <meta name="twitter:card" content="summary">')
-        ld: dict[str, str] = {
+        ld: dict = {
             "@context": "https://schema.org",
             "@type": "Article",
             "headline": title,
@@ -1277,13 +1300,15 @@ class PseoClusterExporter:
         if canonical:
             ld["url"] = canonical
             ld["mainEntityOfPage"] = canonical
-        ld_json = json.dumps(ld, ensure_ascii=False).replace("<", "\\u003c")
+        nodes = [ld, *(extra_ld or [])]
+        payload = nodes if len(nodes) > 1 else ld
+        ld_json = json.dumps(payload, ensure_ascii=False).replace("<", "\\u003c")
         lines.append(f'  <script type="application/ld+json">{ld_json}</script>')
         return "\n".join(lines)
 
-    def _page(self, title: str, body: str, *, description: str = "", canonical: str = "") -> str:
+    def _page(self, title: str, body: str, *, description: str = "", canonical: str = "", extra_ld: list | None = None) -> str:
         desc = description or title
-        head = self._head_meta(title, desc, canonical)
+        head = self._head_meta(title, desc, canonical, extra_ld=extra_ld)
         return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -1307,6 +1332,7 @@ class PseoClusterExporter:
     pre {{ background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:14px; white-space:pre-wrap; font-family:Consolas,monospace; }}
     pre.expr {{ font-size:1.3rem; font-weight:700; color:var(--accent); }}
     .channel {{ margin:0 0 8px; color:var(--accent); text-transform:uppercase; font-size:.78rem; font-weight:700; }}
+    .crumbs {{ color:var(--muted); font-size:.85rem; padding:4px 0 0; }}
     .related, .list {{ padding-left:20px; }}
     .list {{ columns:3; }}
     table {{ border-collapse:collapse; margin:8px 0; }}

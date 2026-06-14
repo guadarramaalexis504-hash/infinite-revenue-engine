@@ -233,6 +233,10 @@ class ExporterTests(unittest.TestCase):
         self.assertIn('property="og:title"', page)
         self.assertIn('application/ld+json', page)
         self.assertIn('"@type": "Article"', page)
+        # Breadcrumb: visible nav + BreadcrumbList JSON-LD.
+        self.assertIn('class="crumbs"', page)
+        self.assertIn('"@type": "BreadcrumbList"', page)
+        self.assertIn('"https://example.com/color/tomato/"', page)
         # Meta description is the page lead, not just the title.
         self.assertIn('<meta name="description" content="The CSS color', page)
 
