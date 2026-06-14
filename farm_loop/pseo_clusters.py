@@ -1307,6 +1307,32 @@ def build_all_clusters() -> list[PseoCluster]:
     ]
 
 
+def build_search_index(clusters: list[PseoCluster]) -> str:
+    """A compact JSON index (title + reference-relative URL) for the client-side
+    search box on the reference hub."""
+    items: list[dict[str, str]] = []
+    for cluster in clusters:
+        items.append({"t": cluster.title, "u": f"../{cluster.key}/"})
+        for page in cluster.pages:
+            items.append({"t": page.title, "u": f"../{cluster.key}/{page.slug}/"})
+    return json.dumps(items, ensure_ascii=False, separators=(",", ":"))
+
+
+_HUB_SEARCH_JS = (
+    "<script>var IDX=null;"
+    "function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}"
+    "function render(q){var out=[],n=0;for(var i=0;i<IDX.length&&n<60;i++){"
+    "if(IDX[i].t.toLowerCase().indexOf(q)>=0){out.push('<li><a href=\"'+IDX[i].u+'\">'+esc(IDX[i].t)+'</a></li>');n++;}}"
+    "document.getElementById('results').innerHTML=n?'<ul class=\"rlist\">'+out.join('')+'</ul>':'<p>No matches.</p>';}"
+    "function srch(){var q=document.getElementById('q').value.trim().toLowerCase(),"
+    "g=document.getElementById('grid'),r=document.getElementById('results');"
+    "if(!q){r.innerHTML='';g.style.display='';return;}g.style.display='none';"
+    "if(!IDX){fetch('search-index.json').then(function(x){return x.json();})"
+    ".then(function(d){IDX=d;render(q);}).catch(function(){r.innerHTML='<p>Search index unavailable.</p>';});return;}"
+    "render(q);}</script>"
+)
+
+
 def render_reference_hub(
     clusters: list[PseoCluster],
     *,
@@ -1372,6 +1398,9 @@ def render_reference_hub(
     .ref-card strong {{ display:block; font-size:1.1rem; }}
     .ref-card span {{ display:block; color:var(--muted); font-size:.9rem; margin:6px 0; }}
     .ref-card em {{ color:var(--accent); font-size:.78rem; font-style:normal; text-transform:uppercase; font-weight:700; }}
+    input[type=search] {{ width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:8px; font-size:1rem; margin-top:20px; background:var(--surface); }}
+    .rlist {{ padding-left:20px; columns:2; }}
+    @media (max-width:640px) {{ .rlist {{ columns:1; }} }}
   </style>
 </head>
 <body>
@@ -1379,10 +1408,13 @@ def render_reference_hub(
     <header class="topbar"><a href="../">Home</a><a href="../apps/">Free tools</a><a href="../offers/">Offers</a></header>
     <h1>Reference</h1>
     <p class="lead">{escape(desc)}</p>
-    <section class="ref-grid">
+    <input id="q" type="search" placeholder="Search reference pages and tools…" oninput="srch()" autocomplete="off" aria-label="Search reference">
+    <div id="results"></div>
+    <section class="ref-grid" id="grid">
       {cards_html}
     </section>
   </main>
+  {_HUB_SEARCH_JS}
 </body>
 </html>
 """

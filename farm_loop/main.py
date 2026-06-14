@@ -710,7 +710,7 @@ def run_build_cron_pages(args: argparse.Namespace) -> int:
 
 
 def run_build_pseo_clusters(args: argparse.Namespace) -> int:
-    from .pseo_clusters import PseoClusterExporter, build_all_clusters, render_reference_hub
+    from .pseo_clusters import PseoClusterExporter, build_all_clusters, build_search_index, render_reference_hub
     from .discord_notify import DiscordNotifier, build_site_build_message
 
     settings = Settings.from_env()
@@ -743,6 +743,7 @@ def run_build_pseo_clusters(args: argparse.Namespace) -> int:
     hub_dir = Path(output_dir) / "reference"
     hub_dir.mkdir(parents=True, exist_ok=True)
     (hub_dir / "index.html").write_text(render_reference_hub(clusters, site_base_url=base), encoding="utf-8")
+    (hub_dir / "search-index.json").write_text(build_search_index(clusters), encoding="utf-8")
 
     total_pages = sum(count for _, count in cluster_counts)
     LOGGER.info(

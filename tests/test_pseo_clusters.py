@@ -101,6 +101,19 @@ class DatasetTests(unittest.TestCase):
         self.assertIn('rel="canonical" href="https://x.test/reference/"', html)
         self.assertIn("<h1>Reference</h1>", html)
 
+    def test_search_index_and_hub_search_box(self):
+        import json as _json
+
+        from farm_loop.pseo_clusters import build_search_index, render_reference_hub
+
+        clusters = [build_emoji_cluster(), build_color_cluster()]
+        idx = _json.loads(build_search_index(clusters))
+        self.assertTrue(any(item["u"] == "../color/tomato/" for item in idx))
+        self.assertTrue(all("t" in item and "u" in item for item in idx))
+        html = render_reference_hub(clusters)
+        self.assertIn('id="q"', html)
+        self.assertIn("search-index.json", html)
+
     def test_cluster_nav_matches_cluster_keys(self):
         nav_keys = {path.strip("/") for _, path in CLUSTER_NAV}
         cluster_keys = {c.key for c in build_all_clusters()}
