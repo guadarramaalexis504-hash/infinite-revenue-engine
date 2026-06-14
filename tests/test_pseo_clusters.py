@@ -7,18 +7,23 @@ from farm_loop.pseo_clusters import (
     PseoCluster,
     PseoClusterExporter,
     PseoPage,
+    build_airport_cluster,
     build_all_clusters,
     build_ascii_cluster,
     build_color_cluster,
     build_country_cluster,
+    build_css_property_cluster,
     build_currency_cluster,
     build_emoji_cluster,
     build_exit_code_cluster,
     build_git_cluster,
     build_html_entity_cluster,
+    build_html_tag_cluster,
     build_http_header_cluster,
     build_http_status_cluster,
+    build_language_cluster,
     build_linux_cluster,
+    build_magic_number_cluster,
     build_mime_cluster,
     build_port_cluster,
     build_regex_cluster,
@@ -114,6 +119,11 @@ class DatasetTests(unittest.TestCase):
             "git": (build_git_cluster, 40),
             "regex": (build_regex_cluster, 30),
             "linux": (build_linux_cluster, 45),
+            "css": (build_css_property_cluster, 180),
+            "html-tag": (build_html_tag_cluster, 90),
+            "lang": (build_language_cluster, 150),
+            "airport": (build_airport_cluster, 140),
+            "magic": (build_magic_number_cluster, 30),
         }
         for key, (builder, min_count) in specs.items():
             cluster = builder()
@@ -165,6 +175,13 @@ class DatasetTests(unittest.TestCase):
         self.assertTrue(any("git reset" in p.body for p in build_git_cluster().pages))
         self.assertTrue(any("email" in p.slug for p in build_regex_cluster().pages))
         self.assertTrue(any("chmod" in p.slug for p in build_linux_cluster().pages))
+        self.assertIn("display", self._by_slug(build_css_property_cluster()))
+        self.assertIn("details", self._by_slug(build_html_tag_cluster()))
+        self.assertIn("es", self._by_slug(build_language_cluster()))
+        self.assertIn("lax", self._by_slug(build_airport_cluster()))
+        self.assertTrue(any("png" in p.slug for p in build_magic_number_cluster().pages))
+        # CSS syntax must not be double-escaped (raw "<" rendered, not "&amp;lt;").
+        self.assertFalse(any("&amp;lt;" in p.body for p in build_css_property_cluster().pages))
         # Commands must not be double-escaped (raw "<" rendered, not "&amp;lt;").
         self.assertFalse(any("&amp;lt;" in p.body for p in build_git_cluster().pages))
 

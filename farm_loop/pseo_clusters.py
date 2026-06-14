@@ -49,6 +49,11 @@ CLUSTER_NAV: list[tuple[str, str]] = [
     ("Git recipes", "git/"),
     ("Regex", "regex/"),
     ("Linux", "linux/"),
+    ("CSS", "css/"),
+    ("HTML tags", "html-tag/"),
+    ("Languages", "lang/"),
+    ("Airports", "airport/"),
+    ("File signatures", "magic/"),
 ]
 
 
@@ -1038,6 +1043,246 @@ def build_linux_cluster() -> PseoCluster:
     )
 
 
+def build_css_property_cluster() -> PseoCluster:
+    from .pseo_data_more import CSS_PROPERTIES
+
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for entry in CSS_PROPERTIES:
+        name = entry["name"]
+        slug = _slug(name)
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        body = f"""
+        <h2>The {escape(name)} CSS property</h2>
+        <p>{escape(entry["description"])}</p>
+        <table>
+          <tr><th>Property</th><td><code>{escape(name)}</code></td></tr>
+          <tr><th>Value syntax</th><td><code>{escape(entry["syntax"])}</code></td></tr>
+        </table>
+        <h2>Example</h2>
+        <pre>{escape(entry["example"])}</pre>
+        <p class="notice">Building a layout or design system? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=slug,
+                title=f"CSS {name} — syntax, values, and example",
+                h1=f"CSS: {name}",
+                lead=f"The CSS {name} property. {entry['description']}",
+                body=body,
+                related_label=name,
+            )
+        )
+    return PseoCluster(
+        key="css",
+        title="CSS property reference",
+        intro=f"{len(pages)} CSS properties with their value syntax and a copy-paste example.",
+        pages=tuple(pages),
+    )
+
+
+def build_html_tag_cluster() -> PseoCluster:
+    from .pseo_data_more import HTML_TAGS
+
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for entry in HTML_TAGS:
+        name = entry["name"].strip().lstrip("<").rstrip(">")
+        slug = _slug(name)
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        body = f"""
+        <h2>The &lt;{escape(name)}&gt; element</h2>
+        <p>{escape(entry["description"])}</p>
+        <table>
+          <tr><th>Tag</th><td><code>&lt;{escape(name)}&gt;</code></td></tr>
+          <tr><th>Category</th><td>{escape(entry["category"])}</td></tr>
+        </table>
+        <h2>Example</h2>
+        <pre>{escape(entry["example"])}</pre>
+        <p class="notice">Building a page or component? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=slug,
+                title=f"<{name}> HTML tag — what it does, with an example",
+                h1=f"&lt;{escape(name)}&gt; HTML tag",
+                lead=f"The HTML {name} element. {entry['description']}",
+                body=body,
+                related_label=f"<{name}>",
+            )
+        )
+    return PseoCluster(
+        key="html-tag",
+        title="HTML tag reference",
+        intro=f"{len(pages)} HTML elements explained with examples.",
+        pages=tuple(pages),
+    )
+
+
+def build_language_cluster() -> PseoCluster:
+    from .pseo_data_more import LANGUAGES
+
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for entry in LANGUAGES:
+        code = entry["code"].lower()
+        slug = _slug(code)
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        body = f"""
+        <h2>{escape(entry["name"])} ({escape(code)})</h2>
+        <table>
+          <tr><th>ISO 639-1 code</th><td><code>{escape(code)}</code></td></tr>
+          <tr><th>Name</th><td>{escape(entry["name"])}</td></tr>
+          <tr><th>Native name</th><td>{escape(entry["native_name"])}</td></tr>
+          <tr><th>Language family</th><td>{escape(entry["family"])}</td></tr>
+        </table>
+        <p class="notice">Adding i18n, hreflang, or locale support? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=slug,
+                title=f"{code} — {entry['name']} language code (ISO 639-1)",
+                h1=f"{code} — {entry['name']}",
+                lead=f"{code} is the ISO 639-1 language code for {entry['name']} ({entry['native_name']}).",
+                body=body,
+                related_label=f"{code} — {entry['name']}",
+            )
+        )
+    return PseoCluster(
+        key="lang",
+        title="Language code reference",
+        intro=f"{len(pages)} ISO 639-1 language codes with native names and families.",
+        pages=tuple(pages),
+    )
+
+
+def build_airport_cluster() -> PseoCluster:
+    from .pseo_data_more import AIRPORTS
+
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for entry in AIRPORTS:
+        iata = entry["iata"].upper()
+        slug = _slug(iata)
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        body = f"""
+        <h2>{escape(iata)} — {escape(entry["name"])}</h2>
+        <table>
+          <tr><th>IATA code</th><td><code>{escape(iata)}</code></td></tr>
+          <tr><th>ICAO code</th><td><code>{escape(entry["icao"])}</code></td></tr>
+          <tr><th>Airport</th><td>{escape(entry["name"])}</td></tr>
+          <tr><th>City</th><td>{escape(entry["city"])}</td></tr>
+          <tr><th>Country</th><td>{escape(entry["country"])}</td></tr>
+        </table>
+        <p class="notice">Building travel, booking, or logistics software? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=slug,
+                title=f"{iata} airport code — {entry['name']}",
+                h1=f"{iata} — {entry['name']}",
+                lead=f"{iata} is the IATA code for {entry['name']} in {entry['city']}, {entry['country']} (ICAO {entry['icao']}).",
+                body=body,
+                related_label=f"{iata} — {entry['city']}",
+            )
+        )
+    return PseoCluster(
+        key="airport",
+        title="Airport code reference",
+        intro=f"{len(pages)} major airports with IATA and ICAO codes, city, and country.",
+        pages=tuple(pages),
+    )
+
+
+# (name, extension, mime, hex signature, byte offset)
+_MAGIC_NUMBERS: list[tuple[str, str, str, str, int]] = [
+    ("PNG image", "png", "image/png", "89 50 4E 47 0D 0A 1A 0A", 0),
+    ("JPEG image", "jpg", "image/jpeg", "FF D8 FF", 0),
+    ("GIF image", "gif", "image/gif", "47 49 46 38 (GIF8)", 0),
+    ("BMP image", "bmp", "image/bmp", "42 4D (BM)", 0),
+    ("WebP image", "webp", "image/webp", "52 49 46 46 .. 57 45 42 50 (RIFF..WEBP)", 0),
+    ("TIFF image (little-endian)", "tif", "image/tiff", "49 49 2A 00", 0),
+    ("TIFF image (big-endian)", "tif", "image/tiff", "4D 4D 00 2A", 0),
+    ("ICO icon", "ico", "image/x-icon", "00 00 01 00", 0),
+    ("PDF document", "pdf", "application/pdf", "25 50 44 46 (%PDF)", 0),
+    ("ZIP archive", "zip", "application/zip", "50 4B 03 04 (PK..)", 0),
+    ("GZIP archive", "gz", "application/gzip", "1F 8B", 0),
+    ("BZIP2 archive", "bz2", "application/x-bzip2", "42 5A 68 (BZh)", 0),
+    ("7-Zip archive", "7z", "application/x-7z-compressed", "37 7A BC AF 27 1C", 0),
+    ("RAR archive", "rar", "application/vnd.rar", "52 61 72 21 1A 07 (Rar!..)", 0),
+    ("TAR archive", "tar", "application/x-tar", "75 73 74 61 72 (ustar)", 257),
+    ("XZ archive", "xz", "application/x-xz", "FD 37 7A 58 5A 00", 0),
+    ("MP3 audio (ID3)", "mp3", "audio/mpeg", "49 44 33 (ID3)", 0),
+    ("WAV audio", "wav", "audio/wav", "52 49 46 46 .. 57 41 56 45 (RIFF..WAVE)", 0),
+    ("FLAC audio", "flac", "audio/flac", "66 4C 61 43 (fLaC)", 0),
+    ("OGG audio", "ogg", "audio/ogg", "4F 67 67 53 (OggS)", 0),
+    ("MP4 video", "mp4", "video/mp4", "66 74 79 70 (ftyp)", 4),
+    ("Matroska / WebM", "mkv", "video/x-matroska", "1A 45 DF A3", 0),
+    ("AVI video", "avi", "video/x-msvideo", "52 49 46 46 .. 41 56 49 20 (RIFF..AVI )", 0),
+    ("FLV video", "flv", "video/x-flv", "46 4C 56 (FLV)", 0),
+    ("ELF executable", "elf", "application/x-elf", "7F 45 4C 46 (.ELF)", 0),
+    ("Windows PE (EXE/DLL)", "exe", "application/x-msdownload", "4D 5A (MZ)", 0),
+    ("Java class file", "class", "application/java-vm", "CA FE BA BE", 0),
+    ("WebAssembly module", "wasm", "application/wasm", "00 61 73 6D", 0),
+    ("SQLite database", "sqlite", "application/vnd.sqlite3", "53 51 4C 69 74 65 (SQLite)", 0),
+    ("TrueType font", "ttf", "font/ttf", "00 01 00 00", 0),
+    ("OpenType font", "otf", "font/otf", "4F 54 54 4F (OTTO)", 0),
+    ("WOFF font", "woff", "font/woff", "77 4F 46 46 (wOFF)", 0),
+    ("WOFF2 font", "woff2", "font/woff2", "77 4F 46 32 (wOF2)", 0),
+    ("PostScript", "ps", "application/postscript", "25 21 (%!)", 0),
+    ("RTF document", "rtf", "application/rtf", "7B 5C 72 74 66", 0),
+    ("ISO 9660 image", "iso", "application/x-iso9660-image", "43 44 30 30 31 (CD001)", 32769),
+]
+
+
+def build_magic_number_cluster() -> PseoCluster:
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for name, ext, mime, signature, offset in _MAGIC_NUMBERS:
+        slug = _slug(name)
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        body = f"""
+        <h2>{escape(name)} file signature</h2>
+        <table>
+          <tr><th>File type</th><td>{escape(name)}</td></tr>
+          <tr><th>Extension</th><td>.{escape(ext)}</td></tr>
+          <tr><th>Hex signature</th><td><code>{escape(signature)}</code></td></tr>
+          <tr><th>Byte offset</th><td>{offset}</td></tr>
+          <tr><th>MIME type</th><td>{escape(mime)}</td></tr>
+        </table>
+        <h2>Check it</h2>
+        <pre>xxd -l 16 file.{escape(ext)}
+file file.{escape(ext)}</pre>
+        <p class="notice">Detecting or validating file types in code? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=slug,
+                title=f"{name} magic number — hex signature & MIME type",
+                h1=f"{name} — file signature",
+                lead=f"The {name} (.{ext}) file signature is {signature} at byte offset {offset}. MIME type {mime}.",
+                body=body,
+                related_label=f"{name} (.{ext})",
+            )
+        )
+    return PseoCluster(
+        key="magic",
+        title="File signature (magic number) reference",
+        intro=f"{len(pages)} file formats with their magic-number hex signature, offset, and MIME type.",
+        pages=tuple(pages),
+    )
+
+
 def build_all_clusters() -> list[PseoCluster]:
     return [
         build_emoji_cluster(),
@@ -1054,6 +1299,11 @@ def build_all_clusters() -> list[PseoCluster]:
         build_git_cluster(),
         build_regex_cluster(),
         build_linux_cluster(),
+        build_css_property_cluster(),
+        build_html_tag_cluster(),
+        build_language_cluster(),
+        build_airport_cluster(),
+        build_magic_number_cluster(),
     ]
 
 
