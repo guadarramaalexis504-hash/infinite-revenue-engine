@@ -14,11 +14,14 @@ from farm_loop.pseo_clusters import (
     build_currency_cluster,
     build_emoji_cluster,
     build_exit_code_cluster,
+    build_git_cluster,
     build_html_entity_cluster,
     build_http_header_cluster,
     build_http_status_cluster,
+    build_linux_cluster,
     build_mime_cluster,
     build_port_cluster,
+    build_regex_cluster,
 )
 
 
@@ -96,6 +99,9 @@ class DatasetTests(unittest.TestCase):
             "exit": (build_exit_code_cluster, 35),
             "country": (build_country_cluster, 190),
             "currency": (build_currency_cluster, 140),
+            "git": (build_git_cluster, 40),
+            "regex": (build_regex_cluster, 30),
+            "linux": (build_linux_cluster, 45),
         }
         for key, (builder, min_count) in specs.items():
             cluster = builder()
@@ -120,6 +126,10 @@ class DatasetTests(unittest.TestCase):
         entities = self._by_slug(build_html_entity_cluster())
         self.assertIn("entity-copy", entities)
         self.assertIn("©", entities["entity-copy"].body)  # ©
+        # The "<" entity page must escape the raw char, not break the markup.
+        lt_body = entities["entity-lt"].body
+        self.assertNotIn('emoji-hero"><', lt_body)
+        self.assertIn("writeText('&lt;')", lt_body)
         countries = self._by_slug(build_country_cluster())
         self.assertIn("mexico", countries)
         self.assertIn("MEX", countries["mexico"].body)
@@ -127,6 +137,11 @@ class DatasetTests(unittest.TestCase):
         currencies = self._by_slug(build_currency_cluster())
         self.assertIn("mxn", currencies)
         self.assertIn("Peso", currencies["mxn"].body)
+        self.assertTrue(any("git reset" in p.body for p in build_git_cluster().pages))
+        self.assertTrue(any("email" in p.slug for p in build_regex_cluster().pages))
+        self.assertTrue(any("chmod" in p.slug for p in build_linux_cluster().pages))
+        # Commands must not be double-escaped (raw "<" rendered, not "&amp;lt;").
+        self.assertFalse(any("&amp;lt;" in p.body for p in build_git_cluster().pages))
 
 
 class ExporterTests(unittest.TestCase):

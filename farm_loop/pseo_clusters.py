@@ -46,6 +46,9 @@ CLUSTER_NAV: list[tuple[str, str]] = [
     ("Exit codes", "exit/"),
     ("Country codes", "country/"),
     ("Currencies", "currency/"),
+    ("Git recipes", "git/"),
+    ("Regex", "regex/"),
+    ("Linux", "linux/"),
 ]
 
 
@@ -631,8 +634,8 @@ def build_html_entity_cluster() -> PseoCluster:
         numeric_ref = f"&#{codepoint};"
         hex_ref = f"&#x{codepoint:X};"
         body = f"""
-        <div class="emoji-hero">{char if visible else escape(display)}</div>
-        <button class="copy" onclick="navigator.clipboard.writeText('{char}')">Copy {escape(display)}</button>
+        <div class="emoji-hero">{escape(char) if visible else escape(display)}</div>
+        <button class="copy" onclick="navigator.clipboard.writeText('{escape(char)}')">Copy {escape(display)}</button>
         <h2>The {escape(named_ref)} HTML entity</h2>
         <p>The named character reference <code>{escape(named_ref)}</code> renders the character <strong>{escape(display)}</strong> (Unicode U+{codepoint:04X}).</p>
         <table>
@@ -919,6 +922,115 @@ def build_currency_cluster() -> PseoCluster:
     )
 
 
+def build_git_cluster() -> PseoCluster:
+    from .pseo_data_devref import GIT_RECIPES
+
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for entry in GIT_RECIPES:
+        task, command = entry["task"], entry["command"]
+        slug = _slug(task)
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        body = f"""
+        <h2>{escape(task)}</h2>
+        <p>{escape(entry["explanation"])}</p>
+        <pre>{escape(command)}</pre>
+        <p class="notice">Stuck in a git mess, or wiring up CI? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=slug,
+                title=f"How to {task[:1].lower()}{task[1:]} in Git",
+                h1=task,
+                lead=f"{task}: {entry['explanation']}",
+                body=body,
+                related_label=task,
+            )
+        )
+    return PseoCluster(
+        key="git",
+        title="Git command recipes",
+        intro=f"{len(pages)} copy-paste Git recipes for what developers actually google — undo, reset, branches, history, and recovery.",
+        pages=tuple(pages),
+    )
+
+
+def build_regex_cluster() -> PseoCluster:
+    from .pseo_data_devref import REGEX_PATTERNS
+
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for entry in REGEX_PATTERNS:
+        name, pattern = entry["name"], entry["pattern"]
+        slug = _slug(name)
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        body = f"""
+        <h2>Regex for {escape(name)}</h2>
+        <p>{escape(entry["explanation"])}</p>
+        <pre>{escape(pattern)}</pre>
+        <table>
+          <tr><th>Matches</th><td>{escape(name)}</td></tr>
+          <tr><th>Example match</th><td><code>{escape(entry["example"])}</code></td></tr>
+        </table>
+        <p class="notice">Validating or extracting text? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=slug,
+                title=f"Regex for {name} — pattern and example",
+                h1=f"Regex: {name}",
+                lead=f"Regular expression to match {name.lower()}. {entry['explanation']}",
+                body=body,
+                related_label=name,
+            )
+        )
+    return PseoCluster(
+        key="regex",
+        title="Regex pattern reference",
+        intro=f"{len(pages)} ready-to-use regular expressions (email, URL, dates, and more) with examples and explanations.",
+        pages=tuple(pages),
+    )
+
+
+def build_linux_cluster() -> PseoCluster:
+    from .pseo_data_devref import LINUX_COMMANDS
+
+    pages: list[PseoPage] = []
+    seen: set[str] = set()
+    for entry in LINUX_COMMANDS:
+        name, command = entry["name"], entry["command"]
+        slug = _slug(name)
+        if not slug or slug in seen:
+            continue
+        seen.add(slug)
+        body = f"""
+        <h2>{escape(name)}</h2>
+        <p>{escape(entry["explanation"])}</p>
+        <pre>{escape(command)}</pre>
+        <p class="notice">Automating servers or CI on Linux? {{cta}}</p>
+        """
+        pages.append(
+            PseoPage(
+                slug=slug,
+                title=f"{name} — Linux command explained",
+                h1=name,
+                lead=f"{name}: {entry['explanation']}",
+                body=body,
+                related_label=name,
+            )
+        )
+    return PseoCluster(
+        key="linux",
+        title="Linux command reference",
+        intro=f"{len(pages)} common Linux/Unix commands explained with copy-paste examples.",
+        pages=tuple(pages),
+    )
+
+
 def build_all_clusters() -> list[PseoCluster]:
     return [
         build_emoji_cluster(),
@@ -932,6 +1044,9 @@ def build_all_clusters() -> list[PseoCluster]:
         build_exit_code_cluster(),
         build_country_cluster(),
         build_currency_cluster(),
+        build_git_cluster(),
+        build_regex_cluster(),
+        build_linux_cluster(),
     ]
 
 
