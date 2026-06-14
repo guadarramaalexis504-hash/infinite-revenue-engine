@@ -8,10 +8,11 @@ from farm_loop.web_tools import APPS_NAV, WebToolsExporter, build_web_tools
 class WebToolsTests(unittest.TestCase):
     def test_builds_distinct_functional_tools(self):
         tools = build_web_tools()
-        self.assertGreaterEqual(len(tools), 8)
+        self.assertGreaterEqual(len(tools), 16)
         slugs = [t.slug for t in tools]
         self.assertEqual(len(slugs), len(set(slugs)))
-        self.assertIn("base64-encode-decode", slugs)
+        for expected in ("base64-encode-decode", "jwt-decoder", "password-generator", "color-converter"):
+            self.assertIn(expected, slugs)
         for tool in tools:
             self.assertTrue(tool.slug.replace("-", "").isalnum())
             self.assertIn("<script>", tool.body)  # actually functional

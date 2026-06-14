@@ -206,6 +206,185 @@ def build_web_tools() -> list[WebTool]:
         ),
     ))
 
+    tools.append(WebTool(
+        slug="jwt-decoder",
+        title="JWT Decoder — decode JSON Web Tokens in your browser",
+        h1="JWT Decoder",
+        description="Decode a JWT's header and payload in your browser and check its expiry. The token never leaves your tab.",
+        body=_tool_ui(
+            input_rows=4,
+            controls=_btn("Decode", "dec()") + _btn("Copy", "cp()"),
+            output_rows=12,
+            script=(
+                r"""function E(i){return document.getElementById(i);}function er(m){E('err').textContent=m;}
+function b64u(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return decodeURIComponent(escape(atob(s)));}
+function dec(){try{var p=E('in').value.trim().split('.');if(p.length<2){er('Not a JWT - expected header.payload.signature.');return;}var h=JSON.parse(b64u(p[0]));var pl=JSON.parse(b64u(p[1]));var o='HEADER:\n'+JSON.stringify(h,null,2)+'\n\nPAYLOAD:\n'+JSON.stringify(pl,null,2);if(pl.exp){o+='\n\nexp: '+new Date(pl.exp*1000).toISOString()+(Date.now()>pl.exp*1000?' (EXPIRED)':' (valid)');}E('out').value=o;er('');}catch(e){er('Invalid JWT: '+e.message);}}
+function cp(){navigator.clipboard.writeText(E('out').value);}"""
+            ),
+        ),
+    ))
+
+    tools.append(WebTool(
+        slug="html-encode-decode",
+        title="HTML Encode / Decode — escape HTML entities online",
+        h1="HTML Entity Encoder & Decoder",
+        description="Escape text into HTML entities or decode entities back to text, entirely in your browser.",
+        body=_tool_ui(
+            input_rows=6,
+            controls=_btn("Encode", "enc()") + _btn("Decode", "dec()") + _btn("Copy", "cp()"),
+            output_rows=6,
+            script=(
+                r"""function E(i){return document.getElementById(i);}
+function enc(){E('out').value=E('in').value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function dec(){var t=document.createElement('textarea');t.innerHTML=E('in').value;E('out').value=t.value;}
+function cp(){navigator.clipboard.writeText(E('out').value);}"""
+            ),
+        ),
+    ))
+
+    tools.append(WebTool(
+        slug="slugify",
+        title="Slug Generator — make URL-safe slugs online",
+        h1="Slug Generator (Slugify)",
+        description="Turn any title into a clean URL slug, stripping accents and symbols. Great for Spanish text too.",
+        body=_tool_ui(
+            input_rows=4,
+            controls=_btn("Slugify", "slug()") + _btn("Copy", "cp()"),
+            output_rows=3,
+            script=(
+                r"""function E(i){return document.getElementById(i);}
+function slug(){E('out').value=E('in').value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');}
+function cp(){navigator.clipboard.writeText(E('out').value);}"""
+            ),
+        ),
+    ))
+
+    tools.append(WebTool(
+        slug="sort-dedupe-lines",
+        title="Sort & Dedupe Lines — online text line tool",
+        h1="Sort & Deduplicate Lines",
+        description="Sort lines alphabetically, remove duplicates, or reverse a list — all in your browser.",
+        body=_tool_ui(
+            input_rows=8,
+            controls=(
+                _btn("Sort A-Z", "srt()") + _btn("Dedupe", "dedupe()") + _btn("Sort + Dedupe", "both()") + _btn("Reverse", "rev()") + _btn("Copy", "cp()")
+            ),
+            output_rows=8,
+            script=(
+                r"""function E(i){return document.getElementById(i);}
+function L(){return E('in').value.split('\n');}
+function O(a){E('out').value=a.join('\n');}
+function srt(){O(L().slice().sort());}
+function dedupe(){O([...new Set(L())]);}
+function both(){O([...new Set(L())].sort());}
+function rev(){O(L().slice().reverse());}
+function cp(){navigator.clipboard.writeText(E('out').value);}"""
+            ),
+        ),
+    ))
+
+    tools.append(WebTool(
+        slug="password-generator",
+        title="Password Generator — strong random passwords in your browser",
+        h1="Password Generator",
+        description="Generate strong random passwords with crypto.getRandomValues. Pick length and character sets; nothing leaves your browser.",
+        body=r"""
+        <div class="tool">
+          <label for="len">Length</label>
+          <input id="len" type="number" value="16" min="4" max="128">
+          <div class="row" style="margin-top:10px">
+            <label class="opt"><input type="checkbox" id="cl" checked> a-z</label>
+            <label class="opt"><input type="checkbox" id="cu" checked> A-Z</label>
+            <label class="opt"><input type="checkbox" id="cd" checked> 0-9</label>
+            <label class="opt"><input type="checkbox" id="cs" checked> symbols</label>
+          </div>
+          <div class="row"><button type="button" onclick="gen()">Generate</button><button type="button" onclick="cp()">Copy</button></div>
+          <label for="out">Password</label>
+          <input id="out" readonly>
+          <p class="trust">&#128274; Generated with crypto.getRandomValues - never leaves your browser.</p>
+        </div>
+        <script>
+        function gen(){var s='';if(document.getElementById('cl').checked)s+='abcdefghijklmnopqrstuvwxyz';if(document.getElementById('cu').checked)s+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';if(document.getElementById('cd').checked)s+='0123456789';if(document.getElementById('cs').checked)s+='!@#$%^&*()-_=+[]?';var o=document.getElementById('out');if(!s){o.value='Select at least one set';return;}var n=Math.max(4,Math.min(128,parseInt(document.getElementById('len').value)||16));var a=new Uint32Array(n);crypto.getRandomValues(a);var p='';for(var i=0;i<n;i++)p+=s[a[i]%s.length];o.value=p;}
+        function cp(){navigator.clipboard.writeText(document.getElementById('out').value);}
+        gen();
+        </script>
+        """,
+    ))
+
+    tools.append(WebTool(
+        slug="color-converter",
+        title="Color Converter — HEX to RGB to HSL online",
+        h1="Color Converter",
+        description="Convert a color between HEX, RGB, and HSL with a live picker and swatch, all in your browser.",
+        body=r"""
+        <div class="tool">
+          <div class="row" style="align-items:center;gap:14px">
+            <input type="color" id="pick" value="#116a5b" oninput="fromPick()" style="max-width:80px">
+            <div style="flex:1">
+              <label for="hex">HEX</label>
+              <input id="hex" value="#116A5B" oninput="fromHex()" placeholder="#FF6347">
+            </div>
+          </div>
+          <label for="rgb">RGB</label><input id="rgb" readonly>
+          <label for="hsl">HSL</label><input id="hsl" readonly>
+          <div class="swatch" id="sw"></div>
+          <p class="err" id="err"></p>
+        </div>
+        <script>
+        function E(i){return document.getElementById(i);}
+        function fromPick(){E('hex').value=E('pick').value.toUpperCase();fromHex();}
+        function fromHex(){var h=E('hex').value.trim().replace('#','');if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];if(!/^[0-9a-fA-F]{6}$/.test(h)){E('err').textContent='Enter a valid hex like #FF6347';return;}E('err').textContent='';var r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);E('rgb').value='rgb('+r+', '+g+', '+b+')';E('hsl').value=toHsl(r,g,b);E('sw').style.background='#'+h;E('pick').value='#'+h.toLowerCase();}
+        function toHsl(r,g,b){r/=255;g/=255;b/=255;var mx=Math.max(r,g,b),mn=Math.min(r,g,b),l=(mx+mn)/2,h,s;if(mx===mn){h=s=0;}else{var d=mx-mn;s=l>0.5?d/(2-mx-mn):d/(mx+mn);if(mx===r)h=(g-b)/d+(g<b?6:0);else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60;}return 'hsl('+Math.round(h)+', '+Math.round(s*100)+'%, '+Math.round(l*100)+'%)';}
+        fromHex();
+        </script>
+        """,
+    ))
+
+    tools.append(WebTool(
+        slug="number-base-converter",
+        title="Number Base Converter — binary, decimal, hex, octal",
+        h1="Number Base Converter",
+        description="Convert numbers between binary, decimal, hexadecimal, and octal live as you type, in your browser.",
+        body=r"""
+        <div class="tool">
+          <label for="b10">Decimal (base 10)</label><input id="b10" oninput="up(10)" placeholder="255">
+          <label for="b16">Hexadecimal (base 16)</label><input id="b16" oninput="up(16)" placeholder="ff">
+          <label for="b2">Binary (base 2)</label><input id="b2" oninput="up(2)" placeholder="11111111">
+          <label for="b8">Octal (base 8)</label><input id="b8" oninput="up(8)" placeholder="377">
+          <p class="err" id="err"></p>
+        </div>
+        <script>
+        function E(i){return document.getElementById(i);}
+        function up(base){var v=E('b'+base).value.trim();if(v===''){return;}var n=parseInt(v,base);if(isNaN(n)){E('err').textContent='Invalid base-'+base+' number';return;}E('err').textContent='';if(base!==10)E('b10').value=n.toString(10);if(base!==16)E('b16').value=n.toString(16);if(base!==2)E('b2').value=n.toString(2);if(base!==8)E('b8').value=n.toString(8);}
+        </script>
+        """,
+    ))
+
+    tools.append(WebTool(
+        slug="lorem-ipsum-generator",
+        title="Lorem Ipsum Generator — placeholder text online",
+        h1="Lorem Ipsum Generator",
+        description="Generate placeholder lorem ipsum paragraphs in your browser. Pick how many, then copy.",
+        body=r"""
+        <div class="tool">
+          <label for="n">Paragraphs</label>
+          <input id="n" type="number" value="3" min="1" max="50">
+          <div class="row"><button type="button" onclick="gen()">Generate</button><button type="button" onclick="cp()">Copy</button></div>
+          <label for="out">Output</label>
+          <textarea id="out" rows="10" readonly></textarea>
+        </div>
+        <script>
+        var W='lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua enim ad minim veniam quis nostrud exercitation ullamco laboris nisi aliquip ex ea commodo consequat duis aute irure in reprehenderit voluptate velit esse cillum eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt culpa qui officia deserunt mollit anim id est laborum'.split(' ');
+        function rnd(n){return Math.floor(Math.random()*n);}
+        function sent(){var n=7+rnd(10),s=[];for(var i=0;i<n;i++)s.push(W[rnd(W.length)]);var t=s.join(' ');return t.charAt(0).toUpperCase()+t.slice(1)+'.';}
+        function para(){var n=3+rnd(4),p=[];for(var i=0;i<n;i++)p.push(sent());return p.join(' ');}
+        function gen(){var c=Math.max(1,Math.min(50,parseInt(document.getElementById('n').value)||3)),a=[];for(var i=0;i<c;i++)a.push(para());document.getElementById('out').value=a.join('\n\n');}
+        function cp(){navigator.clipboard.writeText(document.getElementById('out').value);}
+        gen();
+        </script>
+        """,
+    ))
+
     return tools
 
 
@@ -335,6 +514,13 @@ class WebToolsExporter:
     .row {{ display:flex; gap:10px; flex-wrap:wrap; margin:12px 0; }}
     button {{ background:var(--accent); color:#fff; border:0; border-radius:6px; padding:10px 16px; cursor:pointer; font-size:.95rem; }}
     button:hover {{ opacity:.92; }}
+    input {{ width:100%; border:1px solid var(--line); border-radius:8px; padding:10px; font-family:Consolas,monospace; font-size:.95rem; background:var(--bg); }}
+    input[type=color] {{ height:48px; padding:4px; cursor:pointer; }}
+    input[type=number] {{ max-width:160px; }}
+    .swatch {{ height:80px; border-radius:8px; border:1px solid var(--line); margin-top:10px; }}
+    .out-box {{ background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:12px; min-height:46px; font-family:Consolas,monospace; word-break:break-word; }}
+    .opt {{ display:inline-flex; align-items:center; gap:6px; margin:0 14px 8px 0; font-weight:400; }}
+    .opt input {{ width:auto; }}
     .err {{ color:#b00020; min-height:1.2em; margin:6px 0 0; font-size:.9rem; }}
     .trust {{ color:var(--muted); font-size:.82rem; margin:8px 0 0; }}
     .notice {{ background:var(--accent-soft); border:1px solid #b6dbd2; border-radius:8px; padding:14px 16px; margin-top:20px; }}
