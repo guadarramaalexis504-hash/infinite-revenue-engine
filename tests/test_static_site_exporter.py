@@ -43,7 +43,7 @@ class StaticSiteExporterTests(unittest.TestCase):
             sitemap = (root / "sitemap.xml").read_text(encoding="utf-8")
             robots = (root / "robots.txt").read_text(encoding="utf-8")
 
-        self.assertEqual(len(written), 6)
+        self.assertEqual(len(written), 7)
         self.assertIn("Infinite Revenue Engine", index)
         self.assertIn("Webhook Setup Service", index)
         self.assertIn("offer-webhook-setup-service/", index)
@@ -77,7 +77,22 @@ class StaticSiteExporterTests(unittest.TestCase):
         self.assertIn("<loc>https://revenue.example/offer-webhook-setup-service/</loc>", sitemap)
         self.assertIn("User-agent: *", robots)
         self.assertIn("Allow: /", robots)
-        self.assertIn("Sitemap: https://revenue.example/sitemap.xml", robots)
+        self.assertIn("Sitemap: https://revenue.example/sitemap_index.xml", robots)
+
+    def test_sitemap_index_references_cluster_and_cron_sub_sitemaps(self):
+        with tempfile.TemporaryDirectory() as directory:
+            StaticSiteExporter(
+                directory,
+                site_base_url="https://revenue.example",
+                cron_path="cron/",
+                pseo_clusters=[("Emoji", "emoji/"), ("Colors", "color/")],
+            ).export_portfolio([])
+            index = (Path(directory) / "sitemap_index.xml").read_text(encoding="utf-8")
+        self.assertIn("<sitemapindex", index)
+        self.assertIn("<loc>https://revenue.example/sitemap.xml</loc>", index)
+        self.assertIn("<loc>https://revenue.example/cron/sitemap.xml</loc>", index)
+        self.assertIn("<loc>https://revenue.example/emoji/sitemap.xml</loc>", index)
+        self.assertIn("<loc>https://revenue.example/color/sitemap.xml</loc>", index)
 
     def test_support_cta_uses_click_redirect_endpoint_when_configured(self):
         assets = AssetGenerator().generate_all(self.opportunity)

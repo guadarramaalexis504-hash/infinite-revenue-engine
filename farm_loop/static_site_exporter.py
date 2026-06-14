@@ -62,10 +62,21 @@ class StaticSiteExporter:
         sitemap_path = self.output_dir / "sitemap.xml"
         sitemap_path.write_text(self._sitemap_page(opportunities), encoding="utf-8")
 
+        sitemap_index_path = self.output_dir / "sitemap_index.xml"
+        sitemap_index_path.write_text(self._sitemap_index(), encoding="utf-8")
+
         robots_path = self.output_dir / "robots.txt"
         robots_path.write_text(self._robots_txt(), encoding="utf-8")
 
-        return [str(index_path), str(offers_path), str(intake_path), str(sitemap_path), str(robots_path), *written]
+        return [
+            str(index_path),
+            str(offers_path),
+            str(intake_path),
+            str(sitemap_path),
+            str(sitemap_index_path),
+            str(robots_path),
+            *written,
+        ]
 
     def _index_page(self, opportunities: list[RevenueOpportunity]) -> str:
         cards = "\n".join(self._opportunity_card(opportunity) for opportunity in opportunities)
@@ -329,10 +340,27 @@ class StaticSiteExporter:
 </urlset>
 """
 
+    def _sitemap_index(self) -> str:
+        # A sitemap index so search engines discover every sub-sitemap (and thus
+        # all cluster pages) directly instead of relying on crawl discovery.
+        subs = ["sitemap.xml"]
+        if self.cron_path:
+            subs.append(f"{self.cron_path.lstrip('/')}sitemap.xml")
+        for _, cluster_path in self.pseo_clusters:
+            subs.append(f"{cluster_path.lstrip('/')}sitemap.xml")
+        entries = "\n".join(
+            f"  <sitemap><loc>{escape(self._absolute_url(sub))}</loc></sitemap>" for sub in subs
+        )
+        return f"""<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{entries}
+</sitemapindex>
+"""
+
     def _robots_txt(self) -> str:
         return f"""User-agent: *
 Allow: /
-Sitemap: {self._absolute_url("sitemap.xml")}
+Sitemap: {self._absolute_url("sitemap_index.xml")}
 """
 
     def _absolute_url(self, path: str) -> str:
