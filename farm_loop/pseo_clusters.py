@@ -8,6 +8,7 @@ the same funnel pattern as the cron schedule pages.
 """
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass
 from html import escape
@@ -51,6 +52,14 @@ CLUSTER_NAV: list[tuple[str, str]] = [
 def _slug(text: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
     return re.sub(r"-{2,}", "-", slug)
+
+
+def _meta_description(text: str, *, limit: int = 155) -> str:
+    text = " ".join(str(text).split())
+    if len(text) <= limit:
+        return text
+    clipped = text[:limit].rsplit(" ", 1)[0].rstrip(",.;:")
+    return f"{clipped}…"
 
 
 # ---------------------------------------------------------------------------
@@ -991,6 +1000,8 @@ class PseoClusterExporter:
               </article>
             </main>
             """,
+            description=_meta_description(page.lead),
+            canonical=self._absolute_url(f"{page.slug}/"),
         )
 
     def _index_page(self) -> str:
@@ -1010,6 +1021,8 @@ class PseoClusterExporter:
               <section><ul class="list">{links}</ul></section>
             </main>
             """,
+            description=_meta_description(self.cluster.intro),
+            canonical=self._absolute_url(""),
         )
 
     def _nav(self, *, prefix: str) -> str:
@@ -1043,14 +1056,39 @@ class PseoClusterExporter:
             return f"{self.site_base_url}/{normalized}" if normalized else f"{self.site_base_url}/"
         return f"/{normalized}" if normalized else "/"
 
-    def _page(self, title: str, body: str) -> str:
+    def _head_meta(self, title: str, description: str, canonical: str) -> str:
+        lines: list[str] = []
+        if canonical:
+            lines.append(f'  <link rel="canonical" href="{escape(canonical)}">')
+            lines.append(f'  <meta property="og:url" content="{escape(canonical)}">')
+        lines.append('  <meta property="og:type" content="article">')
+        lines.append(f'  <meta property="og:title" content="{escape(title)}">')
+        lines.append(f'  <meta property="og:description" content="{escape(description)}">')
+        lines.append('  <meta name="twitter:card" content="summary">')
+        ld: dict[str, str] = {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": title,
+            "description": description,
+        }
+        if canonical:
+            ld["url"] = canonical
+            ld["mainEntityOfPage"] = canonical
+        ld_json = json.dumps(ld, ensure_ascii=False).replace("<", "\\u003c")
+        lines.append(f'  <script type="application/ld+json">{ld_json}</script>')
+        return "\n".join(lines)
+
+    def _page(self, title: str, body: str, *, description: str = "", canonical: str = "") -> str:
+        desc = description or title
+        head = self._head_meta(title, desc, canonical)
         return f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{escape(title)}</title>
-  <meta name="description" content="{escape(title)}">
+  <meta name="description" content="{escape(desc)}">
+{head}
   <style>
     :root {{ color-scheme: light; --bg:#f7f7f3; --ink:#17201b; --muted:#5c665f; --line:#d8ddd5; --surface:#fff; --accent:#116a5b; --accent-soft:#e2f3ee; }}
     * {{ box-sizing: border-box; }}

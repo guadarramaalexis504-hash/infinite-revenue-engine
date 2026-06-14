@@ -173,6 +173,18 @@ class ExporterTests(unittest.TestCase):
             index = (Path(directory) / "index.html").read_text(encoding="utf-8")
             self.assertIn("fire/", index)
 
+    def test_detail_page_has_canonical_og_and_jsonld(self):
+        with tempfile.TemporaryDirectory() as directory:
+            cluster = build_color_cluster()
+            self._export(directory, cluster)
+            page = (Path(directory) / "tomato" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('rel="canonical" href="https://example.com/color/tomato/"', page)
+        self.assertIn('property="og:title"', page)
+        self.assertIn('application/ld+json', page)
+        self.assertIn('"@type": "Article"', page)
+        # Meta description is the page lead, not just the title.
+        self.assertIn('<meta name="description" content="The CSS color', page)
+
 
 if __name__ == "__main__":
     unittest.main()
