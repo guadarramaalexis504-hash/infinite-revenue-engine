@@ -49,6 +49,9 @@ jobs:
       - name: Generate pSEO clusters (emoji, colors, ports)
         run: python -m farm_loop.main --build-pseo-clusters --pseo-output-dir out/site --site-base-url "${SITE_BASE_URL}" --pseo-tools-path "../tools/" --pseo-offers-path "../offers/"
 
+      - name: Generate standalone web tools (/apps/)
+        run: python -m farm_loop.main --build-web-tools --web-tools-output-dir out/site/apps --site-base-url "${SITE_BASE_URL}" --web-tools-offers-path "../offers/"
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
