@@ -39,6 +39,7 @@ from .sources_idea_catalog import IdeaCatalogSource
 from .sources_keywords import KeywordCSVSource
 from .sponsor_repo_exporter import SponsorRepoExporter
 from .static_site_exporter import StaticSiteExporter
+from .pseo_clusters import CLUSTER_NAV
 from .tracking_deploy import TrackingDeployExporter
 from .traffic_plan import TrafficPlanExporter
 
@@ -274,6 +275,7 @@ def run_portfolio_single(args: argparse.Namespace) -> int:
             site_base_url=site_base_url,
             offer_payment_urls=offer_payment_urls,
             cron_path="cron/",
+            pseo_clusters=CLUSTER_NAV,
         )
         if site_output_dir
         else None
@@ -705,6 +707,36 @@ def run_build_cron_pages(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_build_pseo_clusters(args: argparse.Namespace) -> int:
+    from .pseo_clusters import PseoClusterExporter, build_all_clusters
+
+    settings = Settings.from_env()
+    output_dir = args.pseo_output_dir or os.getenv("PSEO_OUTPUT_DIR")
+    if not output_dir:
+        LOGGER.error("Set --pseo-output-dir (or PSEO_OUTPUT_DIR) to build the pSEO clusters.")
+        return 1
+    base = (args.site_base_url or settings.site_base_url or "").rstrip("/")
+    total = 0
+    for cluster in build_all_clusters():
+        cluster_dir = Path(output_dir) / cluster.key
+        site_base_url = f"{base}/{cluster.key}" if base else ""
+        exporter = PseoClusterExporter(
+            cluster_dir,
+            cluster,
+            site_base_url=site_base_url,
+            tools_path=args.pseo_tools_path,
+            offers_path=args.pseo_offers_path,
+        )
+        written = exporter.export()
+        total += len(written)
+        LOGGER.info(
+            "pseo_cluster_built %s",
+            json.dumps({"cluster": cluster.key, "pages": len(written)}, sort_keys=True),
+        )
+    LOGGER.info("pseo_clusters_built %s", json.dumps({"files": total, "output_dir": output_dir}, sort_keys=True))
+    return 0
+
+
 def _parse_json_object(value: str | None) -> dict[str, Any]:
     if not value:
         return {}
@@ -763,10 +795,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     mode.add_argument("--record-conversion", action="store_true", help="Record one confirmed conversion and exit.")
     mode.add_argument("--create-stripe-links", action="store_true", help="Create Stripe Payment Links for paid offers in Supabase and write them back.")
     mode.add_argument("--build-cron-pages", action="store_true", help="Generate the programmatic-SEO cron schedule pages.")
+    mode.add_argument("--build-pseo-clusters", action="store_true", help="Generate the programmatic-SEO clusters (emoji, colors, ports).")
     parser.add_argument("--max-stripe-links", type=int, default=25, help="Maximum number of Stripe Payment Links to create per run.")
     parser.add_argument("--cron-pages-output-dir", default=None, help="Output directory for the cron schedule pages.")
     parser.add_argument("--cron-tools-path", default="../tools/", help="Relative path from cron pages to the interactive tools.")
     parser.add_argument("--cron-offers-path", default="../offers/", help="Relative path from cron pages to the offers catalog.")
+    parser.add_argument("--pseo-output-dir", default=None, help="Base output directory for the pSEO clusters (each cluster gets a subdirectory).")
+    parser.add_argument("--pseo-tools-path", default="../tools/", help="Relative path from cluster pages to the interactive tools.")
+    parser.add_argument("--pseo-offers-path", default="../offers/", help="Relative path from cluster pages to the offers catalog.")
     parser.add_argument("--interval-seconds", type=int, default=300)
     parser.add_argument("--dry-run", action="store_true", help="Avoid Supabase writes and OpenAI draft generation.")
     parser.add_argument("--force-drafts", action="store_true", help="Generate drafts even after TARGET_USD is reached.")
@@ -948,6 +984,8 @@ def main(argv: list[str] | None = None) -> int:
             return run_create_stripe_links(args)
         if args.build_cron_pages:
             return run_build_cron_pages(args)
+        if args.build_pseo_clusters:
+            return run_build_pseo_clusters(args)
         if args.portfolio_once:
             return run_portfolio_single(args)
         if args.loop:

@@ -45,6 +45,9 @@ jobs:
       - name: Generate cron schedule pages (programmatic SEO)
         run: python -m farm_loop.main --build-cron-pages --cron-pages-output-dir out/site/cron --site-base-url "${SITE_BASE_URL}" --cron-tools-path "../tools/" --cron-offers-path "../offers/"
 
+      - name: Generate pSEO clusters (emoji, colors, ports)
+        run: python -m farm_loop.main --build-pseo-clusters --pseo-output-dir out/site --site-base-url "${SITE_BASE_URL}" --pseo-tools-path "../tools/" --pseo-offers-path "../offers/"
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
