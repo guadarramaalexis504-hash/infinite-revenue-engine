@@ -521,7 +521,7 @@ function cp(){navigator.clipboard.writeText(E('out').value);}"""
         </div>
         <script>
         function E(i){return document.getElementById(i);}
-        async function run(){try{var enc=new TextEncoder();var key=await crypto.subtle.importKey('raw',enc.encode(E('key').value),{name:'HMAC',hash:E('alg').value},false,['sign']);var sig=await crypto.subtle.sign('HMAC',key,enc.encode(E('msg').value));E('out').value=[...new Uint8Array(sig)].map(function(b){return b.toString(16).padStart(2,'0');}).join('');E('err').textContent='';}catch(e){E('err').textContent='Error: '+e.message;}}
+        async function run(){if(!E('key').value){E('err').textContent='Enter a secret key.';return;}try{var enc=new TextEncoder();var key=await crypto.subtle.importKey('raw',enc.encode(E('key').value),{name:'HMAC',hash:E('alg').value},false,['sign']);var sig=await crypto.subtle.sign('HMAC',key,enc.encode(E('msg').value));E('out').value=[...new Uint8Array(sig)].map(function(b){return b.toString(16).padStart(2,'0');}).join('');E('err').textContent='';}catch(e){E('err').textContent='Error: '+e.message;}}
         function cp(){navigator.clipboard.writeText(E('out').value);}
         </script>
         """,
@@ -662,7 +662,7 @@ class WebToolsExporter:
     input[type=file] {{ padding:8px; }}
     select {{ width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--bg); font-size:.95rem; }}
     mark {{ background:#ffe89e; color:#17201b; }}
-    #res div, #next div {{ font-family:Consolas,monospace; font-size:.9rem; }}
+    #res div {{ font-family:Consolas,monospace; font-size:.9rem; }}
     .swatch {{ height:80px; border-radius:8px; border:1px solid var(--line); margin-top:10px; }}
     .out-box {{ background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:12px; min-height:46px; font-family:Consolas,monospace; word-break:break-word; }}
     .opt {{ display:inline-flex; align-items:center; gap:6px; margin:0 14px 8px 0; font-weight:400; }}
